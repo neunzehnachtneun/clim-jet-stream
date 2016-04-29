@@ -145,7 +145,7 @@ fkt.cheb.fit.seq <- function(x, d, n, split, dx.hr){
     x.extr.seq <- fkt.cheb.rescale(extr.seq, x = x.seq)
     x.extr <- if (i == 1) x.extr.seq else c(x.extr, x.extr.seq)
     # filtern der maxima aus nullstellen d. ableitung
-    y.extr.seq <- if (length(extr.seq) != 0) fkt.cheb.val(x = x.extr.seq, cheb.coeff = cheb.coeff.seq)
+    y.extr.seq <- if (length(extr.seq) != 0) fkt.cheb.val(x = extr.seq, cheb.coeff = cheb.coeff.seq)
     #y.extr <- if (exists(y.extr) == F &) y.extr.seq else c(y.extr, y.extr.seq)
     if (exists("y.extr.seq") == T & exists("y.extr") == F) {
       y.extr <- y.extr.seq
@@ -153,15 +153,15 @@ fkt.cheb.fit.seq <- function(x, d, n, split, dx.hr){
       y.extr <- c(y.extr, y.extr.seq)
     }
     ## löschung der übergangsvariablen
-    print(i)
-    print(cheb.coeff.seq)
-    rm(cheb.coeff.seq, cheb.model.seq, cheb.model.deriv.seq, roots.deriv.seq, x.extr.seq, y.extr.seq)
+#    print(i)
+#    print(cheb.coeff.seq)
+    rm(cheb.coeff.seq, cheb.model.seq, cheb.model.deriv.seq, extr.seq, x.extr.seq, y.extr.seq)
   
     #print(i) 
   }
   
   ## übergabe der variablen als liste
-  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv, x.extr = x.extr)#, y.extr = y.extr)
+  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv, extr.x = x.extr, extr.y = y.extr)#, y.extr = y.extr)
   return(cheb.list)
 }
   
