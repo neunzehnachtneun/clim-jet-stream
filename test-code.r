@@ -22,11 +22,12 @@ abline(h = 0, lty = 3)
 roots.deriv <- uniroot.all(cheb.poly.deriv, coeff.cheb = m.cheb.seq, lower = (-1), upper = 1)
 points(roots.deriv, y = rep(0, length(roots.deriv)), pch = 16, cex = 1)
 
+roots.deriv <- uniroot.all(fkt.cheb.deriv, cheb.coeff = tst.cheb.list$cheb.coeff[4,], lower = (-1), upper = 1)
+
+##
 a <- array(rnorm(8, mean = 0, sd = 2), dim=c(2,2,2))
 b <- array(rnorm(8, mean = 0, sd = 2), dim=c(2,2,2))
 c <- array(rnorm(8, mean = 0, sd = 2), dim=c(2,2,2))
-
-
 
 
 ## hohe auflösung
@@ -58,6 +59,34 @@ if (dx.hr > 0) {
   # rekursionsformel quelle ??? wiki???
   deriv.cheb.t.hr <- t((2:m)*t(cheb.u.hr[,2:m]))
 }
+
+
+
+tst.cheb.list <- fkt.cheb.fit.seq(x = lat.era.t63, d = d, n = n, split = split, dx.hr = 0)
+str(tst.cheb.list)
+
+plot(lat.era.t63, uwind.monmean[1,,1])
+points(cheb.list[[1,1]]$extr.x, cheb.list[[1,1]]$extr.y, pch = 20)
+lines(lat.era.t63, c(cheb.list[[1,1]]$cheb.model), lty = 3)
+
+plot(lat.era.t63, uwind.monmean[2,,1])
+points(cheb.list[[2,1]]$extr.x, cheb.list[[2,1]]$extr.y, pch = 20)
+lines(lat.era.t63, c(cheb.list[[2,1]]$cheb.model), lty = 3)
+
+plot(lat.era.t63, uwind.monmean[3,,1])
+points(cheb.list[[3,1]]$extr.x, cheb.list[[3,1]]$extr.y, pch = 20)
+lines(lat.era.t63, c(cheb.list[[3,1]]$cheb.model), lty = 3)
+
+
+plot(lat.era.t63, uwind.monmean[4,,1])
+points(cheb.list[[4,1]]$extr.x, cheb.list[[4,1]]$extr.y, pch = 20)
+lines(lat.era.t63, c(cheb.list[[4,1]]$cheb.model), lty = 3)
+
+
+plot(lat.era.t63, c(tst.cheb.list$cheb.model))
+points(tst.cheb.list$extr.x, tst.cheb.list$extr.y, pch = 20)
+
+
 
 
 
