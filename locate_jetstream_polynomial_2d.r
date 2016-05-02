@@ -28,8 +28,6 @@ close.ncdf(nc)
 rm(nc)
 ## nützliche variablen aus datensatz ziehen
 ##
-uwind.mean <- apply(uwind.monmean,c(1,2),mean)
-uwind.std <- apply(uwind.monmean,c(1,2),sd)
 n.lat <- length(lat.era.t63)
 n.lat.diff <- n.lat-1
 n.lon <- length(lon.era.t63)
@@ -51,50 +49,56 @@ dx.hr <- 0#0.01 # auflösung des hochaufgelösten gitters
 ## chebyshev polynome
 ## source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 ##
-cheb.list <- apply(uwind.monmean, c(1,3), fkt.cheb.fit.seq, x=lat, split=split, n=n, dx.hr=dx.hr)
+cheb.list <- apply(uwind.monmean, c(1,3), fkt.cheb.fit.seq, x = lat, split = split, n = n, dx.hr = dx.hr)
 
-m.cheb <- array(NA, dim=c(192,664,n+1))
-model.cheb <- array(NA, dim=c(192,664,201))
-model.deriv.cheb <- array(NA, dim=c(192,664,201))
+cheb.coeff <- array(NA, dim = c(192, n + 1, 664))
+cheb.model <- array(NA, dim = c(192, 48, 664))
+cheb.model.deriv <- array(NA, dim = c(192, 48, 664))
+#len.extr <- array(NA, dim = c(192, 664)) 
 
-for (ii in 1:dim(cheb.list)[1]){
-  for (jj in 1:dim(cheb.list)[2]){
-    m.cheb[ii,jj,] <- cheb.list[[ii,jj]]$m.cheb
-    model.cheb[ii,jj,] <- cheb.list[[ii,jj]]$model.cheb
-    model.deriv.cheb[ii,jj,] <- cheb.list[[ii,jj]]$model.deriv.cheb
+#for (ii in 1:dim(cheb.list)[1]) {
+#  for (jj in 1:dim(cheb.list)[2]) {
+#    len.extr[ii,jj] <- length(cheb.list[[ii,jj]]$extr.x)
+#  }
+#}
+#extr.x <- array(NA, dim = c(192,664,11))
+#extr.y <- array(NA, dim = c(192,664,11))
+
+for (ii in 1:dim(cheb.list)[1]) {
+  for (jj in 1:dim(cheb.list)[2]) {
+#    cheb.coeff[ii,jj,] <- cheb.list[[ii,jj]]$cheb.coeff
+    cheb.model[ii,,jj] <- cheb.list[[ii,jj]]$cheb.model
+    cheb.model.deriv[ii,,jj] <- cheb.list[[ii,jj]]$cheb.model.deriv
+#    extr.x[ii,jj,] <- cheb.list[[ii,jj]]$extr.x
+#    extr.y[ii,jj,] <- cheb.list[[ii,jj]]$extr.y
   }
 }
-rm(cheb.list)
 
-m.cheb <- apply(m.cheb, c(3,2), t)
-model.cheb <- apply(model.cheb, c(3,2), t)
-model.deriv.cheb <- apply(model.deriv.cheb, c(3,2), t)
-residuals.cheb <- uwind.monmean-model.cheb
-rmse <- sqrt(sum(residuals.cheb**2)/length(residuals.cheb))
+rm(cheb.list, len.extr)
 
 
-# ## legendre polynome
-# ## source('~/Master_Thesis/Code/fun_legendre.r')
-# ##
-# leg.list <- apply(d, c(1,3), leg.poly, x=lat, n=order)
-# 
-# m.leg <- array(NA, dim=c(192,664,6))
-# model.leg <- array(NA, dim=c(192,664,48))
-# # model.deriv.leg <- array(NA, dim=c(192,664,48))
-# 
-# for (ii in 1:dim(leg.list)[1]){
-#   for (jj in 1:dim(leg.list)[2]){
-#     m.leg[ii,jj,] <- leg.list[[ii,jj]]$m.leg
-#     model.leg[ii,jj,] <- leg.list[[ii,jj]]$model.leg
-# #     model.deriv.leg[ii,jj,] <- leg.list[[ii,jj]]$model.deriv.leg
-#   }
-# }
-# 
-# m.leg <- apply(m.leg, c(3,2), t)
-# model.leg <- apply(model.leg, c(3,2), t)
-# # model.deriv.leg <- apply(model.deriv.leg, c(3,2), t)
+residuals.cheb <- uwind.monmean - cheb.model
+rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
 
 
+##### Anpassen der Variablennamen!!
+## Zeitlich gemittelter Zonalwind
+uwind.mean <- apply(uwind.monmean,c(1,2),mean)
+uwind.std <- apply(uwind.monmean,c(1,2),sd)
+
+## Meridional und zeitliche gemittelter Zonalwind
+uwind.mon.mer.mean <- apply(uwind.monmean, 2, mean)
+uwind.mon.mer.sd <- apply(uwind.mean, 2, sd)
+plot(uwind.mon.mer.sd)
+
+## Vermutung, dass Fehler mit (Breitengrad) ansteigt
+## scheint nicht so
+apply(residuals.cheb, 2, mean)
+
+## Meridional gemittelter Zonalwind
+uwind.monmean.mermean <- apply(uwind.monmean, c(2,3), mean)
+apply(uwind.monmean, c(2,3), sd)
+#####
 
 ## Vergleichsplot
 ## Modell vs Daten
