@@ -87,7 +87,15 @@ plot(lat.era.t63, c(tst.cheb.list$cheb.model))
 points(tst.cheb.list$extr.x, tst.cheb.list$extr.y, pch = 20)
 
 
+## Schreiben von Datei aus Liste mit unterschiedlicher Länge
+a <- c(NA, NA, NA)
+b <- c(1,2)
 
 
+
+vec.a <- cheb.list[[2,1]]$extr.x
+while (length(vec.a) != 11) {
+  vec.a <- c(vec.a, NA)
+}
 
 
