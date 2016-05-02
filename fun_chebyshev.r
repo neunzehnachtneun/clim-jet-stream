@@ -134,10 +134,10 @@ fkt.cheb.fit.seq <- function(x, d, n, split, dx.hr){
     # berechnung des gefilterten modells
     cheb.model.seq <- cheb.t %*% cheb.coeff.seq
     end <- length(cheb.model.seq)
-    cheb.model <- if (i == 1) cheb.model.seq else cbind(cheb.model, cheb.model.seq[2:end])
+    cheb.model <- if (i == 1) cheb.model.seq else c(cheb.model, cheb.model.seq[2:end])
     # berechnung des abgeleiteten modells
     cheb.model.deriv.seq <- cheb.t.deriv %*% cheb.coeff.seq[2:m]
-    cheb.model.deriv <- if (i == 1) cheb.model.deriv.seq else cbind(cheb.model.deriv, cheb.model.deriv.seq[2:end])
+    cheb.model.deriv <- if (i == 1) cheb.model.deriv.seq else c(cheb.model.deriv, cheb.model.deriv.seq[2:end])
     
     # berechnung der nullstellen
     extr.seq <- uniroot.all(fkt.cheb.deriv, cheb.coeff = cheb.coeff.seq, lower = (-1), upper = 1)
