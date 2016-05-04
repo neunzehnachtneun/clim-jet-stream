@@ -61,25 +61,37 @@ cheb.model.deriv <- array(NA, dim = c(192, 48, 664))
 #    len.extr[ii,jj] <- length(cheb.list[[ii,jj]]$extr.x)
 #  }
 #}
-#extr.x <- array(NA, dim = c(192,664,11))
-#extr.y <- array(NA, dim = c(192,664,11))
+extr.x <- array(NA, dim = c(192, 11, 664))
+extr.y <- array(NA, dim = c(192, 11, 664))
 
 for (ii in 1:dim(cheb.list)[1]) {
   for (jj in 1:dim(cheb.list)[2]) {
 #    cheb.coeff[ii,jj,] <- cheb.list[[ii,jj]]$cheb.coeff
     cheb.model[ii,,jj] <- cheb.list[[ii,jj]]$cheb.model
     cheb.model.deriv[ii,,jj] <- cheb.list[[ii,jj]]$cheb.model.deriv
-#    extr.x[ii,jj,] <- cheb.list[[ii,jj]]$extr.x
-#    extr.y[ii,jj,] <- cheb.list[[ii,jj]]$extr.y
+    extr.x.h <- cheb.list[[ii,jj]]$extr.x
+    extr.y.h <- cheb.list[[ii,jj]]$extr.y
+    while (length(extr.x.h) != 11) {
+      extr.x.h <- c(extr.x.h, NA)
+      extr.y.h <- c(extr.y.h, NA)
+    }
+    extr.x[ii,,jj] <- extr.x.h
+    extr.y[ii,,jj] <- extr.y.h
   }
 }
 
-rm(cheb.list, len.extr)
+rm(cheb.list, extr.x.h, extr.y.h)
 
 
 residuals.cheb <- uwind.monmean - cheb.model
 rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
-
+## rmse = 0.4079846
+for (i in 1:664) {
+  plot(lat.era.t63, uwind.monmean[1,,i])
+  lines(lat.era.t63, cheb.model[1,,i], lty = 3)
+  points(extr.x[1,,i], extr.y[1,,i],  pch = 20)
+  print(i)
+}
 
 ##### Anpassen der Variablennamen!!
 ## Zeitlich gemittelter Zonalwind
@@ -99,6 +111,9 @@ apply(residuals.cheb, 2, mean)
 uwind.monmean.mermean <- apply(uwind.monmean, c(2,3), mean)
 apply(uwind.monmean, c(2,3), sd)
 #####
+
+
+
 
 ## Vergleichsplot
 ## Modell vs Daten
