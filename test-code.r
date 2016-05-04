@@ -99,3 +99,61 @@ while (length(vec.a) != 11) {
 }
 
 
+
+fkt.cheb.1st <- function(x, n){
+  x.cheb <- fkt.cheb.scale(x)
+  m <- n + 1
+  cheb.t.0 <- 1;  cheb.t.1 <- x.cheb; 
+  cheb.t <- cbind(cheb.t.0, cheb.t.1)
+  if (n >= 2) {
+    for (i in 3:m) {
+      cheb.t.i <- 2 * x.cheb * cheb.t[,(i - 1)] - cheb.t[,(i - 2)]
+      cheb.t <- cbind(cheb.t, cheb.t.i)
+      rm(cheb.t.i)
+    }
+  }
+  return(cheb.t)
+}
+
+fkt.cheb.2nd <- function(x, n){
+  cheb.u.0 <- 1; cheb.u.1 <-  2*x.cheb
+  cheb.u <- cbind(cheb.u.0, cheb.u.1)
+  if (n >= 2) {
+    for (i in 3:m) {
+      cheb.u.i <- 2 * x.cheb * cheb.u[,(i - 1)] - cheb.u[,(i - 2)]
+      cheb.u <- cbind(cheb.u, cheb.u.i)
+      rm(cheb.u.i)
+    }
+  }
+  return(cheb.u)
+}
+
+
+
+
+
+
+
+fkt.cheb.fit <- function(x, d, n){
+  x.cheb <- fkt.cheb.scale(x)
+  cheb.t <- fkt.cheb.1st(x, n)
+  cheb.u <- fkt.cheb.2nd(x, n)
+  m <- n + 1
+  
+  ## modell berechnungen
+  # berechnung der koeffizienten des polyfits
+  cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
+  # berechnung des gefilterten modells
+  cheb.model <- fkt.cheb.val(x.cheb, cheb.coeff)
+  # berechnung des abgeleiteten modells
+  cheb.model.deriv <- fkt.cheb.deriv(x.cheb, cheb.coeff)
+
+  # berechnung der nullstellen
+  extr <- uniroot.all(fkt.cheb.deriv, cheb.coeff = cheb.coeff, lower = (-1), upper = 1)
+  # reskalierung der Nullstellen auf normale Lat- Achse
+  x.extr <- fkt.cheb.rescale(extr, x = x)
+  y.extr <- if (length(extr) != 0) fkt.cheb.val(x = extr, cheb.coeff = cheb.coeff)
+
+  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv)#, x.extr = x.extr, y.extr = y.extr)
+  return(cheb.list)
+}
