@@ -5,56 +5,88 @@
 
 
 ##
-## skalierung der stützpunkte auf [-1,1]
+## Skalierung
 fkt.cheb.scale <- function(x) {
+  ## Funktion zur Skalierung von Stützpunkten
+  ## von beliebigen Gittern auf [-1, 1]
+  ## ##
   x.cheb.scaled <- (2 * (x - x[1]) / (max(x) - min(x))) - 1
   return(x.cheb.scaled)
 }
 
-
 ##
-## reskalierung
+## Reskalierung
 fkt.cheb.rescale <- function(x.cheb, x) {
+  ## Funktion zur Reskalierung vom [-1, 1]-Gitter
+  ## auf das Ursprungsgitter (in diesem Fall - Lat)
+  ## ##
   x.rescaled <- (1/2 * (x.cheb + 1) * (max(x) - min(x))) + x[1]
   return(x.rescaled)
 }
 
 
 ##
-## funktion zur berechnung der y-werte aus koeffizienten (chebyshev) und x-werten
-## benötigt für nullstellensuche
-fkt.cheb.val <- function(x, cheb.coeff) {
-  n <- length(cheb.coeff) - 1
+## Chebyshev Erster Art
+fkt.cheb.1st <- function(x, n){
+  ## Funktion zur Erzeugung von Chebyshev-Polynomen Erster Art
+  ## ##
+  x.cheb <- if (max(x) - min(x) > 2) fkt.cheb.scale(x) else x
   m <- n + 1
-  cheb.t.0 <- 1;  cheb.t.1 <- x; 
+  # Rekursionsformel Wiki / Bronstein
+  cheb.t.0 <- 1;  cheb.t.1 <- x.cheb; 
   cheb.t <- cbind(cheb.t.0, cheb.t.1)
   if (n >= 2) {
     for (i in 3:m) {
-      cheb.t.i <- 2 * x * cheb.t[,(i - 1)] - cheb.t[,(i - 2)]
+      cheb.t.i <- 2 * x.cheb * cheb.t[,(i - 1)] - cheb.t[,(i - 2)]
       cheb.t <- cbind(cheb.t, cheb.t.i)
       rm(cheb.t.i)
     }
   }
-  cheb.model <- cheb.t %*% cheb.coeff
-  return(cheb.model)
+  return(cheb.t)
+}
+
+##
+## Chebyshev Zweiter Art
+fkt.cheb.2nd <- function(x, n){
+  ## Funktion zur Erzeugung von Chebyshev-Polynomen Zweiter Art
+  ## ##
+  x.cheb <- if (max(x) - min(x) > 2) fkt.cheb.scale(x) else x
+  m <- n + 1
+  cheb.u.0 <- 1; cheb.u.1 <-  2*x.cheb
+  cheb.u <- cbind(cheb.u.0, cheb.u.1)
+  if (n >= 2) {
+    for (i in 3:m) {
+      cheb.u.i <- 2 * x.cheb * cheb.u[,(i - 1)] - cheb.u[,(i - 2)]
+      cheb.u <- cbind(cheb.u, cheb.u.i)
+      rm(cheb.u.i)
+    }
+  }
+  return(cheb.u)
 }
 
 
 ##
-## funktion zur berechnung der werte der ableitung
-## benötigt zum auffinden des maximums => nullstelle der ableitung
+## Y-Werte aus X und Cheb-Koeff.
+fkt.cheb.val <- function(x, cheb.coeff) {
+  ## Funktion zur Berechnung der Y-Werte aus X-Stellen und Cheb-Koeffizienten
+  ## ##
+  n <- length(cheb.coeff) - 1
+  cheb.t <- fkt.cheb.1st(x, n)
+  cheb.model <- cheb.t %*% cheb.coeff
+  return(cheb.model)
+}
+
+##
+## Werte der Ableitung des Modells
 fkt.cheb.deriv <- function(x, cheb.coeff) {
-  if(length(x) != 0) {
+  ## Funktion zur Berechnung der Y-Werte der Ableitung des Modells
+  ## aus X-Stellen und Chebyshev-Koeffizienten
+  ## ##
+  if (length(x) != 0) { ### Überprüfen, ob nötig
     n <- length(cheb.coeff) - 1
     m <- n + 1
-    cheb.u.0 <- 1; cheb.u.1 <-  2*x
-    cheb.u <- cbind(cheb.u.0, cheb.u.1)
-    if (n >= 2) {
-      for (i in 3:m) {
-        cheb.u.i <- 2 * x * cheb.u[,(i - 1)] - cheb.u[,(i - 2)]
-        cheb.u <- cbind(cheb.u, cheb.u.i)
-        rm(cheb.u.i)
-      }}
+    cheb.u <- fkt.cheb.2nd(x, n)
+
     # berechnung der ableitung der polynome erster art
     # rekursionsformel 0
     # dT/dx = n * U_(n-1)
@@ -65,12 +97,31 @@ fkt.cheb.deriv <- function(x, cheb.coeff) {
 }
 
 
+##
 ## Variante 1 - Least squares fit über gesamten Datensatz
-#
-#
-fkt.cheb.fit <- function(){
+fkt.cheb.fit <- function(x, d, n){
+  x.cheb <- fkt.cheb.scale(x)
+  cheb.t <- fkt.cheb.1st(x, n)
+  cheb.u <- fkt.cheb.2nd(x, n)
+  m <- n + 1
+  ## modell berechnungen
+  # berechnung der koeffizienten des polyfits
+  cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
+  # berechnung des gefilterten modells
+  cheb.model <- fkt.cheb.val(x.cheb, cheb.coeff)
+  # berechnung des abgeleiteten modells
+  cheb.model.deriv <- fkt.cheb.deriv(x.cheb, cheb.coeff)
   
+  # berechnung der nullstellen
+  extr <- uniroot.all(fkt.cheb.deriv, cheb.coeff = cheb.coeff, lower = (-1), upper = 1)
+  # reskalierung der Nullstellen auf normale Lat- Achse
+  x.extr <- fkt.cheb.rescale(extr, x = x)
+  y.extr <- if (length(extr) != 0) fkt.cheb.val(x = extr, cheb.coeff = cheb.coeff)
+  
+  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv)#, x.extr = x.extr, y.extr = y.extr)
+  return(cheb.list)
 }
+
 
 ## Variante 2 - Least squares fit über Sequenzierungen des Datensatzes
 ## Schnitt des Datensatzes in <split> Sequenzen
@@ -101,26 +152,10 @@ fkt.cheb.fit.seq <- function(x, d, n, split, dx.hr){
     # daher wird ein hilfsskalar benutzt
     m <- (n + 1)
     ## erzeugung der chebyshev polynome erster art
-    # rekursionsformel nach bronstein et al s952
-    cheb.t.0 <- 1;  cheb.t.1 <- x.cheb; 
-    cheb.t <- cbind(cheb.t.0, cheb.t.1)
-    if (n >= 2) {
-      for (j in 3:m) {
-        cheb.t.i <- 2*x.cheb*cheb.t[,(j - 1)] - cheb.t[,(j - 2)]
-        cheb.t <- cbind(cheb.t, cheb.t.i)
-        rm(cheb.t.i)
-      }} 
+    cheb.t <- fkt.cheb.1st(x.cheb, n)
     
     ## erzeugung der chebyshev polynome zweiter art
-    # rekursionsformel wiki???
-    cheb.u.0 <- 1; cheb.u.1 <-  2*x.cheb
-    cheb.u <- cbind(cheb.u.0, cheb.u.1)
-    if (n >= 2) {
-      for (k in 3:m) {
-        cheb.u.i <- 2*x.cheb*cheb.u[,(k - 1)] - cheb.u[,(k - 2)]
-        cheb.u <- cbind(cheb.u, cheb.u.i)
-        rm(cheb.u.i)
-      }}
+    cheb.u <- fkt.cheb.2nd(x.cheb, n)
     
     # berechnung der ableitung der polynome erster art
     # rekursionsformel wiki???
@@ -161,7 +196,7 @@ fkt.cheb.fit.seq <- function(x, d, n, split, dx.hr){
   }
   
   ## übergabe der variablen als liste
-  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv, extr.x = x.extr, extr.y = y.extr)#, y.extr = y.extr)
+  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv, extr.x = x.extr, extr.y = y.extr)
   return(cheb.list)
 }
   
