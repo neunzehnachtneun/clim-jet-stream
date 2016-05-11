@@ -157,3 +157,26 @@ fkt.cheb.fit <- function(x, d, n){
   cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv)#, x.extr = x.extr, y.extr = y.extr)
   return(cheb.list)
 }
+
+tst <- fkt.cheb.fit(lat,d,n)
+typeof(tst)
+str(tst)
+plot(lat, d)
+lines(lat, tst$cheb.model, lty = 3)
+points(tst$x.extr, tst$y.extr, pch = 20)
+
+
+
+### multi core processing
+cl <- makeCluster(getOption("cl.cores", 2))
+parApply(cl, uwind.monmean[,,1:2], c(1,3), fkt.cheb.fit, x.axis = lat, n = n)
+clusterApply(cl, uwind.monmean[,,1:2], c(1,3), fkt.cheb.fit, x.axis = lat, n = n)
+clusterApplyLB(cl, uwind.monmean[,,1:2], c(1,3), fkt.cheb.fit, ax = lat, n = n)
+
+parApply(cl, uwind.monmean[,,1:2], c(1,3), mean, trim = 0.1)
+stopCluster(cl)
+
+
+
+
+

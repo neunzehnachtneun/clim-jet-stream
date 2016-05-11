@@ -2,35 +2,40 @@
 ## source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 ##
 ##
+## to do - umbenennung der x-achse in absz (für abszisse), um mc testen zu können.
+## alternativ axis - könnte problematisch werden
+## alternativ lat
 
 
 ##
 ## Skalierung
-fkt.cheb.scale <- function(x) {
+fkt.cheb.scale <- function(x.axis) {#, scale) {
   ## Funktion zur Skalierung von Stützpunkten
   ## von beliebigen Gittern auf [-1, 1]
   ## ##
-  x.cheb.scaled <- (2 * (x - x[1]) / (max(x) - min(x))) - 1
+#  if (type == "cheb") {
+    x.cheb.scaled <- (2 * (x.axis - x.axis[1]) / (max(x.axis) - min(x.axis))) - 1
+#  }
   return(x.cheb.scaled)
 }
 
 ##
 ## Reskalierung
-fkt.cheb.rescale <- function(x.cheb, x) {
+fkt.cheb.rescale <- function(x.cheb, x.axis) {
   ## Funktion zur Reskalierung vom [-1, 1]-Gitter
   ## auf das Ursprungsgitter (in diesem Fall - Lat)
   ## ##
-  x.rescaled <- (1/2 * (x.cheb + 1) * (max(x) - min(x))) + x[1]
+  x.rescaled <- (1/2 * (x.cheb + 1) * (max(x.axis) - min(x.axis))) + x.axis[1]
   return(x.rescaled)
 }
 
 
 ##
 ## Chebyshev Erster Art
-fkt.cheb.1st <- function(x, n){
+fkt.cheb.1st <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Erster Art
   ## ##
-  x.cheb <- if (max(x) - min(x) > 2) fkt.cheb.scale(x) else x
+  x.cheb <- if (max(x.axis) - min(x.axis) > 2) fkt.cheb.scale(x.axis) else x.axis  ### ###
   m <- n + 1
   # Rekursionsformel Wiki / Bronstein
   cheb.t.0 <- 1;  cheb.t.1 <- x.cheb; 
@@ -47,10 +52,10 @@ fkt.cheb.1st <- function(x, n){
 
 ##
 ## Chebyshev Zweiter Art
-fkt.cheb.2nd <- function(x, n){
+fkt.cheb.2nd <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Zweiter Art
   ## ##
-  x.cheb <- if (max(x) - min(x) > 2) fkt.cheb.scale(x) else x
+  x.cheb <- if (max(x.axis) - min(x.axis) > 2) fkt.cheb.scale(x.axis) else x.axis
   m <- n + 1
   cheb.u.0 <- 1; cheb.u.1 <-  2*x.cheb
   cheb.u <- cbind(cheb.u.0, cheb.u.1)
@@ -67,42 +72,45 @@ fkt.cheb.2nd <- function(x, n){
 
 ##
 ## Y-Werte aus X und Cheb-Koeff.
-fkt.cheb.val <- function(x, cheb.coeff) {
+fkt.cheb.val <- function(x.axis, cheb.coeff) {
   ## Funktion zur Berechnung der Y-Werte aus X-Stellen und Cheb-Koeffizienten
   ## ##
   n <- length(cheb.coeff) - 1
-  cheb.t <- fkt.cheb.1st(x, n)
+  cheb.t <- fkt.cheb.1st(x.axis, n)
   cheb.model <- cheb.t %*% cheb.coeff
   return(cheb.model)
 }
 
 ##
 ## Werte der Ableitung des Modells
-fkt.cheb.deriv <- function(x, cheb.coeff) {
+fkt.cheb.deriv <- function(x.axis, cheb.coeff) {
   ## Funktion zur Berechnung der Y-Werte der Ableitung des Modells
   ## aus X-Stellen und Chebyshev-Koeffizienten
   ## ##
-  if (length(x) != 0) { ### Überprüfen, ob nötig
+  if (length(x.axis) != 0) { ### Überprüfen, ob nötig
     n <- length(cheb.coeff) - 1
     m <- n + 1
-    cheb.u <- fkt.cheb.2nd(x, n)
+    cheb.u <- fkt.cheb.2nd(x.axis, n)
 
     # berechnung der ableitung der polynome erster art
     # rekursionsformel 0
     # dT/dx = n * U_(n-1)
-    cheb.t.deriv <- if (length(x) == 1) (2:m)*t(cheb.u[,1:n]) else t((2:m)*t(cheb.u[,1:n]))
+    cheb.t.deriv <- if (length(x.axis) == 1) (2:m)*t(cheb.u[,1:n]) else t((2:m)*t(cheb.u[,1:n]))
     cheb.model.deriv <- cheb.t.deriv %*% cheb.coeff[2:m]
     return(cheb.model.deriv)
   }
 }
 
+##
+## Werte der zweiten Ableitung des Modells
+fkt.cheb.deriv.2nd <- function() {}
 
 ##
 ## Variante 1 - Least squares fit über gesamten Datensatz
-fkt.cheb.fit <- function(x, d, n){
-  x.cheb <- fkt.cheb.scale(x)
-  cheb.t <- fkt.cheb.1st(x, n)
-  cheb.u <- fkt.cheb.2nd(x, n)
+fkt.cheb.fit <- function(d, x.axis, n){
+  x.cheb <- fkt.cheb.scale(x.axis)
+  cheb.t <- fkt.cheb.1st(x.axis, n)
+  cheb.u <- fkt.cheb.2nd(x.axis, n)
   m <- n + 1
   ## modell berechnungen
   # berechnung der koeffizienten des polyfits
@@ -115,10 +123,10 @@ fkt.cheb.fit <- function(x, d, n){
   # berechnung der nullstellen
   extr <- uniroot.all(fkt.cheb.deriv, cheb.coeff = cheb.coeff, lower = (-1), upper = 1)
   # reskalierung der Nullstellen auf normale Lat- Achse
-  x.extr <- fkt.cheb.rescale(extr, x = x)
-  y.extr <- if (length(extr) != 0) fkt.cheb.val(x = extr, cheb.coeff = cheb.coeff)
+  x.extr <- fkt.cheb.rescale(extr, x.axis = x.axis)
+  y.extr <- if (length(extr) != 0) fkt.cheb.val(x.axis = extr, cheb.coeff = cheb.coeff)
   
-  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv)#, x.extr = x.extr, y.extr = y.extr)
+  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv, x.extr = x.extr, y.extr = y.extr)
   return(cheb.list)
 }
 

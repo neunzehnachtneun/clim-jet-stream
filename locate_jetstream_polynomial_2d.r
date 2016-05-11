@@ -5,6 +5,7 @@ library(ncdf)
 library(fields)
 library(clim.pact)
 library(rootSolve)
+library(parallel)
 source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 #source('~/Master_Thesis/Code/fun_legendre.r')
 
@@ -18,7 +19,7 @@ source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 # nc <- open.ncdf('/home/skiefer/era/era--t63_ua_monmean_300hpa.nc') ## ganzer globus
 ## Nordhemisphäre
 nc <- open.ncdf('/home/skiefer/era/era--t63_ua_monmean_300hpa_nh.nc') # miub
-# nc <- open.ncdf('/home/johndoe/Master_Thesis/Code/era--t63_ua_monmean_300hpa_nh.nc') # laptop
+nc <- open.ncdf('/home/johndoe/Master_Thesis/Code/era--t63_ua_monmean_300hpa_nh.nc') # laptop
 lon.era.t63 <- get.var.ncdf(nc,"lon") #längengrad
 lat.era.t63 <- get.var.ncdf(nc,"lat") #breitengrad
 lev.era.t63 <- get.var.ncdf(nc,"lev") #höhenlevel
@@ -29,7 +30,7 @@ rm(nc)
 ## nützliche variablen aus datensatz ziehen
 ##
 n.lat <- length(lat.era.t63)
-n.lat.diff <- n.lat-1
+n.lat.diff <- n.lat - 1
 n.lon <- length(lon.era.t63)
 
 
@@ -43,13 +44,15 @@ n.lon <- length(lon.era.t63)
 d <- uwind.monmean[1,,1]
 lat <- lat.era.t63
 split <- 6
-n <- 3 # ordnung des polynoms
+n <- 24#3 # ordnung des polynoms
 dx.hr <- 0#0.01 # auflösung des hochaufgelösten gitters
 
 ## chebyshev polynome
 ## source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 ##
 cheb.list <- apply(uwind.monmean, c(1,3), fkt.cheb.fit.seq, x = lat, split = split, n = n, dx.hr = dx.hr)
+cheb.list <- apply(uwind.monmean[,,1:2], c(1,3), fkt.cheb.fit, x.axis = lat, n = n)
+
 
 cheb.coeff <- array(NA, dim = c(192, n + 1, 664))
 cheb.model <- array(NA, dim = c(192, 48, 664))
