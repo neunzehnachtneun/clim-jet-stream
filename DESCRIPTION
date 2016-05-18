@@ -1,9 +1,9 @@
 Package: pckg.cheb
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Title: Curve Fitting with Chebyshev Polynomials
+Version: 0.1
+Author: Sebastian Kiefer <s.kiefer@posteo.de>
+Maintainer: Sebastian Kiefer <s.kiefer@posteo.de>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE

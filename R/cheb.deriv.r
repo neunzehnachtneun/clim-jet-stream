@@ -5,7 +5,7 @@
 
 ##
 ## Werte der Ableitung des Modells
-cheb.deriv <- function(x.axis, cheb.coeff) {
+cheb.deriv.1st <- function(x.axis, cheb.coeff) {
   ## Funktion zur Berechnung der Y-Werte der Ableitung des Modells
   ## aus X-Stellen und Chebyshev-Koeffizienten
   ## ##
