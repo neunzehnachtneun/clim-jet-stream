@@ -8,12 +8,14 @@
 
 
 ##
-#' @title Scaling of Y-Axis
+#' @title Scaling of X-Axis
+#' @param x.axis ursprüngliche beliebige X-Achse (Vektor)
+#' @return x.cheb.scaled skalierte X-Achse (Vektor)
 #' @description
-#' \code(cheb.scale) skaliert beliebige Y-Achse auf Achse, die für Polynom-fits verträglich ist.
+#' \code{cheb.scale} skaliert beliebige X-Achse auf Achse, die für Polynom-fits verträglich ist.
 #' @examples
 #' x.axis <- c(0:30)
-#' cheb.scale(x.axis)
+#' x.cheb.scaled <- cheb.scale(x.axis)
 cheb.scale <- function(x.axis) {#, scale) {
   ## Funktion zur Skalierung von Stützpunkten
   ## von beliebigen Gittern auf [-1, 1]
@@ -26,11 +28,14 @@ cheb.scale <- function(x.axis) {#, scale) {
 
 
 ##
-#' @title Rescaling of Y-Axis
+#' @title Rescaling of X-Axis
+#' @param x.cheb skalierte X-Achse (Skalar oder Vektor)
+#' @param x.axis beliebige X-Achse (Vektor)
+#' @return x.rescaled reskalierte X-Achse (Skalar oder Sektor)
 #' @description
 #' cheb.rescale reskaliert die für den Fit erzeugte Achse auf die Ursprüngliche
 #' @examples
-#' cheb.rescale(x.cheb, x.axis)
+#' x.rescaled <- cheb.rescale(x.cheb, x.axis)
 cheb.rescale <- function(x.cheb, x.axis) {
   ## Funktion zur Reskalierung vom [-1, 1]-Gitter
   ## auf das Ursprungsgitter (in diesem Fall - Lat)
@@ -42,10 +47,13 @@ cheb.rescale <- function(x.cheb, x.axis) {
 
 ##
 #' @title Generating Chebyshev Polynomials of first kind
+#' @param x.axis beliebige X-Achse (Vektor)
+#' @param n Ordnung des Polynoms (Skalar)
+#' @return cheb.t Chebyshev-Polynome Erster Art (Vektor)
 #' @description
 #' cheb.1st erzeugt Chebyshev Polynome erster Art aus beliebiger X-Achse
 #' @examples
-#' cheb.1st(x.axis, n)
+#' cheb.t <- cheb.1st(x.axis, n)
 cheb.1st <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Erster Art
   ## ##
@@ -67,10 +75,13 @@ cheb.1st <- function(x.axis, n){
 
 ##
 #' @title Generating Chebyshev Polynomials of second kind
+#' @param x.axis beliebigie X-Achse (Vektor)
+#' @param n Ordnung des Polynoms (Skalar)
+#' @return cheb.u Chebyshev-Polynome Zweiter Art (Vektor)
 #' @description
 #' cheb.2nd erzeugt Chebyshev Polynome zweiter Art aus beliebiger X-Achse
 #' @examples
-#' cheb.2nd(x.axis, n)
+#' cheb.u <- cheb.2nd(x.axis, n)
 cheb.2nd <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Zweiter Art
   ## ##
@@ -91,10 +102,13 @@ cheb.2nd <- function(x.axis, n){
 
 ##
 #' @title Calculation of Values of the model fit
+#' @param x.axis beliebige X-Achse (Skalar oder Vektor)
+#' @param cheb.coeff Chebyshev-Koeffizienten aus Least-Squares-Verfahren (Vektor)
+#' @return cheb.model gefiltertes Modell (Skalar oder Vektor)
 #' @description
 #' cheb.val berechnet aus den Chebyshev-Koeffizienten die Y-Werte
 #' @examples
-#' cheb.val(x.axis, cheb.coeff)
+#' cheb.model <- cheb.val(x.axis, cheb.coeff)
 cheb.val <- function(x.axis, cheb.coeff) {
   ## Funktion zur Berechnung der Y-Werte aus X-Stellen und Cheb-Koeffizienten
   ## ##
@@ -107,10 +121,13 @@ cheb.val <- function(x.axis, cheb.coeff) {
 
 ##
 #' @title Calculation of the values of the first derivation
+#' @param x.axis beliebige X-Achse (Skalar oder Vektor)
+#' @param cheb.coeff Chebyshev-Koeffizienten aus Least-Squares-Verfahren (Vektor)
+#' @return cheb.model.deriv Erste Ableitung des gefilterten Modells (Skalar oder Vektor)
 #' @description
 #' cheb.deriv.1st berechnet aus den Chebyshev-Koeffizienten die Werte der ersten Ableitung
 #' @examples
-#' cheb.deriv.1st(x.axis, cheb.coeff)
+#' cheb.model.deriv <- cheb.deriv.1st(x.axis, cheb.coeff)
 cheb.deriv.1st <- function(x.axis, cheb.coeff) {
   ## Funktion zur Berechnung der Y-Werte der Ableitung des Modells
   ## aus X-Stellen und Chebyshev-Koeffizienten
@@ -132,19 +149,29 @@ cheb.deriv.1st <- function(x.axis, cheb.coeff) {
 
 ##
 #' @title Calculation of the values of the second derivation
+#' @param x.axis beliebige X-Achse (Skalar oder Vektor)
+#' @param cheb.coeff Chebyshev-Koeffizienten aus Least-Squares-Verfahren (Vektor)
+#' @return cheb.model.deriv Zweite Ableitung des gefilterten Modells (Skalar oder Vektor)
 #' @description
 #' cheb.deriv.2nd berechnet aus den Chebyshev-Koeffizienten die Werte der zweiten Ableitung
 #' @examples
-#' ##
-cheb.deriv.2nd <- function() {}
+#' cheb.model.deriv.2nd <- cheb.deriv.2nd(x.axis, cheb.coeff)
+cheb.deriv.2nd <- function(x.axis, cheb.coeff) {
+  cheb.model.deriv.2nd <- NA
+  return(cheb.model.deriv.2nd)
+}
 
 
 ##
 #' @title Curve Fitting with Chebyshev Polynomials
+#' @param d Zu fittender Datensatz/Zeitreihe (Vektor)
+#' @param x.axis Beliebige X-Achse (Vektor)
+#' @param n Ordnung des Polynoms (Skalar)
+#' @return cheb.list Berechnete Parameter (Koeffizienten, gefiltertes Modell, erste und zweite Ableitung des gefilterten Modells, Extremstellen und -Werte) (Liste)
 #' @description
 #' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
-#' cheb.fit(d, x.axis, n)
+#' cheb.list <- cheb.fit(d, x.axis, n)
 cheb.fit <- function(d, x.axis, n){
   x.cheb <- cheb.scale(x.axis)
   cheb.t <- cheb.1st(x.axis, n)
