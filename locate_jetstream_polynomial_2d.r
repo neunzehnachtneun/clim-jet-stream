@@ -6,9 +6,13 @@ library(fields)
 library(clim.pact)
 library(rootSolve)
 library(parallel)
-source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
+library(pckg.cheb)
+#source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 #source('~/Master_Thesis/Code/fun_legendre.r')
 
+
+os <- 'fedora' #opensuse
+path <- if(os == 'fedora') "//" else if()
 
 ####################################################################################################
 ########## era-t63grid #############################################################################
@@ -48,10 +52,12 @@ n <- 24#3 # ordnung des polynoms
 dx.hr <- 0#0.01 # auflösung des hochaufgelösten gitters
 
 ## chebyshev polynome
-## source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 ##
-cheb.list <- apply(uwind.monmean, c(1,3), fkt.cheb.fit.seq, x = lat, split = split, n = n, dx.hr = dx.hr)
-cheb.list <- apply(uwind.monmean[,,1:2], c(1,3), fkt.cheb.fit, x.axis = lat, n = n)
+cheb.list <- apply(uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
+## Variante für paralleles Rechnen
+cl <- makeCluster(getOption("cl.cores", 2))
+cheb.list <- parApply(cl, uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
+stopCluster(cl)
 
 
 cheb.coeff <- array(NA, dim = c(192, n + 1, 664))
