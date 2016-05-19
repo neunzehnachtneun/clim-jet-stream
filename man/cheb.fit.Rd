@@ -7,7 +7,7 @@
 cheb.fit(d, x.axis, n)
 }
 \description{
-Fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
+\code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 }
 \examples{
 cheb.fit(d, x.axis, n)

@@ -142,7 +142,7 @@ cheb.deriv.2nd <- function() {}
 ##
 #' @title Curve Fitting with Chebyshev Polynomials
 #' @description
-#' Fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
+#' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
 #' cheb.fit(d, x.axis, n)
 cheb.fit <- function(d, x.axis, n){
