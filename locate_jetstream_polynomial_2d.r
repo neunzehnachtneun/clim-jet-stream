@@ -1,5 +1,5 @@
 ####################################################################################################
-## source('~/Master_Thesis/Code/locate_jetstream_polynomial_2d.r')
+## source('~/Master_Thesis/r-code-git/locate_jetstream_polynomial_2d.r')
 ## era40, era-interim
 library(ncdf)
 library(fields)
@@ -11,19 +11,18 @@ library(pckg.cheb)
 #source('~/Master_Thesis/Code/fun_legendre.r')
 
 
-os <- 'fedora' #opensuse
-path <- if(os == 'fedora') "//" else if()
+path <- "~/Master_Thesis/data/"
+file <- "era--t63_ua_monmean_300hpa_nh.nc"  # Nordhemisphäre
+#file <- "era--t63_ua_monmean_300hpa_sh.nc" # Südhemisphäre
+#file <- "era--t63_ua_monmean_300hpa.nc"    # Globus
+
 
 ####################################################################################################
 ########## era-t63grid #############################################################################
 ########## einlesen ################################################################################
 ####################################################################################################
 ##
-## Ganzer Globus
-# nc <- open.ncdf('/home/skiefer/era/era--t63_ua_monmean_300hpa.nc') ## ganzer globus
-## Nordhemisphäre
-nc <- open.ncdf('/home/skiefer/era/era--t63_ua_monmean_300hpa_nh.nc') # miub
-nc <- open.ncdf('/home/johndoe/Master_Thesis/Code/era--t63_ua_monmean_300hpa_nh.nc') # laptop
+nc <- open.ncdf(paste(path, file, sep = ""))
 lon.era.t63 <- get.var.ncdf(nc,"lon") #längengrad
 lat.era.t63 <- get.var.ncdf(nc,"lat") #breitengrad
 lev.era.t63 <- get.var.ncdf(nc,"lev") #höhenlevel
@@ -44,11 +43,9 @@ n.lon <- length(lon.era.t63)
 ####################################################################################################
 ### chebyshev
 ##
-# d <- uwind.monmean
-d <- uwind.monmean[1,,1]
 lat <- lat.era.t63
+n <- 23 # ordnung des polynoms
 split <- 6
-n <- 24#3 # ordnung des polynoms
 dx.hr <- 0#0.01 # auflösung des hochaufgelösten gitters
 
 ## chebyshev polynome
@@ -58,7 +55,8 @@ cheb.list <- apply(uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = 
 cl <- makeCluster(getOption("cl.cores", 2))
 cheb.list <- parApply(cl, uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
 stopCluster(cl)
-
+write.csv(cheb.list, "cheblist.csv")
+cheb.list.2 <- read.csv(paste(path,"cheblist.csv", sep = ""))
 
 cheb.coeff <- array(NA, dim = c(192, n + 1, 664))
 cheb.model <- array(NA, dim = c(192, 48, 664))
