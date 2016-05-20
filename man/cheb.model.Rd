@@ -15,9 +15,9 @@ cheb.model(x.axis, cheb.coeff)
 cheb.model gefiltertes Modell (Skalar oder Vektor)
 }
 \description{
-cheb.val berechnet aus den Chebyshev-Koeffizienten die Y-Werte
+cheb.model berechnet aus den Chebyshev-Koeffizienten die Y-Werte
 }
 \examples{
-cheb.model <- cheb.val(x.axis, cheb.coeff)
+cheb.model <- cheb.model(x.axis, cheb.coeff)
 }
 

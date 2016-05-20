@@ -106,9 +106,9 @@ cheb.2nd <- function(x.axis, n){
 #' @param cheb.coeff Chebyshev-Koeffizienten aus Least-Squares-Verfahren (Vektor)
 #' @return cheb.model gefiltertes Modell (Skalar oder Vektor)
 #' @description
-#' cheb.val berechnet aus den Chebyshev-Koeffizienten die Y-Werte
+#' cheb.model berechnet aus den Chebyshev-Koeffizienten die Y-Werte
 #' @examples
-#' cheb.model <- cheb.val(x.axis, cheb.coeff)
+#' cheb.model <- cheb.model(x.axis, cheb.coeff)
 cheb.model <- function(x.axis, cheb.coeff) {
   ## Funktion zur Berechnung der Y-Werte aus X-Stellen und Cheb-Koeffizienten
   ## ##
@@ -189,7 +189,7 @@ cheb.fit <- function(d, x.axis, n){
   # berechnung der koeffizienten des polyfits
   cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
   # berechnung des gefilterten modells
-  cheb.model <- cheb.val(x.cheb, cheb.coeff)
+  cheb.model <- cheb.model(x.cheb, cheb.coeff)
   # berechnung des abgeleiteten modells
   cheb.model.deriv.1st <- cheb.deriv.1st(x.cheb, cheb.coeff)
 
@@ -197,9 +197,9 @@ cheb.fit <- function(d, x.axis, n){
   extr <- rootSolve::uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff, lower = (-1), upper = 1)
   # reskalierung der Nullstellen auf normale Lat- Achse
   x.extr <- cheb.rescale(extr, x.axis = x.axis)
-  y.extr <- if (length(extr) != 0) cheb.val(x.axis = extr, cheb.coeff = cheb.coeff)
+  y.extr <- if (length(extr) != 0) cheb.model(x.axis = extr, cheb.coeff = cheb.coeff)
 
-  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv = cheb.model.deriv, x.extr = x.extr, y.extr = y.extr)
+  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st, x.extr = x.extr, y.extr = y.extr)
   return(cheb.list)
 }
 
