@@ -13,8 +13,8 @@ library(pckg.cheb)
 
 path <- "~/Master_Thesis/data/"
 file <- "era--t63_ua_monmean_300hpa_nh.nc"  # Nordhemisphäre
-#file <- "era--t63_ua_monmean_300hpa_sh.nc" # Südhemisphäre
-#file <- "era--t63_ua_monmean_300hpa.nc"    # Globus
+#file <- "era--t63_ua_monmean_300hpa_sh.nc"  # Südhemisphäre
+#file <- "era--t63_ua_monmean_300hpa.nc"     # Globus
 
 
 ####################################################################################################
