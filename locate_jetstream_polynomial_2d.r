@@ -6,9 +6,10 @@ library(fields)
 library(clim.pact)
 library(rootSolve)
 library(parallel)
+# install.packages("~/Master_Thesis/pckg.cheb/pckg.cheb_0.1.tar.gz", repos = NULL, type = "source")
 library(pckg.cheb)
-#source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
-#source('~/Master_Thesis/Code/fun_legendre.r')
+# source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
+# source('~/Master_Thesis/Code/fun_legendre.r')
 
 
 path <- "~/Master_Thesis/data/"
@@ -52,42 +53,19 @@ dx.hr <- 0#0.01 # auflösung des hochaufgelösten gitters
 ##
 cheb.list <- apply(uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
 ## Variante für paralleles Rechnen
-cl <- makeCluster(getOption("cl.cores", 2))
-cheb.list <- parApply(cl, uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
+cl <- makeCluster(getOption("cl.cores", 6))
+cheb.list <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
 stopCluster(cl)
-write.csv(cheb.list, "cheblist.csv")
-cheb.list.2 <- read.csv(paste(path,"cheblist.csv", sep = ""))
+# write.csv(cheb.list, "cheblist.csv")
+# cheb.list.2 <- read.csv(paste(path,"cheblist.csv", sep = ""))
 
-cheb.coeff <- array(NA, dim = c(192, n + 1, 664))
-cheb.model <- array(NA, dim = c(192, 48, 664))
-cheb.model.deriv <- array(NA, dim = c(192, 48, 664))
-#len.extr <- array(NA, dim = c(192, 664)) 
+cheb.coeff <- sapply(cheb.list, "[[", 1)
+cheb.model <- sapply(cheb.list, "[[", 2)
+cheb.model.deriv.1st <- sapply(cheb.list, "[[", 3)
+x.extr <- sapply(cheb.list, "[[", 4)
+y.extr <- sapply(cheb.list, "[[", 5)
 
-#for (ii in 1:dim(cheb.list)[1]) {
-#  for (jj in 1:dim(cheb.list)[2]) {
-#    len.extr[ii,jj] <- length(cheb.list[[ii,jj]]$extr.x)
-#  }
-#}
-extr.x <- array(NA, dim = c(192, 11, 664))
-extr.y <- array(NA, dim = c(192, 11, 664))
 
-for (ii in 1:dim(cheb.list)[1]) {
-  for (jj in 1:dim(cheb.list)[2]) {
-#    cheb.coeff[ii,jj,] <- cheb.list[[ii,jj]]$cheb.coeff
-    cheb.model[ii,,jj] <- cheb.list[[ii,jj]]$cheb.model
-    cheb.model.deriv[ii,,jj] <- cheb.list[[ii,jj]]$cheb.model.deriv
-    extr.x.h <- cheb.list[[ii,jj]]$extr.x
-    extr.y.h <- cheb.list[[ii,jj]]$extr.y
-    while (length(extr.x.h) != 11) {
-      extr.x.h <- c(extr.x.h, NA)
-      extr.y.h <- c(extr.y.h, NA)
-    }
-    extr.x[ii,,jj] <- extr.x.h
-    extr.y[ii,,jj] <- extr.y.h
-  }
-}
-
-rm(cheb.list, extr.x.h, extr.y.h)
 
 
 residuals.cheb <- uwind.monmean - cheb.model
