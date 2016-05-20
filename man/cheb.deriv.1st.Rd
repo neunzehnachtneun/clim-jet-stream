@@ -12,7 +12,7 @@ cheb.deriv.1st(x.axis, cheb.coeff)
 \item{cheb.coeff}{Chebyshev-Koeffizienten aus Least-Squares-Verfahren (Vektor)}
 }
 \value{
-cheb.model.deriv Erste Ableitung des gefilterten Modells (Skalar oder Vektor)
+cheb.model.deriv.1st Erste Ableitung des gefilterten Modells (Skalar oder Vektor)
 }
 \description{
 cheb.deriv.1st berechnet aus den Chebyshev-Koeffizienten die Werte der ersten Ableitung
