@@ -6,13 +6,13 @@ library(fields)
 library(clim.pact)
 library(rootSolve)
 library(parallel)
-# install.packages("~/Master_Thesis/pckg.cheb/pckg.cheb_0.1.tar.gz", repos = NULL, type = "source")
+install.packages("pckg.cheb_0.1.tar.gz", repos = NULL, type = "source")
 library(pckg.cheb)
 # source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
 # source('~/Master_Thesis/Code/fun_legendre.r')
 
 
-path <- "~/Master_Thesis/data/"
+path <- "data/"
 file <- "era--t63_ua_monmean_300hpa_nh.nc"  # Nordhemisphäre
 #file <- "era--t63_ua_monmean_300hpa_sh.nc"  # Südhemisphäre
 #file <- "era--t63_ua_monmean_300hpa.nc"     # Globus
@@ -47,28 +47,37 @@ n.lon <- length(lon.era.t63)
 lat <- lat.era.t63
 n <- 23 # ordnung des polynoms
 split <- 6
-dx.hr <- 0#0.01 # auflösung des hochaufgelösten gitters
+dx.hr <- 0 #0.01 # auflösung des hochaufgelösten gitters
 
 ## chebyshev polynome
 ##
 cheb.list <- apply(uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
 ## Variante für paralleles Rechnen
-cl <- makeCluster(getOption("cl.cores", 6))
-cheb.list <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
+cl <- makeCluster(getOption("cl.cores", 2))
+cheb.list <- parApply(cl, uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
 stopCluster(cl)
 # write.csv(cheb.list, "cheblist.csv")
 # cheb.list.2 <- read.csv(paste(path,"cheblist.csv", sep = ""))
 
 cheb.coeff <- sapply(cheb.list, "[[", 1)
+cheb.coeff <- array(t(cheb.coeff), c(192, n + 1, 2))
 cheb.model <- sapply(cheb.list, "[[", 2)
+cheb.model <- array(t(cheb.model), c(192, 48, 2)) # 664))
 cheb.model.deriv.1st <- sapply(cheb.list, "[[", 3)
 x.extr <- sapply(cheb.list, "[[", 4)
 y.extr <- sapply(cheb.list, "[[", 5)
 
+fun.fill <- function(x, n) {
+  while(length(x) < n) {
+    x <- c(x, NA)
+  }
+  return(x)
+}
 
+x.extr <- sapply(x.extr, fun.fill, n = 14)
+y.extr <- sapply(y.extr, fun.fill, n = 14)
 
-
-residuals.cheb <- uwind.monmean - cheb.model
+residuals.cheb <- uwind.monmean[,,1:2] - cheb.model
 rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
 ## rmse = 0.4079846
 for (i in 1:664) {
