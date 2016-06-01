@@ -6,10 +6,10 @@ library(fields)
 library(clim.pact)
 library(rootSolve)
 library(parallel)
-install.packages("pckg.cheb_0.1.tar.gz", repos = NULL, type = "source")
+library(chron)
+# eigenes package für polynom fit
+# install.packages("pckg.cheb_0.1.tar.gz", repos = NULL, type = "source")
 library(pckg.cheb)
-# source('~/Master_Thesis/r-code-git/fun_chebyshev.r')
-# source('~/Master_Thesis/Code/fun_legendre.r')
 
 
 path <- "data/"
@@ -27,10 +27,19 @@ nc <- open.ncdf(paste(path, file, sep = ""))
 lon.era.t63 <- get.var.ncdf(nc,"lon") #längengrad
 lat.era.t63 <- get.var.ncdf(nc,"lat") #breitengrad
 lev.era.t63 <- get.var.ncdf(nc,"lev") #höhenlevel
-time.era.t63 <- get.var.ncdf(nc,"time")
+time.help <- get.var.ncdf(nc,"time")
+time.era.t63 <- chron(time.help/24, origin. = c(month = 9,day = 1,year = 1957))
 uwind.monmean <- get.var.ncdf(nc,"var131")
 close.ncdf(nc)
 rm(nc)
+
+
+## alternative einleseroutine mit ncdf4
+nc <- nc_open(paste(path, file, sep = ""))
+time.help <- ncvar_get(nc, "time")
+time.era.t63 = chron(time.help/24, origin. = c(month = 9,day = 1,year = 1957))
+
+
 ## nützliche variablen aus datensatz ziehen
 ##
 n.lat <- length(lat.era.t63)
@@ -46,53 +55,68 @@ n.lon <- length(lon.era.t63)
 ##
 lat <- lat.era.t63
 n <- 23 # ordnung des polynoms
-split <- 6
-dx.hr <- 0 #0.01 # auflösung des hochaufgelösten gitters
 
 ## chebyshev polynome
 ##
-cheb.list <- apply(uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
+cheb.list <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
 ## Variante für paralleles Rechnen
 cl <- makeCluster(getOption("cl.cores", 2))
 cheb.list <- parApply(cl, uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n)
 stopCluster(cl)
-# write.csv(cheb.list, "cheblist.csv")
-# cheb.list.2 <- read.csv(paste(path,"cheblist.csv", sep = ""))
 
 cheb.coeff <- sapply(cheb.list, "[[", 1)
-cheb.coeff <- array(t(cheb.coeff), c(192, n + 1, 2))
+cheb.coeff <- apply(array(data = cheb.coeff, dim = c(dim(cheb.coeff)[1], 192, 664)),  c(1,3), t)
+
 cheb.model <- sapply(cheb.list, "[[", 2)
-cheb.model <- array(t(cheb.model), c(192, 48, 2)) # 664))
+cheb.model <- apply(array(data = cheb.model, dim = c(dim(cheb.model)[1], 192, 664)),  c(1,3), t)
+
 cheb.model.deriv.1st <- sapply(cheb.list, "[[", 3)
+cheb.model.deriv.1st <- apply(array(data = cheb.model.deriv.1st, dim = c(dim(cheb.model.deriv.1st)[1], 192, 664)),  c(1,3), t)
+
 x.extr <- sapply(cheb.list, "[[", 4)
 y.extr <- sapply(cheb.list, "[[", 5)
 
 fun.fill <- function(x, n) {
-  while(length(x) < n) {
+  while (length(x) < n) {
     x <- c(x, NA)
   }
   return(x)
 }
 
-x.extr <- sapply(x.extr, fun.fill, n = 14)
-y.extr <- sapply(y.extr, fun.fill, n = 14)
+x.extr <- sapply(x.extr, fun.fill, n = 24)
+x.extr <- apply(array(x.extr, c(dim(x.extr)[1], 192, 664)), c(1,3), t)
+y.extr <- sapply(y.extr, fun.fill, n = 24)
+y.extr <- apply(array(y.extr, c(dim(y.extr)[1], 192, 664)), c(1,3), t)
 
-residuals.cheb <- uwind.monmean[,,1:2] - cheb.model
+
+
+residuals.cheb <- uwind.monmean - cheb.model
 rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
 ## rmse = 0.4079846
+## rmse = 0.2911683
+
+
+
+
+
 for (i in 1:664) {
-  plot(lat.era.t63, uwind.monmean[1,,i])
-  lines(lat.era.t63, cheb.model[1,,i], lty = 3)
-  points(extr.x[1,,i], extr.y[1,,i],  pch = 20)
-  print(i)
+  for (j in 1:192) {
+    plot(lat.era.t63, uwind.monmean[j,,i])
+    lines(lat.era.t63, cheb.model[j,,i], lty = 3)
+    points(x.extr[j,,i], y.extr[j,,i],  pch = 20)
+    print(i)
+  }
 }
+
+
+
 
 ##### Anpassen der Variablennamen!!
 ## Zeitlich gemittelter Zonalwind
 uwind.mean <- apply(uwind.monmean,c(1,2),mean)
 uwind.std <- apply(uwind.monmean,c(1,2),sd)
 
-## Meridional und zeitliche gemittelter Zonalwind
+## Meridional und zeitlich gemittelter Zonalwind
 uwind.mon.mer.mean <- apply(uwind.monmean, 2, mean)
 uwind.mon.mer.sd <- apply(uwind.mean, 2, sd)
 plot(uwind.mon.mer.sd)
