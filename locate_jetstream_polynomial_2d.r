@@ -36,8 +36,15 @@ rm(nc)
 
 ## alternative einleseroutine mit ncdf4
 nc <- nc_open(paste(path, file, sep = ""))
+print.ncdf(nc)
+lon.era.t63 <- ncvar_get(nc,"lon") #längengrad
+lat.era.t63 <- ncvar_get(nc,"lat") #breitengrad
+lev.era.t63 <- ncvar_get(nc,"lev") #höhenlevel
 time.help <- ncvar_get(nc, "time")
 time.era.t63 = chron(time.help/24, origin. = c(month = 9,day = 1,year = 1957))
+uwind.monmean <- ncvar_get(nc,"var131")
+nc_close(nc)
+rm(nc)
 
 
 ## nützliche variablen aus datensatz ziehen
@@ -48,11 +55,11 @@ n.lon <- length(lon.era.t63)
 
 
 ####################################################################################################
-########## fitte polynom fünfter ordnung ###########################################################
+########## fitte polynom nter ordnung ###########################################################
 ########## an uwind in meridionaler richtung #######################################################
 ####################################################################################################
-### chebyshev
 ##
+
 lat <- lat.era.t63
 n <- 23 # ordnung des polynoms
 
@@ -85,6 +92,7 @@ fun.fill <- function(x, n) {
 
 x.extr <- sapply(x.extr, fun.fill, n = 24)
 x.extr <- apply(array(x.extr, c(dim(x.extr)[1], 192, 664)), c(1,3), t)
+
 y.extr <- sapply(y.extr, fun.fill, n = 24)
 y.extr <- apply(array(y.extr, c(dim(y.extr)[1], 192, 664)), c(1,3), t)
 
