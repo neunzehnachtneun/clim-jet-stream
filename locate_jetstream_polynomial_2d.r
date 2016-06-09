@@ -58,12 +58,10 @@ apply(uwind.monmean, c(2,3), sd)
 
 
 ####################################################################################################
-########## fitte polynom fünfter ordnung ###########################################################
+########## fitte polynom nter ordnung ###########################################################
 ########## an uwind in meridionaler richtung #######################################################
 ####################################################################################################
 ##
-
-## chebyshev polynome
 ##
 # model.list <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = 23)
 ## Variante für paralleles Rechnen
@@ -94,6 +92,15 @@ model.extr.lat <- sapply(model.extr.lat, fun.fill, n = 24)
 model.extr.lat <- apply(array(model.extr.lat, c(dim(model.extr.lat)[1], 192, 664)), c(1,3), t)
 model.extr.uwind <- sapply(model.extr.uwind, fun.fill, n = 24)
 model.extr.uwind <- apply(array(model.extr.uwind, c(dim(model.extr.uwind)[1], 192, 664)), c(1,3), t)
+
+
+residuals.cheb <- uwind.monmean - cheb.model
+rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
+## rmse = 0.4079846
+## rmse = 0.2911683
+
+
+
 
 model.max.uwind <- apply(model.extr.uwind, c(1,3), max, na.rm = TRUE)
 
