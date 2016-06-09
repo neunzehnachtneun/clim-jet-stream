@@ -1,89 +1,69 @@
-#### Programm zur Datenvisualisierung
-#### source('~/Master_Thesis/r-code-git/visualize.r')
-#### 
-#### 
-#### 
-#### 
-## Vergleichsplot
-## Modell vs Daten
-## gefiltert über Chebyshev und Legendre bis Ordnung 5
+######################################################################
+######################################################################
+## source('~/Master_Thesis/r-code-git/visualize.r')
+
+library(fields)
+library(clim.pact)
+
+#load(".RData")
+
+## Festlegen der Parameter
+lo <- 1 # index längengrad
+la <- 1 # index breitengrad
+ti <- 1 # index zeit
+
+
+######################################################################
+## VERGLEICHSPLOT
+## ERA-DATEN VS MODELL VS ABLEITUNG D. MODELLS
+######################################################################
 ##
-plot(lat.era.t63, uwind.monmean[2,,1], type = "l")
-lines(lat.era.t63, model.cheb[2,,1], col = "dark red")
-lines(lat.era.t63, model.deriv.cheb[2,,1], col = "light blue")
 
-plot(lat.era.t63, d, type="l")
-lines(lat.model.cheb, model.cheb, col = "dark red")
-lines(lat.model.cheb, model.deriv.cheb, col = "dark green")
-
-lines(lat.era.t63, model.leg[2,1,], col="green")
+plot(lat, uwind.monmean[lo,,ti], type = "l")
+lines(lat, model.uwind[lo,,ti], col = "dark red")
+lines(lat, model.uwind.deriv.1st[lo,,ti], col = "light blue")
 
 
-image.plot(lon.era.t63, lat.era.t63, uwind.monmean[,,1])
-addland(col="grey50",lwd=1)
-image.plot(lon.era.t63,lat.era.t63,d.model.cheb[,,1])
-addland(col="grey50",lwd=1)
-image.plot(lon.era.t63,lat.era.t63,d.model.leg[,,1])
-addland(col="grey50",lwd=1)
-
-image.plot(lon.era.t63,lat.era.t63,uwind.monmean[,,1]-d.model.cheb[,,1])
-addland(col="grey50",lwd=1)
-image.plot(lon.era.t63,lat.era.t63,uwind.monmean[,,1]-d.model.leg[,,1])
-addland(col="grey50",lwd=1)
-
-
-image.plot(lon.era.t63,lat.era.t63,uwind.monmean[,,2]-d.model.cheb[,,2])
-addland(col="grey50",lwd=1)
-image.plot(lon.era.t63,lat.era.t63,uwind.monmean[,,2]-d.model.leg[,,2])
-addland(col="grey50",lwd=1)
-
-image.plot(lon.era.t63,lat.era.t63,uwind.monmean[,,3]-d.model.cheb[,,3])
-addland(col="grey50",lwd=1)
-image.plot(lon.era.t63,lat.era.t63,uwind.monmean[,,3]-d.model.leg[,,3])
-addland(col="grey50",lwd=1)
-
-
-image.plot(lon.era.t63, lat.era.t63, uwind.monmean[,,1])
-lines(lon.era.t63, x.max[,1])
-
-image.plot(lon.era.t63, lat.era.t63, uwind.monmean[,,2])
-lines(lon.era.t63, x.max[,2])
-
-image.plot(lon.era.t63, lat.era.t63, uwind.monmean[,,3])
-lines(lon.era.t63, x.max[,3])
-
-
-
-
-for (i in 1:664) {
-  for (j in 1:192) {
-    plot(lat.era.t63, uwind.monmean[j,,i])
-    lines(lat.era.t63, cheb.model[j,,i], lty = 3)
-    points(x.extr[j,,i], y.extr[j,,i],  pch = 20)
-    print(i)
-  }
-}
-
-
-
-
-
-####################################################################################################
-########## visualisierung der daten ################################################################
-####################################################################################################
+######################################################################
+## IMAGE PLOT
+## ZONAL WIND NORDHEMISPHÄRE IM ZEITLICHEN VERLAUF
+######################################################################
 ##
-## plot über gesamte zeit
-image.plot(lon.era.t63,lat.era.t63,uwind.monmean[,,1])
-addland(col="grey50",lwd=1)
+
+image.plot(lon, lat, uwind.monmean[,,ti])
+addland(col = "grey50",lwd = 1)
+
+
+######################################################################
+## DIFFERENZ IMAGE PLOT
+## ZONAL WIND MINUS GEFILTERTES MODELL
+######################################################################
+##
+
+image.plot(lon, lat, uwind.monmean[,,ti] - model.uwind[,,ti])
+addland(col = "grey50",lwd = 1)
+
+
+######################################################################
+######################################################################
+## VERGLEICHSPLOT
+## DATEN VS MODELL VS EXTREMA
+######################################################################
+##
+
+plot(lat, uwind.monmean[lo,,ti])
+points(model.extr.lat[lo,,ti], model.extr.uwind[lo,,ti], pch = 20)
+lines(lat, model.uwind[lo,,ti], lty = 3)
+
+######################################################################
+## IMAGE PLOT
+## ZONAL WIND UND GEFITTETE MAXIMA
+######################################################################
+##
+
+image.plot(lon, lat, uwind.monmean[,,ti])
+lines(lon, model.max.lon[,ti])
 
 
 
-## plot mean
-#X11()
-image.plot(lon.era.t63,lat.era.t63,uwind.mean)
-addland(col="grey50",lwd=1)
 
-## plot mean
-#X11()
-image.plot(lon.era.t63,lat.era.t63,uwind.std)
-addland(col="grey50",lwd=1)
