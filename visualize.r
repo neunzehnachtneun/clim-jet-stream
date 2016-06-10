@@ -4,6 +4,8 @@
 
 library(fields)
 library(clim.pact)
+library(ggplot2)
+
 
 #load(".RData")
 
@@ -18,6 +20,16 @@ ti <- 1 # index zeit
 ## ERA-DATEN VS MODELL VS ABLEITUNG D. MODELLS
 ######################################################################
 ##
+pdf(file = "test.pdf")
+for (ti in 1:2) {
+  print(ti)
+  for (lon in 1:192) {
+    for (lat in 1:48) {
+    }
+  }
+}
+dev.off()
+
 
 plot(lat, uwind.monmean[lo,,ti], type = "l")
 lines(lat, model.uwind[lo,,ti], col = "dark red")
@@ -61,8 +73,32 @@ lines(lat, model.uwind[lo,,ti], lty = 3)
 ######################################################################
 ##
 
-image.plot(lon, lat, uwind.monmean[,,ti])
-lines(lon, model.max.lon[,ti])
+
+pdf(file = "test.pdf", family="serif")
+for (ti in 1:664) {
+  print(ti)
+  image.plot(lon, lat, uwind.monmean[,,ti], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-20,80), axes = F)
+  title(paste(time.era[ti]))
+  axis(1, at = seq(0, 360, 40), labels = TRUE)
+  axis(2, at = seq(0,90,10), labels = TRUE)
+  addland(col = "grey50",lwd = 1)
+  lines(lon, model.max.lon[,ti])
+}
+dev.off()
+
+
+
+pdf(file = "test.pdf", family="serif")
+for (ti in 1:664) {
+  print(ti)
+  contour(lon, lat, uwind.monmean[,,ti], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-20,80))
+  title(paste(time.era[ti]))
+  axis(1, at = seq(0, 360, 40), labels = TRUE)
+  axis(2, at = seq(0,90,10), labels = TRUE)
+  addland(col = "grey50",lwd = 1)
+  lines(lon, model.max.lon[,ti])
+}
+dev.off()
 
 
 

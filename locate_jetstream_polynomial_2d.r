@@ -1,6 +1,11 @@
 ######################################################################
 ######################################################################
+## ROUTINE ZUM EINLESEN VON ERA-DATEN (ZONAL-WIND) IM NCDF-FORMAT
+## UND AUFFINDEN DES JETSTREAMS AUF NORDHEMISPHÄRE
 ## source('~/Master_Thesis/r-code-git/locate_jetstream_polynomial_2d.r')
+######################################################################
+######################################################################
+
 
 library(ncdf)
 library(ncdf4)
@@ -32,7 +37,7 @@ lon <- ncvar_get(nc, "lon")
 lat <- ncvar_get(nc, "lat")
 lev <- ncvar_get(nc, "lev")
 time.help <- ncvar_get(nc, "time")
-time.era.t63 = chron(time.help/24, origin. = c(month = 9,day = 1,year = 1957))
+time.era = chron(time.help/24, origin. = c(month = 9,day = 1,year = 1957))
 nc_close(nc)
 rm(nc)
 
