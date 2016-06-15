@@ -36,8 +36,8 @@ uwind.monmean <- ncvar_get(nc, "var131")
 lon <- ncvar_get(nc, "lon")
 lat <- ncvar_get(nc, "lat")
 lev <- ncvar_get(nc, "lev")
-time.help <- ncvar_get(nc, "time")
-time.era = chron(time.help/24, origin. = c(month = 9,day = 1,year = 1957))
+date.help <- ncvar_get(nc, "time")
+dts = chron(dates. = time.help/24, origin. = c(month = 9,day = 1,year = 1957), format = "day mon year")
 nc_close(nc)
 rm(nc)
 
@@ -50,6 +50,10 @@ rm(nc)
 n.lat <- length(lat)
 n.lat.diff <- n.lat - 1
 n.lon <- length(lon)
+
+dts.month <- months(dts, abbreviate = TRUE)
+dts.year <- years(dts)
+
 
 ## Zeitlich gemittelter Zonalwind
 uwind.mean <- apply(uwind.monmean,c(1,2),mean)
@@ -74,7 +78,7 @@ apply(uwind.monmean, c(2,3), sd)
 
 # model.list <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = 23)
 cl <- makeCluster(getOption("cl.cores", 2)) ## Variante für paralleles Rechnen
-model.list <- parApply(cl, uwind.monmean[,,1:2], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = 23)
+model.list <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = 23)
 stopCluster(cl)
 
 ## Chebyshev-Koeffiziente
@@ -114,11 +118,12 @@ for (i in 1:664) {
     model.max.lat[j,i] <- model.extr.lat[j, which(model.extr.uwind[j,,i] == model.max.uwind[j,i]), i]
   }
 }
+rm(model.list)
 
 
 ######################################################################
 ## LEAST SQUARES FIT 
-## CHEBYSHEV POLYNOME 23-TER ORDNUNG
+## CHEBYSHEV POLYNOME 8-TER ORDNUNG
 ## AN MERIDIONALE MAXIMA DES ZONALWINDS IN ZONALER RICHTUNG
 ######################################################################
 ##
@@ -131,6 +136,16 @@ stopCluster(cl)
 ## Gefiltertes Modell für Maxima des Zonal-Wind in Zonalrichtung
 model.max.lon <- sapply(model.list, "[[", 2)
 rm(model.list)
+
+
+######################################################################
+## LEAST SQUARES FIT ÜBER **SEQUENZEN** (l=8)
+## CHEBYSHEV POLYNOME 3-TER ORDNUNG
+## AN ZONAL-WIND IN MERIDIONALER RICHTUNG
+######################################################################
+##
+pckg.cheb:::cheb.fit.seq(uwind.monmean[1,,1], lat, 3, 8)
+
 
 
 ######################################################################
