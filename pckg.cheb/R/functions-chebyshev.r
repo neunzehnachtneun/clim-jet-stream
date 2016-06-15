@@ -1,4 +1,4 @@
-## source('~/Master_Thesis/pckg.cheb/R/pckg.cheb.r')
+## source('~/Master_Thesis/pckg.cheb/R/functions-chebyshev.r')
 ##
 ## library(devtools)
 ## library(roxygen2)
@@ -109,8 +109,8 @@ cheb.2nd <- function(x.axis, n){
 #' @description
 #' cheb.model berechnet aus den Chebyshev-Koeffizienten die Y-Werte
 #' @examples
-#' cheb.model <- cheb.model(x.axis, cheb.coeff)
-cheb.model <- function(x.axis, cheb.coeff) {
+#' cheb.model <- cheb.model.filter(x.axis, cheb.coeff)
+cheb.model.filter <- function(x.axis, cheb.coeff) {
   ## Funktion zur Berechnung der Y-Werte aus X-Stellen und Cheb-Koeffizienten
   ## ##
   n <- length(cheb.coeff) - 1
@@ -182,6 +182,7 @@ cheb.deriv.2nd <- function(x.axis, cheb.coeff) {
 #' @examples
 #' cheb.list <- cheb.fit(d, x.axis, n)
 cheb.fit <- function(d, x.axis, n){
+  library(rootSolve)
   x.cheb <- cheb.scale(x.axis)
   cheb.t <- cheb.1st(x.axis, n)
 #  cheb.u <- cheb.2nd(x.axis, n)
@@ -190,15 +191,15 @@ cheb.fit <- function(d, x.axis, n){
   # berechnung der koeffizienten des polyfits
   cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
   # berechnung des gefilterten modells
-  cheb.model <- cheb.model(x.cheb, cheb.coeff)
+  cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
   # berechnung des abgeleiteten modells
   cheb.model.deriv.1st <- cheb.deriv.1st(x.cheb, cheb.coeff)
 
   # berechnung der nullstellen
   extr <- rootSolve::uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff, lower = (-1), upper = 1)
   # reskalierung der Nullstellen auf normale Lat- Achse
-  x.extr <- cheb.rescale(extr, x.axis = x.axis)
-  y.extr <- if (length(extr) != 0) cheb.model(x.axis = extr, cheb.coeff = cheb.coeff)
+  x.extr <- if (length(extr) != 0) cheb.rescale(extr, x.axis = x.axis)
+  y.extr <- if (length(extr) != 0) cheb.model.filter(x.axis = extr, cheb.coeff = cheb.coeff)
 
   cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st, x.extr = x.extr, y.extr = y.extr)
   return(cheb.list)
@@ -213,16 +214,7 @@ cheb.fit <- function(d, x.axis, n){
 #' @examples
 #' cheb.fit.seq(d, x.axis, n, l)
 cheb.fit.seq <- function(d, x.axis, n, l){
-  ## funktion zur rechnung mit chebyshev polynomen
-  ## bestimmung der polynome erster und zweiter art, polynomfit nter ordnung,
-  ## ermittelung der ableitung der polynome und entwicklung von modellen des fits und der ableitung.
-  ## inputs: d datensatz, der approximiert werden soll,
-  ## x stützpunkte für f(x), zb längengrad [0,90],
-  ## n ordnung des polynom fit, dx.h auflösung des hochaufgelösten gitters,
-  ## split die unterteilung der daten in sektoren mit der länge split
-  ## outputs: koeffizienten und ableitung, modell und ableitung
-  ##
-
+  library(rootSolve)
   x.mat <- matrix(x.axis, ncol = l, byrow = TRUE)
   d.mat <- matrix(d, ncol = l, byrow = TRUE)
 
@@ -233,27 +225,24 @@ cheb.fit.seq <- function(d, x.axis, n, l){
     x.seq <- if (i == 1) c(x.mat[i,]) else c(x.mat[(i - 1), dim(x.mat)[2]], x.mat[i,])
     x.cheb.seq <- cheb.scale(x.seq)
     d.seq <- if (i == 1) c(d.mat[i,]) else c(d.mat[(i - 1), dim(d.mat)[2]], d.mat[i,])
-    # skalierung der stützpunkte auf [-1,1]
     cheb.t.seq <- cheb.1st(x.seq, n)
-    ######################################################################
-    ######################################################################
     ## modell berechnungen
     # berechnung der koeffizienten des polyfits
     cheb.coeff.seq <- solve(t(cheb.t.seq) %*% cheb.t.seq) %*% t(cheb.t.seq) %*% d.seq
     cheb.coeff <- if (i == 1) cheb.coeff.seq else cbind(cheb.coeff, cheb.coeff.seq)
     # berechnung des gefilterten modells
-    cheb.model.seq <- cheb.model(x.cheb.seq, cheb.coeff.seq)
-    cheb.model <- if (i == 1) cheb.model.seq else c(cheb.model, cheb.model.seq[2:l+1])
+    cheb.model.seq <- cheb.model.filter(x.cheb.seq, cheb.coeff.seq)
+    cheb.model <- if (i == 1) cheb.model.seq else c(cheb.model, cheb.model.seq[2:(l+1)])
     # berechnung des abgeleiteten modells
     cheb.model.deriv.1st.seq <- cheb.deriv.1st(x.cheb.seq, cheb.coeff.seq)
-    cheb.model.deriv.1st <- if (i == 1) cheb.model.deriv.1st.seq else c(cheb.model.deriv.1st, cheb.model.deriv.1st.seq[2:l+1])
+    cheb.model.deriv.1st <- if (i == 1) cheb.model.deriv.1st.seq else c(cheb.model.deriv.1st, cheb.model.deriv.1st.seq[2:(l+1)])
 
     # berechnung der nullstellen
     extr.seq <- rootSolve::uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff.seq, lower = (-1), upper = 1)
     # reskalierung der Nullstellen auf normale Lat- Achse
-    x.extr.seq <- cheb.rescale(extr.seq, x.axis = x.seq)
-    y.extr.seq <- if (length(extr.seq) != 0) cheb.model(x.axis = extr.seq, cheb.coeff = cheb.coeff)
-
+    x.extr.seq <- if (length(extr.seq) != 0) cheb.rescale(extr.seq, x.axis = x.seq)
+    y.extr.seq <- if (length(extr.seq) != 0) cheb.model.filter(x.axis = extr.seq, cheb.coeff = cheb.coeff.seq)
+    #
     if (exists("x.extr.seq") == TRUE & exists("x.extr") == FALSE) {
       x.extr <- x.extr.seq
       y.extr <- y.extr.seq
@@ -261,10 +250,6 @@ cheb.fit.seq <- function(d, x.axis, n, l){
       x.extr <- c(x.extr, x.extr.seq)
       y.extr <- c(y.extr, y.extr.seq)
     }
-
-
-
-    ######################################################################
   }
 
   ## übergabe der variablen als liste

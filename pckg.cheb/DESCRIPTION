@@ -7,4 +7,4 @@ Maintainer: Sebastian Kiefer <s.kiefer@posteo.de>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 5.0.1
