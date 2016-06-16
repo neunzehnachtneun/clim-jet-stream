@@ -63,9 +63,50 @@ addland(col = "grey50",lwd = 1)
 ######################################################################
 ##
 
-plot(lat, uwind.monmean[lo,,ti])
+pdf(file = "model-uni.pdf", family="serif")
+for (ti in 1:664) {
+  print(ti)
+  for (lo in 1:192) {
+    plot(lat, uwind.monmean[lo,,ti], axes = FALSE)
+    points(model.extr.lat[lo,,ti], model.extr.uwind[lo,,ti], pch = 20)
+    lines(lat, model.uwind[lo,,ti], lty = 3)
+    title(paste(dts.month[ti], dts.year[ti], "//", "Lon =", lon[lo], "deg", sep = " "))
+    axis(1, at = seq(0,90,10), labels = TRUE)
+    axis(2, at = seq(-25, 85, 10), labels = TRUE)
+  }
+}
+dev.off()
+
+
+pdf(file = "model-seq.pdf", family="serif")
+for (ti in 1:664) {
+  print(ti)
+  for (lo in 1:192) {
+    plot(lat, uwind.monmean[lo,,ti], axes = FALSE)
+    points(model.extr.lat.seq[lo,,ti], model.extr.uwind.seq[lo,,ti], pch = 20)
+    lines(lat, model.uwind.seq[lo,,ti], lty = 3)
+    title(paste(dts.month[ti], dts.year[ti], "//", "Lon =", lon[lo], "deg", sep = " "))
+    axis(1, at = seq(0,90,10), labels = TRUE)
+    axis(2, at = seq(-25, 85, 10), labels = TRUE)
+  }
+}
+dev.off()
+
+plot(lat, uwind.monmean[lo,,ti], axes = FALSE)
 points(model.extr.lat[lo,,ti], model.extr.uwind[lo,,ti], pch = 20)
 lines(lat, model.uwind[lo,,ti], lty = 3)
+title(paste(dts.month[ti], dts.year[ti], "//", "Lon =", lon[lo], sep = " "))
+axis(1, at = seq(0,90,10), labels = TRUE)
+axis(2, at = seq(-25, 85, 10), labels = TRUE)
+
+
+
+plot(lat, uwind.monmean[lo,,ti], axes = FALSE)
+points(model.extr.lat.seq[lo,,ti], model.extr.uwind.seq[lo,,ti], pch = 20)
+lines(lat, model.uwind.seq[lo,,ti], lty = 3)
+title(paste(dts.month[ti], dts.year[ti], "//", "Lon =", lon[lo], sep = " "))
+axis(1, at = seq(0,90,10), labels = TRUE)
+axis(2, at = seq(-25, 85, 10), labels = TRUE)
 
 ######################################################################
 ## IMAGE PLOT

@@ -55,23 +55,29 @@ lon <- ncvar_get(nc, "lon")
 lat <- ncvar_get(nc, "lat")
 lev <- ncvar_get(nc, "lev")
 date.help <- ncvar_get(nc, "time")
-dts = chron(dates. = date.help/24, origin. = c(month = 9,day = 1,year = 1957), format = "day mon year")
 nc_close(nc)
 rm(nc)
 
 
 ######################################################################
-## NÜTZLICHE VARIABLEN AUS DATENSATZ
+## VARIABLEN UND PARAMETER
 ######################################################################
 ##
 
-n.cpu <- 22
+n.cpu <- 24 #5 # Anzahl der CPUs für parApply
+n.order.lat <- 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
+n.order.lon <- 8 # Ordnung des Least-Square-Verfahrens für Fit über Längengrad
+n.order.lat.seq <- 3 # Ordnung des Least-Square-Verfahrens für sequentiellen Fit über Breitengrad
+len.seq <- 8 # Länge der ersten Sequenz der 
+
+## Räumliche Auflösung
 n.lat <- length(lat)
 n.lon <- length(lon)
 
+## Zeitliche Auflösung
+dts = chron(dates. = date.help/24, origin. = c(month = 9,day = 1,year = 1957), format = "day mon year")
 dts.month <- months(dts, abbreviate = TRUE)
 dts.year <- years(dts)
-
 
 ## Zeitlich gemittelter Zonalwind
 uwind.mean <- apply(uwind.monmean,c(1,2),mean)
@@ -80,11 +86,10 @@ uwind.std <- apply(uwind.monmean,c(1,2),sd)
 ## Meridional und zeitlich gemittelter Zonalwind
 uwind.mon.mer.mean <- apply(uwind.monmean, 2, mean)
 uwind.mon.mer.sd <- apply(uwind.mean, 2, sd)
-plot(uwind.mon.mer.sd)
 
 ## Meridional gemittelter Zonalwind
-uwind.monmean.mermean <- apply(uwind.monmean, c(2,3), mean)
-apply(uwind.monmean, c(2,3), sd)
+# uwind.monmean.mermean <- apply(uwind.monmean, c(2,3), mean)
+# uwind.monmean.mersd <- apply(uwind.monmean, c(2,3), sd)
 
 
 ######################################################################
@@ -94,15 +99,15 @@ apply(uwind.monmean, c(2,3), sd)
 ######################################################################
 ##
 
-# list.model.lat <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = 23)
+# list.model.lat <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
 cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-list.model.lat <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = 23)
+list.model.lat <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
 stopCluster(cl)
 dim.list <- dim(list.model.lat)
 
 ## Chebyshev-Koeffizienten
 cheb.coeff <- sapply(list.model.lat, "[[", 1)
-cheb.coeff <- apply(array(data = cheb.coeff, dim = c(dim(cheb.coeff)[1], dim.list[1], dim.list[2])),  c(1,3), t)
+cheb.coeff <- apply(array(data = cheb.coeff, dim = c((n.order.lat + 1), dim.list[1], dim.list[2])) , c(1,3), t)
 
 ## Gefiltertes Modell für Zonal-Wind
 model.uwind <- sapply(list.model.lat, "[[", 2)
@@ -129,6 +134,7 @@ for (i in 1:dim.list[2]) {
   }
 }
 rm(list.model.lat, dim.list)
+rm(dim.list)
 
 
 ######################################################################
@@ -138,9 +144,9 @@ rm(list.model.lat, dim.list)
 ######################################################################
 ##
 
-#list.model.lon <- apply(model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = 8)
+#list.model.lon <- apply(model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = n.order.lon)
 cl <- makeCluster(getOption("cl.cores", n.cpu))
-list.model.lon <- parApply(cl, model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = 8)
+list.model.lon <- parApply(cl, model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = n.order.lon)
 stopCluster(cl)
 
 ## Gefiltertes Modell für Maxima des Zonal-Wind in Zonalrichtung
@@ -155,9 +161,9 @@ rm(list.model.lon)
 ######################################################################
 ##
 
-# list.model.lat.seq <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = 3, l = 8)
+# list.model.lat.seq <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
 cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-list.model.lat.seq <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = 3, l = 8)
+list.model.lat.seq <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
 stopCluster(cl)
 dim.list <- dim(list.model.lat.seq)
 
@@ -171,9 +177,9 @@ model.uwind.deriv.1st.seq <- apply(array(data = model.uwind.deriv.1st.seq, dim =
 
 ## Extrema des Modells (Positionen und Werte)
 model.extr.lat.seq <- sapply(list.model.lat.seq, "[[", 3)
-model.extr.uwind.seq <- sapply(list.model.lat.seq, "[[", 4)
 model.extr.lat.seq <- sapply(model.extr.lat.seq, fun.fill, n = 24)
 model.extr.lat.seq <- apply(array(model.extr.lat.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
+model.extr.uwind.seq <- sapply(list.model.lat.seq, "[[", 4)
 model.extr.uwind.seq <- sapply(model.extr.uwind.seq, fun.fill, n = 24)
 model.extr.uwind.seq <- apply(array(model.extr.uwind.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
 
@@ -198,7 +204,7 @@ rm(list.model.lat.seq, dim.list)
 
 #list.model.lon.seq <- apply(model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = 8)
 cl <- makeCluster(getOption("cl.cores", n.cpu))
-list.model.lon.seq <- parApply(cl, model.max.lat.seq, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = 8)
+list.model.lon.seq <- parApply(cl, model.max.lat.seq, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = n.order.lon)
 stopCluster(cl)
 
 ## Gefiltertes Modell für Maxima des Zonal-Wind in Zonalrichtung
@@ -219,8 +225,9 @@ mse <- sum(residuals.cheb ** 2) / length(residuals.cheb)
 mse.seq <- sum(residuals.cheb.seq **2) / length(residuals.cheb.seq)
 rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
 rmse.seq <- sqrt(sum(residuals.cheb.seq **2) / length(residuals.cheb.seq))
-## rmse = 0.4079846  ## mse = 
-## rmse = 0.2911683  ## mse = 0.08477901
+
+## rmse.seq = 0.4079846  ## mse.seq = 0.1664514
+## rmse     = 0.2911683  ## mse     = 0.08477901
 
 
 ######################################################################
