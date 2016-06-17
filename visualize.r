@@ -67,7 +67,8 @@ pdf(file = "model-uni.pdf", family="serif")
 for (ti in 1:664) {
   print(ti)
   for (lo in 1:192) {
-    plot(lat, uwind.monmean[lo,,ti], axes = FALSE)
+    
+    plot(lat, uwind.monmean[lo,,ti], xlab = "Breitengrad", ylab = "Zonalwind in #", ylim=c(-25, 85), axes = FALSE)
     points(model.extr.lat[lo,,ti], model.extr.uwind[lo,,ti], pch = 20)
     lines(lat, model.uwind[lo,,ti], lty = 3)
     title(paste(dts.month[ti], dts.year[ti], "//", "Lon =", lon[lo], "deg", sep = " "))
@@ -79,10 +80,11 @@ dev.off()
 
 
 pdf(file = "model-seq.pdf", family="serif")
-for (ti in 1:664) {
+for (ti in 1:2) {
   print(ti)
   for (lo in 1:192) {
-    plot(lat, uwind.monmean[lo,,ti], axes = FALSE)
+    
+    plot(lat, uwind.monmean[lo,,ti], xlab = "Breitengrad", ylab = "Zonalwind in #", ylim=c(-25, 85), axes = FALSE)
     points(model.extr.lat.seq[lo,,ti], model.extr.uwind.seq[lo,,ti], pch = 20)
     lines(lat, model.uwind.seq[lo,,ti], lty = 3)
     title(paste(dts.month[ti], dts.year[ti], "//", "Lon =", lon[lo], "deg", sep = " "))

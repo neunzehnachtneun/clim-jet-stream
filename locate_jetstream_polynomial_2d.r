@@ -13,7 +13,7 @@
 ##
 
 library(ncdf4)
-library(rootSolve)
+# library(rootSolve)
 library(parallel)
 library(chron)
 
@@ -23,7 +23,7 @@ library(pckg.cheb)
 
 setwd("~/Master_Thesis/r-code-git/")
 path <- "data/"
-file <- "era--t63_ua_monmean_300hpa_nh.nc"  # Nordhemisphäre
+file <- "era-79-16-nh-trop-inv.nc"  # Nordhemisphäre + Tropen
 #file <- "era--t63_ua_monmean_300hpa_sh.nc"  # Südhemisphäre
 #file <- "era--t63_ua_monmean_300hpa.nc"     # Globus
 
@@ -50,7 +50,9 @@ fun.fill <- function(x, n) {
 ##
 
 nc <- nc_open(paste(path, file, sep = ""))
+print(nc)
 uwind.monmean <- ncvar_get(nc, "var131")
+vwind.monmean <- ncvar_get(nc, "var132")
 lon <- ncvar_get(nc, "lon")
 lat <- ncvar_get(nc, "lat")
 lev <- ncvar_get(nc, "lev")
@@ -154,62 +156,6 @@ model.max.lon <- sapply(list.model.lon, "[[", 2)
 rm(list.model.lon)
 
 
-######################################################################
-## LEAST SQUARES FIT ÜBER **SEQUENZEN** (l=8)
-## CHEBYSHEV POLYNOME 3-TER ORDNUNG
-## AN ZONAL-WIND IN MERIDIONALER RICHTUNG
-######################################################################
-##
-
-# list.model.lat.seq <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
-cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-list.model.lat.seq <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
-stopCluster(cl)
-dim.list <- dim(list.model.lat.seq)
-
-## Gefiltertes Modell für Zonal-Wind
-model.uwind.seq <- sapply(list.model.lat.seq, "[[", 1)
-model.uwind.seq <- apply(array(data = model.uwind.seq, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
-
-## Erste Ableitung des gefilterten Modells für Zonalwind
-model.uwind.deriv.1st.seq <- sapply(list.model.lat.seq, "[[", 2)
-model.uwind.deriv.1st.seq <- apply(array(data = model.uwind.deriv.1st.seq, dim = c(n.lon, dim.list[1], dim.list[2])),  c(1,3), t)
-
-## Extrema des Modells (Positionen und Werte)
-model.extr.lat.seq <- sapply(list.model.lat.seq, "[[", 3)
-model.extr.lat.seq <- sapply(model.extr.lat.seq, fun.fill, n = 24)
-model.extr.lat.seq <- apply(array(model.extr.lat.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
-model.extr.uwind.seq <- sapply(list.model.lat.seq, "[[", 4)
-model.extr.uwind.seq <- sapply(model.extr.uwind.seq, fun.fill, n = 24)
-model.extr.uwind.seq <- apply(array(model.extr.uwind.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
-
-## Maxima des Modells (Positionen und Werte)
-model.max.uwind.seq <- apply(model.extr.uwind.seq, c(1,3), max, na.rm = TRUE)
-model.max.lat.seq <- array(rep(0, dim.list[1]*dim.list[2]), c(dim.list))
-for (i in 1:dim.list[2]) {
-  for (j in 1:dim.list[1]) {
-    model.max.lat.seq[j,i] <- model.extr.lat.seq[j, which(model.extr.uwind.seq[j,,i] == model.max.uwind.seq[j,i]), i]
-  }
-}
-rm(list.model.lat.seq, dim.list)
-
-
-######################################################################
-## LEAST SQUARES FIT 
-## CHEBYSHEV POLYNOME 8-TER ORDNUNG
-## AN MERIDIONALE MAXIMA DES ZONALWINDS IN ZONALER RICHTUNG
-## ANGEWANDT AUF SEQUENZIERTES MODELL
-######################################################################
-##
-
-#list.model.lon.seq <- apply(model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = 8)
-cl <- makeCluster(getOption("cl.cores", n.cpu))
-list.model.lon.seq <- parApply(cl, model.max.lat.seq, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = n.order.lon)
-stopCluster(cl)
-
-## Gefiltertes Modell für Maxima des Zonal-Wind in Zonalrichtung
-model.max.lon.seq <- sapply(list.model.lon.seq, "[[", 2)
-rm(list.model.lon.seq)
 
 
 ######################################################################
@@ -235,7 +181,19 @@ rmse.seq <- sqrt(sum(residuals.cheb.seq **2) / length(residuals.cheb.seq))
 save.image()
 
 
+######################################################################
+## Berechnung von Mean und Sd
+## über fünf Jahre & saisonal
+######################################################################
 
+mam <- which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")
+jja <- which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")
+son <- which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")
+djf <- which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")
+
+y1 <- 
+y2
+y3
 
 
 
@@ -259,4 +217,64 @@ save.image()
 # }
 # #m <- uwind.era.t63.monmean*cos(lat.era.t63)
 # 
+
+
+
+
+# ######################################################################
+# ## LEAST SQUARES FIT ÜBER **SEQUENZEN** (l=8)
+# ## CHEBYSHEV POLYNOME 3-TER ORDNUNG
+# ## AN ZONAL-WIND IN MERIDIONALER RICHTUNG
+# ######################################################################
+# ##
+# 
+# # list.model.lat.seq <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
+# cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
+# list.model.lat.seq <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
+# stopCluster(cl)
+# dim.list <- dim(list.model.lat.seq)
+# 
+# ## Gefiltertes Modell für Zonal-Wind
+# model.uwind.seq <- sapply(list.model.lat.seq, "[[", 1)
+# model.uwind.seq <- apply(array(data = model.uwind.seq, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
+# 
+# ## Erste Ableitung des gefilterten Modells für Zonalwind
+# model.uwind.deriv.1st.seq <- sapply(list.model.lat.seq, "[[", 2)
+# model.uwind.deriv.1st.seq <- apply(array(data = model.uwind.deriv.1st.seq, dim = c(n.lon, dim.list[1], dim.list[2])),  c(1,3), t)
+# 
+# ## Extrema des Modells (Positionen und Werte)
+# model.extr.lat.seq <- sapply(list.model.lat.seq, "[[", 3)
+# model.extr.lat.seq <- sapply(model.extr.lat.seq, fun.fill, n = 24)
+# model.extr.lat.seq <- apply(array(model.extr.lat.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
+# model.extr.uwind.seq <- sapply(list.model.lat.seq, "[[", 4)
+# model.extr.uwind.seq <- sapply(model.extr.uwind.seq, fun.fill, n = 24)
+# model.extr.uwind.seq <- apply(array(model.extr.uwind.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
+# 
+# ## Maxima des Modells (Positionen und Werte)
+# model.max.uwind.seq <- apply(model.extr.uwind.seq, c(1,3), max, na.rm = TRUE)
+# model.max.lat.seq <- array(rep(0, dim.list[1]*dim.list[2]), c(dim.list))
+# for (i in 1:dim.list[2]) {
+#   for (j in 1:dim.list[1]) {
+#     model.max.lat.seq[j,i] <- model.extr.lat.seq[j, which(model.extr.uwind.seq[j,,i] == model.max.uwind.seq[j,i]), i]
+#   }
+# }
+# rm(list.model.lat.seq, dim.list)
+# 
+# 
+# ######################################################################
+# ## LEAST SQUARES FIT 
+# ## CHEBYSHEV POLYNOME 8-TER ORDNUNG
+# ## AN MERIDIONALE MAXIMA DES ZONALWINDS IN ZONALER RICHTUNG
+# ## ANGEWANDT AUF SEQUENZIERTES MODELL
+# ######################################################################
+# ##
+# 
+# #list.model.lon.seq <- apply(model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = 8)
+# cl <- makeCluster(getOption("cl.cores", n.cpu))
+# list.model.lon.seq <- parApply(cl, model.max.lat.seq, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = n.order.lon)
+# stopCluster(cl)
+# 
+# ## Gefiltertes Modell für Maxima des Zonal-Wind in Zonalrichtung
+# model.max.lon.seq <- sapply(list.model.lon.seq, "[[", 2)
+# rm(list.model.lon.seq)
 
