@@ -66,8 +66,8 @@ rm(nc)
 ######################################################################
 ##
 
-n.cpu <- 24 #5 # Anzahl der CPUs für parApply
-n.order.lat <- 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
+n.cpu <- 2#4 #5 # Anzahl der CPUs für parApply
+n.order.lat <- 59 # 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
 n.order.lon <- 8 # Ordnung des Least-Square-Verfahrens für Fit über Längengrad
 n.order.lat.seq <- 3 # Ordnung des Least-Square-Verfahrens für sequentiellen Fit über Breitengrad
 len.seq <- 8 # Länge der ersten Sequenz der 
@@ -185,16 +185,42 @@ save.image()
 ## Berechnung von Mean und Sd
 ## über fünf Jahre & saisonal
 ######################################################################
+dts.year.mn <- seq(1960, 2010, 5)
 
-mam <- which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")
-jja <- which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")
-son <- which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")
-djf <- which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")
+ind.mam <- which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")
+ind.jja <- which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")
+ind.son <- which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")
+ind.djf <- which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")
 
-y1 <- 
-y2
-y3
+uwind.seas.mam.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+uwind.seas.mam.sd <- array( NA , dim = c(n.lon, n.lat, 11))
+uwind.seas.jja.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+uwind.seas.jja.sd <- array( NA , dim = c(n.lon, n.lat, 11))
+uwind.seas.son.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+uwind.seas.son.sd <- array( NA , dim = c(n.lon, n.lat, 11))
+uwind.seas.djf.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+uwind.seas.djf.sd <- array( NA , dim = c(n.lon, n.lat, 11))
 
+for (i in seq(1, 11)) {
+  yr.i <- dts.year.mn[i]
+  ind.yr <- which(dts.year ==  yr.i | dts.year == (yr.i + 1) | dts.year == (yr.i + 2) | dts.year == (yr.i + 3) | dts.year == (yr.i + 4) )
+  ## Mar Apr May
+  ind.mam.yr <- intersect(ind.yr, ind.mam)
+  uwind.seas.mam.mean[,,i] <- apply(uwind.monmean[,, ind.mam.yr], c(1,2), mean)
+  uwind.seas.mam.sd[,,i] <- apply(uwind.monmean[,, ind.mam.yr], c(1,2), sd)
+  ## Jun Jul Aug
+  ind.jja.yr <- intersect(ind.yr, ind.jja)
+  uwind.seas.jja.mean[,,i] <- apply(uwind.monmean[,, ind.jja.yr], c(1,2), mean)
+  uwind.seas.jja.sd[,,i] <- apply(uwind.monmean[,, ind.jja.yr], c(1,2), sd)
+  ## Sep Oct Nov
+  ind.son.yr <- intersect(ind.yr, ind.son)
+  uwind.seas.son.mean[,,i] <- apply(uwind.monmean[,, ind.son.yr], c(1,2), mean)
+  uwind.seas.son.sd[,,i] <- apply(uwind.monmean[,, ind.son.yr], c(1,2), sd)
+  ## Dec Jan Feb
+  ind.djf.yr <- intersect(ind.yr, ind.djf)
+  uwind.seas.djf.mean[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), mean)
+  uwind.seas.djf.sd[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), sd)
+}
 
 
 

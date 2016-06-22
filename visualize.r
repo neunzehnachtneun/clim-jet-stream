@@ -144,5 +144,16 @@ for (ti in 1:664) {
 dev.off()
 
 
+######################################################################
+## IMAGE PLOT
+## SAISONALE MEANS UND STANDARDABWEICHUNG
+######################################################################
+##
+
+image.plot(lon, lat, uwind.seas.son.mean[,,1]+uwind.seas.son.sd[,,1], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-20,80), axes = F)
+title("Mar Apr May // 1960 - 1964")
+axis(1, at = seq(-180, 180, 30), labels = TRUE)
+axis(2, at = seq(-30,90,20), labels = TRUE)
+addland(col = "grey50",lwd = 1)
 
 
