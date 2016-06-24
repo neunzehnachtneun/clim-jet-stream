@@ -150,7 +150,6 @@ dev.off()
 ######################################################################
 ##
 
-pdf(file = "test.pdf", family="serif")
 for (i in 1:11) {
   par(mfrow=c(4,1))
   ## Mean # Mar Apr May
@@ -178,5 +177,13 @@ for (i in 1:11) {
   axis(2, at = seq(-30,90,15), labels = TRUE)
   addland(col = "grey50",lwd = 1)
 }
-dev.off()
 
+
+## Mean # Mar Apr May
+for (i in 1:11) {
+  image.plot(lon, lat, uwind.seas.son.mean[,,i] - uwind.mean, xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("Mean //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(-180, 180, 30), labels = TRUE)
+  axis(2, at = seq(-30,90,15), labels = TRUE)
+  addland(col = "grey50",lwd = 1)
+}

@@ -191,6 +191,7 @@ ind.jja <- which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")
 ind.son <- which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")
 ind.djf <- which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")
 
+## Mittelwerte global
 uwind.seas.mam.mean <- array( NA , dim = c(n.lon, n.lat, 11))
 uwind.seas.mam.sd <- array( NA , dim = c(n.lon, n.lat, 11))
 uwind.seas.jja.mean <- array( NA , dim = c(n.lon, n.lat, 11))
@@ -200,6 +201,16 @@ uwind.seas.son.sd <- array( NA , dim = c(n.lon, n.lat, 11))
 uwind.seas.djf.mean <- array( NA , dim = c(n.lon, n.lat, 11))
 uwind.seas.djf.sd <- array( NA , dim = c(n.lon, n.lat, 11))
 
+## Mittelwerte meridional *???*
+uwind.mer.seas.mam.mean <- array( NA , dim = c(n.lat, 11))
+uwind.mer.seas.mam.sd <- array( NA , dim = c(n.lat, 11))
+uwind.mer.seas.jja.mean <- array( NA , dim = c(n.lat, 11))
+uwind.mer.seas.jja.sd <- array( NA , dim = c(n.lat, 11))
+uwind.mer.seas.son.mean <- array( NA , dim = c(n.lat, 11))
+uwind.mer.seas.son.sd <- array( NA , dim = c(n.lat, 11))
+uwind.mer.seas.djf.mean <- array( NA , dim = c(n.lat, 11))
+uwind.mer.seas.djf.sd <- array( NA , dim = c(n.lat, 11))
+
 for (i in seq(1, 11)) {
   print(i)
   yr.i <- dts.year.mn[i]
@@ -208,18 +219,26 @@ for (i in seq(1, 11)) {
   ind.mam.yr <- intersect(ind.yr, ind.mam)
   uwind.seas.mam.mean[,,i] <- apply(uwind.monmean[,, ind.mam.yr], c(1,2), mean)
   uwind.seas.mam.sd[,,i] <- apply(uwind.monmean[,, ind.mam.yr], c(1,2), sd)
+  uwind.mer.seas.mam.mean[,i] <- apply(uwind.monmean[,, ind.mam.yr], 2, mean)
+  uwind.mer.seas.mam.sd[,i] <- apply(uwind.monmean[,, ind.mam.yr], 2, sd)
   ## Jun Jul Aug
   ind.jja.yr <- intersect(ind.yr, ind.jja)
   uwind.seas.jja.mean[,,i] <- apply(uwind.monmean[,, ind.jja.yr], c(1,2), mean)
   uwind.seas.jja.sd[,,i] <- apply(uwind.monmean[,, ind.jja.yr], c(1,2), sd)
+  uwind.mer.seas.jja.mean[,i] <- apply(uwind.monmean[,, ind.jja.yr], 2, mean)
+  uwind.mer.seas.jja.sd[,i] <- apply(uwind.monmean[,, ind.jja.yr], 2, sd)
   ## Sep Oct Nov
   ind.son.yr <- intersect(ind.yr, ind.son)
   uwind.seas.son.mean[,,i] <- apply(uwind.monmean[,, ind.son.yr], c(1,2), mean)
   uwind.seas.son.sd[,,i] <- apply(uwind.monmean[,, ind.son.yr], c(1,2), sd)
+  uwind.mer.seas.son.mean[,i] <- apply(uwind.monmean[,, ind.son.yr], 2, mean)
+  uwind.mer.seas.son.sd[,i] <- apply(uwind.monmean[,, ind.son.yr], 2, sd)
   ## Dec Jan Feb
   ind.djf.yr <- intersect(ind.yr, ind.djf)
   uwind.seas.djf.mean[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), mean)
   uwind.seas.djf.sd[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), sd)
+  uwind.mer.seas.djf.mean[,i] <- apply(uwind.monmean[,, ind.djf.yr], 2, mean)
+  uwind.mer.seas.djf.sd[,i] <- apply(uwind.monmean[,, ind.djf.yr], 2, sd)
   ## Löschen von Übergangsvariablen
   rm(yr.i, ind.yr, ind.mam.yr, ind.jja.yr, ind.son.yr, ind.djf.yr, i)
 }
