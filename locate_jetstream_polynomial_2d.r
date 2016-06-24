@@ -13,7 +13,6 @@
 ##
 
 library(ncdf4)
-# library(rootSolve)
 library(parallel)
 library(chron)
 
@@ -66,7 +65,7 @@ rm(nc)
 ######################################################################
 ##
 
-n.cpu <- 2#4 #5 # Anzahl der CPUs für parApply
+n.cpu <- 4 #5 # Anzahl der CPUs für parApply
 n.order.lat <- 59 # 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
 n.order.lon <- 8 # Ordnung des Least-Square-Verfahrens für Fit über Längengrad
 n.order.lat.seq <- 3 # Ordnung des Least-Square-Verfahrens für sequentiellen Fit über Breitengrad
@@ -202,6 +201,7 @@ uwind.seas.djf.mean <- array( NA , dim = c(n.lon, n.lat, 11))
 uwind.seas.djf.sd <- array( NA , dim = c(n.lon, n.lat, 11))
 
 for (i in seq(1, 11)) {
+  print(i)
   yr.i <- dts.year.mn[i]
   ind.yr <- which(dts.year ==  yr.i | dts.year == (yr.i + 1) | dts.year == (yr.i + 2) | dts.year == (yr.i + 3) | dts.year == (yr.i + 4) )
   ## Mar Apr May
@@ -220,11 +220,29 @@ for (i in seq(1, 11)) {
   ind.djf.yr <- intersect(ind.yr, ind.djf)
   uwind.seas.djf.mean[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), mean)
   uwind.seas.djf.sd[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), sd)
+  ## Löschen von Übergangsvariablen
+  rm(yr.i, ind.yr, ind.mam.yr, ind.jja.yr, ind.son.yr, ind.djf.yr, i)
 }
 
+max(uwind.seas.mam.mean, uwind.seas.jja.mean, uwind.seas.son.mean, uwind.seas.djf.mean)
+min(uwind.seas.mam.mean, uwind.seas.jja.mean, uwind.seas.son.mean, uwind.seas.djf.mean)
+range(uwind.seas.mam.mean, uwind.seas.jja.mean, uwind.seas.son.mean, uwind.seas.djf.mean)
 
+max(uwind.seas.mam.mean)
+min(uwind.seas.mam.mean)
+range(uwind.seas.mam.mean)
 
+max(uwind.seas.jja.mean)
+min(uwind.seas.jja.mean)
+range(uwind.seas.jja.mean)
 
+max(uwind.seas.son.mean)
+min(uwind.seas.son.mean)
+range(uwind.seas.son.mean)
+
+max(uwind.seas.djf.mean)
+min(uwind.seas.djf.mean)
+range(uwind.seas.djf.mean)
 
 
 ####################################################################################################

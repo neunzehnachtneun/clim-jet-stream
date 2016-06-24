@@ -4,7 +4,7 @@
 
 library(fields)
 library(clim.pact)
-library(ggplot2)
+# library(ggplot2)
 
 
 #load(".RData")
@@ -150,10 +150,33 @@ dev.off()
 ######################################################################
 ##
 
-image.plot(lon, lat, uwind.seas.son.mean[,,1]+uwind.seas.son.sd[,,1], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-20,80), axes = F)
-title("Mar Apr May // 1960 - 1964")
-axis(1, at = seq(-180, 180, 30), labels = TRUE)
-axis(2, at = seq(-30,90,20), labels = TRUE)
-addland(col = "grey50",lwd = 1)
-
+pdf(file = "test.pdf", family="serif")
+for (i in 1:11) {
+  par(mfrow=c(4,1))
+  ## Mean # Mar Apr May
+  image.plot(lon, lat, uwind.seas.son.mean[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("Mean //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(-180, 180, 30), labels = TRUE)
+  axis(2, at = seq(-30,90,15), labels = TRUE)
+  addland(col = "grey50",lwd = 1)
+  ## Sd # Mar Apr May
+  image.plot(lon, lat, uwind.seas.son.sd[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("Sd //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(-180, 180, 30), labels = TRUE)
+  axis(2, at = seq(-30,90,15), labels = TRUE)
+  addland(col = "grey50",lwd = 1)
+  ## Mean + Sd # Mar Apr May
+  image.plot(lon, lat, uwind.seas.son.mean[,,i]+uwind.seas.son.sd[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("Mean + Sd //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(-180, 180, 30), labels = TRUE)
+  axis(2, at = seq(-30,90,15), labels = TRUE)
+  addland(col = "grey50",lwd = 1)
+  ## Mean - Sd # Mar Apr May
+  image.plot(lon, lat, uwind.seas.son.mean[,,i]-uwind.seas.son.sd[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("Mean - Sd //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(-180, 180, 30), labels = TRUE)
+  axis(2, at = seq(-30,90,15), labels = TRUE)
+  addland(col = "grey50",lwd = 1)
+}
+dev.off()
 
