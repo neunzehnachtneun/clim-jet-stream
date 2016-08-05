@@ -22,9 +22,8 @@ library(pckg.cheb)
 
 setwd("~/Master_Thesis/r-code-git/")
 path <- "data/"
-file <- "era-79-16-nh-trop-inv.nc"  # Nordhemisphäre + Tropen
-#file <- "era--t63_ua_monmean_300hpa_sh.nc"  # Südhemisphäre
-#file <- "era--t63_ua_monmean_300hpa.nc"     # Globus
+# path <- "/home/skiefer/era/raw/"
+file <- "era-t63-1957-2016.nh-trop-inv.nc"  # Nordhemisphäre + Tropen
 
 
 ######################################################################
@@ -43,19 +42,26 @@ fun.fill <- function(x, n) {
 ######################################################################
 ## EINLESEN DER DATEN
 ## ERA40 / ERA-INTERIM
-## T63 - GRID
-## NCDF4
+## T63 - GRID - GAUSSIAN
+## NORDHEMISPHÄRE & TROPEN
+## 192 (lat) * 64 (lon)
 ######################################################################
 ##
 
 nc <- nc_open(paste(path, file, sep = ""))
-print(nc)
-uwind.monmean <- ncvar_get(nc, "var131")
-vwind.monmean <- ncvar_get(nc, "var132")
-lon <- ncvar_get(nc, "lon")
-lat <- ncvar_get(nc, "lat")
-lev <- ncvar_get(nc, "lev")
+# print(nc)
+u.monmean <- ncvar_get(nc, "var131") # U-Wind-Komponente
+# v.monmean <- ncvar_get(nc, "var132") # V-Wind-Komponente
+# w.monmean <- ncvar_get(nc, "var135") # W-Wind-Komponente
+# z.monmean <- ncvar_get(nc, "var129") # Geopotenzial
+# t.monmean <- ncvar_get(nc, "var130") # Temperatur
+# d.monmean <- ncvar_get(nc, "var155") # Divergenz
+
+lon <- ncvar_get(nc, "lon") # Längengrad
+lat <- ncvar_get(nc, "lat") # Breitengrad
+lev <- ncvar_get(nc, "lev") # Drucklevel
 date.help <- ncvar_get(nc, "time")
+
 nc_close(nc)
 rm(nc)
 
@@ -65,8 +71,8 @@ rm(nc)
 ######################################################################
 ##
 
-n.cpu <- 4 #5 # Anzahl der CPUs für parApply
-n.order.lat <- 59 # 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
+n.cpu <- 5 #5 # Anzahl der CPUs für parApply
+n.order.lat <- 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
 n.order.lon <- 8 # Ordnung des Least-Square-Verfahrens für Fit über Längengrad
 n.order.lat.seq <- 3 # Ordnung des Least-Square-Verfahrens für sequentiellen Fit über Breitengrad
 len.seq <- 8 # Länge der ersten Sequenz der 
@@ -81,16 +87,16 @@ dts.month <- months(dts, abbreviate = TRUE)
 dts.year <- years(dts)
 
 ## Zeitlich gemittelter Zonalwind
-uwind.mean <- apply(uwind.monmean,c(1,2),mean)
-uwind.std <- apply(uwind.monmean,c(1,2),sd)
+u.mean <- apply(u.monmean,c(1,2),mean)
+u.std <- apply(u.monmean,c(1,2),sd)
 
 ## Meridional und zeitlich gemittelter Zonalwind
-uwind.mon.mer.mean <- apply(uwind.monmean, 2, mean)
-uwind.mon.mer.sd <- apply(uwind.mean, 2, sd)
+u.mon.mer.mean <- apply(u.monmean, 2, mean)
+u.mon.mer.sd <- apply(u.mean, 2, sd)
 
 ## Meridional gemittelter Zonalwind
-# uwind.monmean.mermean <- apply(uwind.monmean, c(2,3), mean)
-# uwind.monmean.mersd <- apply(uwind.monmean, c(2,3), sd)
+# u.monmean.mermean <- apply(u.monmean, c(2,3), mean)
+# u.monmean.mersd <- apply(u.monmean, c(2,3), sd)
 
 
 ######################################################################
@@ -100,9 +106,9 @@ uwind.mon.mer.sd <- apply(uwind.mean, 2, sd)
 ######################################################################
 ##
 
-# list.model.lat <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
+# list.model.lat <- apply(u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
 cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-list.model.lat <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
+list.model.lat <- parApply(cl, u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
 stopCluster(cl)
 dim.list <- dim(list.model.lat)
 
@@ -111,27 +117,27 @@ cheb.coeff <- sapply(list.model.lat, "[[", 1)
 cheb.coeff <- apply(array(data = cheb.coeff, dim = c((n.order.lat + 1), dim.list[1], dim.list[2])) , c(1,3), t)
 
 ## Gefiltertes Modell für Zonal-Wind
-model.uwind <- sapply(list.model.lat, "[[", 2)
-model.uwind <- apply(array(data = model.uwind, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
+model.u <- sapply(list.model.lat, "[[", 2)
+model.u <- apply(array(data = model.u, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
 
 ## Erste Ableitung des gefilterten Modells für Zonalwind
-model.uwind.deriv.1st <- sapply(list.model.lat, "[[", 3)
-model.uwind.deriv.1st <- apply(array(data = model.uwind.deriv.1st, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
+model.u.deriv.1st <- sapply(list.model.lat, "[[", 3)
+model.u.deriv.1st <- apply(array(data = model.u.deriv.1st, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
 
 ## Extrema des Modells (Positionen und Werte)
 model.extr.lat <- sapply(list.model.lat, "[[", 4)
-model.extr.uwind <- sapply(list.model.lat, "[[", 5)
+model.extr.u <- sapply(list.model.lat, "[[", 5)
 model.extr.lat <- sapply(model.extr.lat, fun.fill, n = 24)
 model.extr.lat <- apply(array(model.extr.lat, c(24, dim.list[1], dim.list[2])), c(1,3), t)
-model.extr.uwind <- sapply(model.extr.uwind, fun.fill, n = 24)
-model.extr.uwind <- apply(array(model.extr.uwind, c(24, dim.list[1], dim.list[2])), c(1,3), t)
+model.extr.u <- sapply(model.extr.u, fun.fill, n = 24)
+model.extr.u <- apply(array(model.extr.u, c(24, dim.list[1], dim.list[2])), c(1,3), t)
 
 ## Maxima des Modells (Positionen und Werte)
-model.max.uwind <- apply(model.extr.uwind, c(1,3), max, na.rm = TRUE)
+model.max.u <- apply(model.extr.u, c(1,3), max, na.rm = TRUE)
 model.max.lat <- array(rep(0, 192*664), c(dim.list))
 for (i in 1:dim.list[2]) {
   for (j in 1:dim.list[1]) {
-    model.max.lat[j,i] <- model.extr.lat[j, which(model.extr.uwind[j,,i] == model.max.uwind[j,i]), i]
+    model.max.lat[j,i] <- model.extr.lat[j, which(model.extr.u[j,,i] == model.max.u[j,i]), i]
   }
 }
 rm(list.model.lat, dim.list)
@@ -164,8 +170,8 @@ rm(list.model.lon)
 ######################################################################
 ##
 
-residuals.cheb <- uwind.monmean - model.uwind
-residuals.cheb.seq <- uwind.monmean - model.uwind.seq
+residuals.cheb <- u.monmean - model.u
+residuals.cheb.seq <- u.monmean - model.u.seq
 mse <- sum(residuals.cheb ** 2) / length(residuals.cheb)
 mse.seq <- sum(residuals.cheb.seq **2) / length(residuals.cheb.seq)
 rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
@@ -192,24 +198,24 @@ ind.son <- which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")
 ind.djf <- which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")
 
 ## Mittelwerte global
-uwind.seas.mam.mean <- array( NA , dim = c(n.lon, n.lat, 11))
-uwind.seas.mam.sd <- array( NA , dim = c(n.lon, n.lat, 11))
-uwind.seas.jja.mean <- array( NA , dim = c(n.lon, n.lat, 11))
-uwind.seas.jja.sd <- array( NA , dim = c(n.lon, n.lat, 11))
-uwind.seas.son.mean <- array( NA , dim = c(n.lon, n.lat, 11))
-uwind.seas.son.sd <- array( NA , dim = c(n.lon, n.lat, 11))
-uwind.seas.djf.mean <- array( NA , dim = c(n.lon, n.lat, 11))
-uwind.seas.djf.sd <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.mam.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.mam.sd <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.jja.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.jja.sd <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.son.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.son.sd <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.djf.mean <- array( NA , dim = c(n.lon, n.lat, 11))
+u.seas.djf.sd <- array( NA , dim = c(n.lon, n.lat, 11))
 
 ## Mittelwerte meridional *???*
-uwind.mer.seas.mam.mean <- array( NA , dim = c(n.lat, 11))
-uwind.mer.seas.mam.sd <- array( NA , dim = c(n.lat, 11))
-uwind.mer.seas.jja.mean <- array( NA , dim = c(n.lat, 11))
-uwind.mer.seas.jja.sd <- array( NA , dim = c(n.lat, 11))
-uwind.mer.seas.son.mean <- array( NA , dim = c(n.lat, 11))
-uwind.mer.seas.son.sd <- array( NA , dim = c(n.lat, 11))
-uwind.mer.seas.djf.mean <- array( NA , dim = c(n.lat, 11))
-uwind.mer.seas.djf.sd <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.mam.mean <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.mam.sd <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.jja.mean <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.jja.sd <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.son.mean <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.son.sd <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.djf.mean <- array( NA , dim = c(n.lat, 11))
+u.mer.seas.djf.sd <- array( NA , dim = c(n.lat, 11))
 
 for (i in seq(1, 11)) {
   print(i)
@@ -217,51 +223,55 @@ for (i in seq(1, 11)) {
   ind.yr <- which(dts.year ==  yr.i | dts.year == (yr.i + 1) | dts.year == (yr.i + 2) | dts.year == (yr.i + 3) | dts.year == (yr.i + 4) )
   ## Mar Apr May
   ind.mam.yr <- intersect(ind.yr, ind.mam)
-  uwind.seas.mam.mean[,,i] <- apply(uwind.monmean[,, ind.mam.yr], c(1,2), mean)
-  uwind.seas.mam.sd[,,i] <- apply(uwind.monmean[,, ind.mam.yr], c(1,2), sd)
-  uwind.mer.seas.mam.mean[,i] <- apply(uwind.monmean[,, ind.mam.yr], 2, mean)
-  uwind.mer.seas.mam.sd[,i] <- apply(uwind.monmean[,, ind.mam.yr], 2, sd)
+  u.seas.mam.mean[,,i] <- apply(u.monmean[,, ind.mam.yr], c(1,2), mean)
+  u.seas.mam.sd[,,i] <- apply(u.monmean[,, ind.mam.yr], c(1,2), sd)
+  u.mer.seas.mam.mean[,i] <- apply(u.monmean[,, ind.mam.yr], 2, mean)
+  u.mer.seas.mam.sd[,i] <- apply(u.monmean[,, ind.mam.yr], 2, sd)
   ## Jun Jul Aug
   ind.jja.yr <- intersect(ind.yr, ind.jja)
-  uwind.seas.jja.mean[,,i] <- apply(uwind.monmean[,, ind.jja.yr], c(1,2), mean)
-  uwind.seas.jja.sd[,,i] <- apply(uwind.monmean[,, ind.jja.yr], c(1,2), sd)
-  uwind.mer.seas.jja.mean[,i] <- apply(uwind.monmean[,, ind.jja.yr], 2, mean)
-  uwind.mer.seas.jja.sd[,i] <- apply(uwind.monmean[,, ind.jja.yr], 2, sd)
+  u.seas.jja.mean[,,i] <- apply(u.monmean[,, ind.jja.yr], c(1,2), mean)
+  u.seas.jja.sd[,,i] <- apply(u.monmean[,, ind.jja.yr], c(1,2), sd)
+  u.mer.seas.jja.mean[,i] <- apply(u.monmean[,, ind.jja.yr], 2, mean)
+  u.mer.seas.jja.sd[,i] <- apply(u.monmean[,, ind.jja.yr], 2, sd)
   ## Sep Oct Nov
   ind.son.yr <- intersect(ind.yr, ind.son)
-  uwind.seas.son.mean[,,i] <- apply(uwind.monmean[,, ind.son.yr], c(1,2), mean)
-  uwind.seas.son.sd[,,i] <- apply(uwind.monmean[,, ind.son.yr], c(1,2), sd)
-  uwind.mer.seas.son.mean[,i] <- apply(uwind.monmean[,, ind.son.yr], 2, mean)
-  uwind.mer.seas.son.sd[,i] <- apply(uwind.monmean[,, ind.son.yr], 2, sd)
+  u.seas.son.mean[,,i] <- apply(u.monmean[,, ind.son.yr], c(1,2), mean)
+  u.seas.son.sd[,,i] <- apply(u.monmean[,, ind.son.yr], c(1,2), sd)
+  u.mer.seas.son.mean[,i] <- apply(u.monmean[,, ind.son.yr], 2, mean)
+  u.mer.seas.son.sd[,i] <- apply(u.monmean[,, ind.son.yr], 2, sd)
   ## Dec Jan Feb
   ind.djf.yr <- intersect(ind.yr, ind.djf)
-  uwind.seas.djf.mean[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), mean)
-  uwind.seas.djf.sd[,,i] <- apply(uwind.monmean[,, ind.djf.yr], c(1,2), sd)
-  uwind.mer.seas.djf.mean[,i] <- apply(uwind.monmean[,, ind.djf.yr], 2, mean)
-  uwind.mer.seas.djf.sd[,i] <- apply(uwind.monmean[,, ind.djf.yr], 2, sd)
+  u.seas.djf.mean[,,i] <- apply(u.monmean[,, ind.djf.yr], c(1,2), mean)
+  u.seas.djf.sd[,,i] <- apply(u.monmean[,, ind.djf.yr], c(1,2), sd)
+  u.mer.seas.djf.mean[,i] <- apply(u.monmean[,, ind.djf.yr], 2, mean)
+  u.mer.seas.djf.sd[,i] <- apply(u.monmean[,, ind.djf.yr], 2, sd)
   ## Löschen von Übergangsvariablen
   rm(yr.i, ind.yr, ind.mam.yr, ind.jja.yr, ind.son.yr, ind.djf.yr, i)
 }
 
-max(uwind.seas.mam.mean, uwind.seas.jja.mean, uwind.seas.son.mean, uwind.seas.djf.mean)
-min(uwind.seas.mam.mean, uwind.seas.jja.mean, uwind.seas.son.mean, uwind.seas.djf.mean)
-range(uwind.seas.mam.mean, uwind.seas.jja.mean, uwind.seas.son.mean, uwind.seas.djf.mean)
+max(u.seas.mam.mean, u.seas.jja.mean, u.seas.son.mean, u.seas.djf.mean)
+min(u.seas.mam.mean, u.seas.jja.mean, u.seas.son.mean, u.seas.djf.mean)
+range(u.seas.mam.mean, u.seas.jja.mean, u.seas.son.mean, u.seas.djf.mean)
 
-max(uwind.seas.mam.mean)
-min(uwind.seas.mam.mean)
-range(uwind.seas.mam.mean)
+max(u.seas.mam.mean)
+min(u.seas.mam.mean)
+range(u.seas.mam.mean)
 
-max(uwind.seas.jja.mean)
-min(uwind.seas.jja.mean)
-range(uwind.seas.jja.mean)
+max(u.seas.jja.mean)
+min(u.seas.jja.mean)
+range(u.seas.jja.mean)
 
-max(uwind.seas.son.mean)
-min(uwind.seas.son.mean)
-range(uwind.seas.son.mean)
+max(u.seas.son.mean)
+min(u.seas.son.mean)
+range(u.seas.son.mean)
 
-max(uwind.seas.djf.mean)
-min(uwind.seas.djf.mean)
-range(uwind.seas.djf.mean)
+max(u.seas.djf.mean)
+min(u.seas.djf.mean)
+range(u.seas.djf.mean)
+
+
+image.plot(lon, lat, u.seas.mam.mean[,,1])
+contour(lon, lat, u.seas.mam.sd[,,1], add=TRUE)
 
 
 ####################################################################################################
@@ -275,10 +285,10 @@ range(uwind.seas.djf.mean)
 # m <- matrix(NA,n.lon,n.lat)
 # for (i in 1:n.lon){
 #   for (j in 1:n.lat){
-#     m[i,j] <- uwind.era.t63.monmean[i,j,1]*cos(lat.era.t63[j]) + 1/86400*uwind.era.t63.monmean[i,j,1]**2*cos(lat.era.t63[j])**2
+#     m[i,j] <- u.era.t63.monmean[i,j,1]*cos(lat.era.t63[j]) + 1/86400*u.era.t63.monmean[i,j,1]**2*cos(lat.era.t63[j])**2
 #   }
 # }
-# #m <- uwind.era.t63.monmean*cos(lat.era.t63)
+# #m <- u.era.t63.monmean*cos(lat.era.t63)
 # 
 
 
@@ -291,34 +301,34 @@ range(uwind.seas.djf.mean)
 # ######################################################################
 # ##
 # 
-# # list.model.lat.seq <- apply(uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
+# # list.model.lat.seq <- apply(u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
 # cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-# list.model.lat.seq <- parApply(cl, uwind.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
+# list.model.lat.seq <- parApply(cl, u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.seq, x.axis = lat, n = n.order.lat.seq, l = len.seq)
 # stopCluster(cl)
 # dim.list <- dim(list.model.lat.seq)
 # 
 # ## Gefiltertes Modell für Zonal-Wind
-# model.uwind.seq <- sapply(list.model.lat.seq, "[[", 1)
-# model.uwind.seq <- apply(array(data = model.uwind.seq, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
+# model.u.seq <- sapply(list.model.lat.seq, "[[", 1)
+# model.u.seq <- apply(array(data = model.u.seq, dim = c(n.lat, dim.list[1], dim.list[2])),  c(1,3), t)
 # 
 # ## Erste Ableitung des gefilterten Modells für Zonalwind
-# model.uwind.deriv.1st.seq <- sapply(list.model.lat.seq, "[[", 2)
-# model.uwind.deriv.1st.seq <- apply(array(data = model.uwind.deriv.1st.seq, dim = c(n.lon, dim.list[1], dim.list[2])),  c(1,3), t)
+# model.u.deriv.1st.seq <- sapply(list.model.lat.seq, "[[", 2)
+# model.u.deriv.1st.seq <- apply(array(data = model.u.deriv.1st.seq, dim = c(n.lon, dim.list[1], dim.list[2])),  c(1,3), t)
 # 
 # ## Extrema des Modells (Positionen und Werte)
 # model.extr.lat.seq <- sapply(list.model.lat.seq, "[[", 3)
 # model.extr.lat.seq <- sapply(model.extr.lat.seq, fun.fill, n = 24)
 # model.extr.lat.seq <- apply(array(model.extr.lat.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
-# model.extr.uwind.seq <- sapply(list.model.lat.seq, "[[", 4)
-# model.extr.uwind.seq <- sapply(model.extr.uwind.seq, fun.fill, n = 24)
-# model.extr.uwind.seq <- apply(array(model.extr.uwind.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
+# model.extr.u.seq <- sapply(list.model.lat.seq, "[[", 4)
+# model.extr.u.seq <- sapply(model.extr.u.seq, fun.fill, n = 24)
+# model.extr.u.seq <- apply(array(model.extr.u.seq, c(24, dim.list[1], dim.list[2])), c(1,3), t)
 # 
 # ## Maxima des Modells (Positionen und Werte)
-# model.max.uwind.seq <- apply(model.extr.uwind.seq, c(1,3), max, na.rm = TRUE)
+# model.max.u.seq <- apply(model.extr.u.seq, c(1,3), max, na.rm = TRUE)
 # model.max.lat.seq <- array(rep(0, dim.list[1]*dim.list[2]), c(dim.list))
 # for (i in 1:dim.list[2]) {
 #   for (j in 1:dim.list[1]) {
-#     model.max.lat.seq[j,i] <- model.extr.lat.seq[j, which(model.extr.uwind.seq[j,,i] == model.max.uwind.seq[j,i]), i]
+#     model.max.lat.seq[j,i] <- model.extr.lat.seq[j, which(model.extr.u.seq[j,,i] == model.max.u.seq[j,i]), i]
 #   }
 # }
 # rm(list.model.lat.seq, dim.list)
