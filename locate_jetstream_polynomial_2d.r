@@ -71,11 +71,11 @@ rm(nc)
 ######################################################################
 ##
 
-n.cpu <- 5 #5 # Anzahl der CPUs für parApply
-n.order.lat <- 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
+n.cpu <- 2 # Anzahl der CPUs für parApply
+n.order.lat <- 31 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
 n.order.lon <- 8 # Ordnung des Least-Square-Verfahrens für Fit über Längengrad
 n.order.lat.seq <- 3 # Ordnung des Least-Square-Verfahrens für sequentiellen Fit über Breitengrad
-len.seq <- 8 # Länge der ersten Sequenz der 
+len.seq <- 8 # Länge der ersten Sequenz des seq. Least-Squares
 
 ## Räumliche Auflösung
 n.lat <- length(lat)
