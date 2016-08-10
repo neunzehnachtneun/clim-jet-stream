@@ -51,7 +51,7 @@ fun.fill <- function(x, n) {
 nc <- nc_open(paste(path, file, sep = ""))
 # print(nc)
 u.monmean <- ncvar_get(nc, "var131") # U-Wind-Komponente
-# v.monmean <- ncvar_get(nc, "var132") # V-Wind-Komponente
+v.monmean <- ncvar_get(nc, "var132") # V-Wind-Komponente
 # w.monmean <- ncvar_get(nc, "var135") # W-Wind-Komponente
 # z.monmean <- ncvar_get(nc, "var129") # Geopotenzial
 # t.monmean <- ncvar_get(nc, "var130") # Temperatur
@@ -65,6 +65,7 @@ date.help <- ncvar_get(nc, "time")
 nc_close(nc)
 rm(nc)
 
+uv.monmean <- sqrt( u.monmean ** 2 + v.monmean **2 )
 
 ######################################################################
 ## VARIABLEN UND PARAMETER
@@ -91,12 +92,13 @@ u.mean <- apply(u.monmean,c(1,2),mean)
 u.std <- apply(u.monmean,c(1,2),sd)
 
 ## Meridional und zeitlich gemittelter Zonalwind
-u.mon.mer.mean <- apply(u.monmean, 2, mean)
-u.mon.mer.sd <- apply(u.mean, 2, sd)
+# u.mon.mer.mean <- apply(u.monmean, 2, mean)
+# u.mon.mer.sd <- apply(u.mean, 2, sd)
 
 ## Meridional gemittelter Zonalwind
 # u.monmean.mermean <- apply(u.monmean, c(2,3), mean)
 # u.monmean.mersd <- apply(u.monmean, c(2,3), sd)
+
 
 
 ######################################################################
@@ -157,10 +159,8 @@ list.model.lon <- parApply(cl, model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = 
 stopCluster(cl)
 
 ## Gefiltertes Modell für Maxima des Zonal-Wind in Zonalrichtung
-model.max.lon <- sapply(list.model.lon, "[[", 2)
+model.max.lon <- list.model.lon, "[[", 2)
 rm(list.model.lon)
-
-
 
 
 ######################################################################
@@ -184,6 +184,7 @@ rmse.seq <- sqrt(sum(residuals.cheb.seq **2) / length(residuals.cheb.seq))
 ######################################################################
 ######################################################################
 save.image()
+
 
 
 ######################################################################
@@ -270,8 +271,60 @@ min(u.seas.djf.mean)
 range(u.seas.djf.mean)
 
 
-image.plot(lon, lat, u.seas.mam.mean[,,1])
-contour(lon, lat, u.seas.mam.sd[,,1], add=TRUE)
+image.plot(lon, lat, u.mean+u.std)
+contour(lon, lat, u.std[,,1], add=TRUE)
+addland(col= "grey50", lwd = 1)
+
+cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
+list.lat.m.sd <- parApply(cl, (u.mean[,] - u.std[,]), 1, pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
+list.lat.mn <- parApply(cl, u.mean[,], 1, pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
+list.lat.p.sd <- parApply(cl, (u.mean[,] + u.std[,]), 1, pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
+stopCluster(cl)
+
+model.extr.lat.m.sd <- sapply(list.lat.m.sd, "[[", 4)
+model.extr.lat.mn <- sapply(list.lat.mn, "[[", 4)
+model.extr.lat.p.sd <- sapply(list.lat.m.sd, "[[", 4)
+
+model.extr.u.m.sd <- sapply(list.lat.m.sd, "[[", 5)
+model.extr.u.mn <- sapply(list.lat.mn, "[[", 5)
+model.extr.u.p.sd <- sapply(list.lat.p.sd, "[[", 5)
+
+model.extr.lat.m.sd <- sapply(model.extr.lat.m.sd, fun.fill, n = 16)
+model.extr.lat.mn <- sapply(model.extr.lat.mn, fun.fill, n = 16)
+model.extr.lat.p.sd <- sapply(model.extr.lat.p.sd, fun.fill, n = 16)
+
+model.extr.u.m.sd <- sapply(model.extr.u.m.sd, fun.fill, n = 16)
+model.extr.u.mn <- sapply(model.extr.u.mn, fun.fill, n = 16)
+model.extr.u.p.sd <- sapply(model.extr.u.p.sd, fun.fill, n = 16)
+
+model.max.u.m.sd <- apply(model.extr.u.m.sd, 2, max, na.rm = TRUE)
+model.max.u.mn <- apply(model.extr.u.mn, 2, max, na.rm = TRUE)
+model.max.u.p.sd <- apply(model.extr.u.p.sd, 2, max, na.rm = TRUE)
+
+model.max.lat.m.sd <- array(rep(0, 192))
+model.max.lat.mn <- array(rep(0, 192))
+model.max.lat.p.sd <- array(rep(0, 192))
+
+for (i in 1:192) {
+  model.max.lat.m.sd[i] <- model.extr.lat.m.sd[which(model.extr.u.m.sd[,i] == model.max.u.m.sd[i]), i]
+  model.max.lat.mn[i] <- model.extr.lat.mn[which(model.extr.u.mn[,i] == model.max.u.mn[i]), i]
+  model.max.lat.p.sd[i] <- model.extr.lat.p.sd[which(model.extr.u.p.sd[,i] == model.max.u.p.sd[i]), i]
+}
+
+list.lon.m.sd <- pckg.cheb:::cheb.fit(d = model.max.lat.m.sd, x.axis = lon, n = 11)
+list.lon.mn <- pckg.cheb:::cheb.fit(d = model.max.lat.mn, x.axis = lon, n = 11)
+list.lon.p.sd <- pckg.cheb:::cheb.fit(d = model.max.lat.p.sd, x.axis = lon, n = 11)
+
+model.max.lon.m.sd <- list.lon.m.sd[[2]]
+model.max.lon.mn <- list.lon.mn[[2]]
+model.max.lon.p.sd <- list.lon.p.sd[[2]]
+
+
+lines(lon, model.max.lon.m.sd)
+lines(lon, model.max.lon.mn)
+lines(lon, model.max.lon.p.sd)
+
+
 
 
 ####################################################################################################
