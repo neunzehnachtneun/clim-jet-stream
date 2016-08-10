@@ -150,40 +150,54 @@ dev.off()
 ######################################################################
 ##
 
+## MAR APR MAY
+pdf(file = "1-mam.pdf", family="serif", width = 30, height = 10)
 for (i in 1:11) {
-  par(mfrow=c(4,1))
-  ## Mean # Mar Apr May
-  image.plot(lon, lat, uwind.seas.son.mean[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
-  title(paste("Mean //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
-  axis(1, at = seq(-180, 180, 30), labels = TRUE)
+  image.plot(lon, lat, u.seas.mam.mean[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("mean & sd //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(0, 360, 30), labels = TRUE)
   axis(2, at = seq(-30,90,15), labels = TRUE)
-  addland(col = "grey50",lwd = 1)
+  # addland(col = "grey50",lwd = 1)
   ## Sd # Mar Apr May
-  image.plot(lon, lat, uwind.seas.son.sd[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
-  title(paste("Sd //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
-  axis(1, at = seq(-180, 180, 30), labels = TRUE)
-  axis(2, at = seq(-30,90,15), labels = TRUE)
-  addland(col = "grey50",lwd = 1)
-  ## Mean + Sd # Mar Apr May
-  image.plot(lon, lat, uwind.seas.son.mean[,,i]+uwind.seas.son.sd[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
-  title(paste("Mean + Sd //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
-  axis(1, at = seq(-180, 180, 30), labels = TRUE)
-  axis(2, at = seq(-30,90,15), labels = TRUE)
-  addland(col = "grey50",lwd = 1)
-  ## Mean - Sd # Mar Apr May
-  image.plot(lon, lat, uwind.seas.son.mean[,,i]-uwind.seas.son.sd[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
-  title(paste("Mean - Sd //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
-  axis(1, at = seq(-180, 180, 30), labels = TRUE)
-  axis(2, at = seq(-30,90,15), labels = TRUE)
-  addland(col = "grey50",lwd = 1)
+  contour(lon, lat, u.seas.mam.sd[,,i], add = TRUE)
 }
+dev.off()
 
-
-## Mean # Mar Apr May
+## JUN JUL AUG
+pdf(file = "2-jja.pdf", family="serif")
 for (i in 1:11) {
-  image.plot(lon, lat, uwind.seas.son.mean[,,i] - uwind.mean, xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
-  title(paste("Mean //", "Mar Apr May //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
-  axis(1, at = seq(-180, 180, 30), labels = TRUE)
+  image.plot(lon, lat, u.seas.jja.mean[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("mean & sd //", "Jun Jul Aug //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(0, 360, 30), labels = TRUE)
   axis(2, at = seq(-30,90,15), labels = TRUE)
-  addland(col = "grey50",lwd = 1)
+  # addland(col = "grey50",lwd = 1)
+  ## Sd # Mar Apr May
+  contour(lon, lat, u.seas.jja.sd[,,i], add = TRUE)
 }
+dev.off()
+
+## SEP OCT NOV
+pdf(file = "3-son.pdf", family="serif")
+for (i in 1:11) {
+  image.plot(lon, lat, u.seas.son.mean[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("mean & sd //", "Sep Oct Nov //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(0, 360, 30), labels = TRUE)
+  axis(2, at = seq(-30,90,15), labels = TRUE)
+  # addland(col = "grey50",lwd = 1)
+  ## Sd # Mar Apr May
+  contour(lon, lat, u.seas.son.sd[,,i], add = TRUE)
+}
+dev.off()
+
+## DEC JAN FEB
+pdf(file = "4-djf.pdf", family="serif")
+for (i in 1:11) {
+  image.plot(lon, lat, u.seas.djf.mean[,,i], xlab = "Längengrad", ylab = "Breitengrad", zlim = c(-15,70), axes = F)
+  title(paste("mean & sd //", "Dec Jan Feb //", dts.year.mn[i],"-", dts.year.mn[i] + 4, sep = " "))
+  axis(1, at = seq(0, 360, 30), labels = TRUE)
+  axis(2, at = seq(-30,90,15), labels = TRUE)
+  # addland(col = "grey50",lwd = 1)
+  ## Sd # Mar Apr May
+  contour(lon, lat, u.seas.djf.sd[,,i], add = TRUE)
+}
+dev.off()
