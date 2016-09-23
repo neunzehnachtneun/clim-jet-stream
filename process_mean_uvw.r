@@ -50,50 +50,137 @@ nc_close(nc)
 rm(nc)
 
 uvw.mean <- sqrt( u.mean ** 2 + v.mean **2 + w.mean ** 2 )
-##
+
+
+#################################################
 ## ZONAL MEAN
 u.zon.mean <- apply(u.mean[,,], c(2,3), mean)
 v.zon.mean <- apply(v.mean[,,], c(2,3), mean)
 uvw.zon.mean <- apply(uvw.mean[,,], c(2,3), mean)
 
 ## ZONAL-WIND U
-contour(lat, 1:13, u.zon.mean, xlab = "Breitengrad in (deg)", ylab = "Druckniveaus in (hPa)", axes = FALSE)
-title("Zonal gemittelter Zonal-Wind in (m/s)")
-axis(1, at = seq(-90,90,10), labels = TRUE)
-axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+filled.contour(lat, 1:13, u.zon.mean, 
+               xlab = "Breitengrad in (deg)", 
+               ylab = "Druckniveaus in (hPa)",
+               main = "Zonal gemittelter Zonal-Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(-90, 90, 10))
+                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+                 contour(lat, 1:13, u.zon.mean, nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
 
 ## MERIDIONAL-WIND V
-image.plot(lat, 1:13, v.zon.mean, xlab = "Breitengrad in (deg)", ylab = "Druckniveaus in (hPa)", axes = FALSE)
-title("Zonal gemittelter Meridional-Wind in (m/s)")
-axis(1, at = seq(-90,90,10), labels = TRUE)
-axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+filled.contour(lat, 1:13, v.zon.mean, 
+               xlab = "Breitengrad in (deg)", 
+               ylab = "Druckniveaus in (hPa)",
+               main = "Zonal gemittelter Meridional-Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(-90, 90, 10))
+                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+                 contour(lat, 1:13, v.zon.mean, nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
 
 ## BETRAG DES WINDFELDES
-image.plot(lat, 1:13, uvw.zon.mean, xlab = "Breitengrad in (deg)", ylab = "Druckniveaus in (hPa)", axes = FALSE)
-title("Zonal gemittelter Wind in (m/s)")
-axis(1, at = seq(-90,90,10), labels = TRUE)
-axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+filled.contour(lat, 1:13, uvw.zon.mean, 
+               xlab = "Breitengrad in (deg)", 
+               ylab = "Druckniveaus in (hPa)",
+               main = "Zonal gemittelter Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(-90, 90, 10))
+                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+                 contour(lat, 1:13, uvw.zon.mean, nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
 
-##
+
+
+#################################################
 ## MERIDIONAL MEAN
 u.mer.mean <- apply(u.mean[,,], c(1,3), mean)
 v.mer.mean <- apply(v.mean[,,], c(1,3), mean)
 uvw.mer.mean <- apply(uvw.mean[,,], c(1,3), mean)
 
 ## ZONAL-WIND U
-image.plot(lon, 1:13, u.mer.mean, xlab = "Längengrad in (deg)", ylab = "Druckniveaus in (hPa)", axes = FALSE)
-title("Meridional gemittelter Zonal-Wind in (m/s)")
-axis(1, at = seq(0,360,40), labels = TRUE)
-axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+filled.contour(lon, 1:13, u.mer.mean, 
+               xlab = "Längengrad in (deg)", 
+               ylab = "Druckniveaus in (hPa)",
+               main = "Meridional gemittelter Zonal-Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(0, 360, 40))
+                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+                 contour(lon, 1:13, u.mer.mean, nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
 
 ## MERIDIONAL-WIND V
-contour(lon, 1:13, v.mer.mean, xlab = "Längengrad in (deg)", ylab = "Druckniveaus in (hPa)", axes = FALSE)
-title("Meridional gemittelter Meridional-Wind in (m/s)")
-axis(1, at = seq(0,360,40), labels = TRUE)
-axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+filled.contour(lon, 1:13, v.mer.mean, 
+               xlab = "Längengrad in (deg)", 
+               ylab = "Druckniveaus in (hPa)",
+               main = "Meridional gemittelter Meridional-Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(0, 360, 40))
+                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+                 contour(lon, 1:13, v.mer.mean, nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
 
 ## BETRAG DES WINDFELDES
-image.plot(lon, 1:13, uvw.mer.mean, xlab = "Längengrad in (deg)", ylab = "Druckniveaus in (hPa)", axes = FALSE)
-title("Meridional gemittelter Wind in (m/s)")
-axis(1, at = seq(0,360,40), labels = TRUE)
-axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+filled.contour(lon, 1:13, uvw.mer.mean, 
+               xlab = "Längengrad in (deg)", 
+               ylab = "Druckniveaus in (hPa)",
+               main = "Meridional gemittelter Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(0, 360, 40))
+                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
+                 contour(lon, 1:13, uvw.mer.mean, nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
+
+
+
+
+
+
+#################################################
+##
+filled.contour(lon, lat, u.mean[,,11], 
+               xlab = "Längengrad in (deg)", 
+               ylab = "Breitengrad in (deg)",
+               main = "Meridional gemittelter Zonal-Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(0, 360, 40))
+                 axis(2, at = seq(-90, 90, 10))
+                 contour(lon, lat, u.mean[,,11], nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
+
