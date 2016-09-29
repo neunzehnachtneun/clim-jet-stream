@@ -41,8 +41,11 @@ cheb.rescale <- function(x.cheb, x.axis) {
   ## Funktion zur Reskalierung vom [-1, 1]-Gitter
   ## auf das Ursprungsgitter (in diesem Fall - Lat)
   ## ##
-  x.rescaled <- (1/2 * (x.cheb + 1) * (max(x.axis) - min(x.axis))) + x.axis[1]
-  return(x.rescaled)
+  if (x.cheb >= -1 & x.cheb <= 1) {
+    x.rescaled <- (1/2 * (x.cheb + 1) * (max(x.axis) - min(x.axis))) + x.axis[1]
+    return(x.rescaled)
+  } else
+    print("Error: x.cheb went out of boundaries (less -1 or greater 1).")
 }
 
 
@@ -181,12 +184,49 @@ cheb.deriv.2nd <- function(x.axis, cheb.coeff) {
 #' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
 #' cheb.list <- cheb.fit(d, x.axis, n)
-cheb.fit <- function(d, x.axis, n){
+cheb.fit <- function(d, x.axis, n, tp.return = 'NULL'){
+  x.cheb <- cheb.scale(x.axis)
+  cheb.t <- cheb.1st(x.axis, n)
+  # Fallunterscheidung
+  if (tp.return == 'all') {
+    ## modell berechnungen
+    # berechnung der koeffizienten des polyfits
+    cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
+    # berechnung des gefilterten modells
+    cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
+    # berechnung des abgeleiteten modells
+    cheb.model.deriv.1st <- cheb.deriv.1st(x.cheb, cheb.coeff)
+    ## Übergabe der Var.
+    cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st)
+    return(cheb.list)
+  } else {
+    ## modell berechnungen
+    # berechnung der koeffizienten des polyfits
+    cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
+    # berechnung des gefilterten modells
+    cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
+    # Übergabe der Var.
+    return(cheb.model)
+  }
+}
+
+
+##
+#' @title Curve Fitting with Chebyshev Polynomials
+#' @param d Zu fittender Datensatz/Zeitreihe (Vektor)
+#' @param x.axis Beliebige X-Achse (Vektor)
+#' @param n Ordnung des Polynoms (Skalar)
+#' @return cheb.list Berechnete Parameter (Koeffizienten, gefiltertes Modell, erste und zweite Ableitung des gefilterten Modells, Extremstellen und -Werte) (Liste)
+#' @description
+#' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
+#' @examples
+#' cheb.list <- cheb.fit(d, x.axis, n)
+cheb.fit.roots <- function(d, x.axis, n){
   library(rootSolve)
   x.cheb <- cheb.scale(x.axis)
   cheb.t <- cheb.1st(x.axis, n)
-#  cheb.u <- cheb.2nd(x.axis, n)
-#  m <- n + 1
+  #  cheb.u <- cheb.2nd(x.axis, n)
+  #  m <- n + 1
   ## modell berechnungen
   # berechnung der koeffizienten des polyfits
   cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
