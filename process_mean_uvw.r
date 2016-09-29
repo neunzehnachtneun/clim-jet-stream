@@ -55,6 +55,7 @@ uvw.mean <- sqrt( u.mean ** 2 + v.mean **2 + w.mean ** 2 )
 #################################################
 ## ZONAL MEAN
 u.zon.mean <- apply(u.mean[,,], c(2,3), mean)
+u.zon.sd <- apply(u.mean[,,], c(2,3), sd)
 v.zon.mean <- apply(v.mean[,,], c(2,3), mean)
 uvw.zon.mean <- apply(uvw.mean[,,], c(2,3), mean)
 
@@ -70,9 +71,11 @@ filled.contour(lat, 1:13, u.zon.mean,
                          drawlabels = TRUE, axes = FALSE, 
                          frame.plot = FALSE, add = TRUE,
                          col = "grey0", lty = 3, lwd = 1)
+                 
                },
                color.palette = tim.colors, nlevels = 16
 )
+
 
 ## MERIDIONAL-WIND V
 filled.contour(lat, 1:13, v.zon.mean, 
@@ -111,6 +114,8 @@ filled.contour(lat, 1:13, uvw.zon.mean,
 #################################################
 ## MERIDIONAL MEAN
 u.mer.mean <- apply(u.mean[,,], c(1,3), mean)
+u.mer.mean <- apply(u.mean[,,], c(1,3), mean)
+
 v.mer.mean <- apply(v.mean[,,], c(1,3), mean)
 uvw.mer.mean <- apply(uvw.mean[,,], c(1,3), mean)
 
@@ -169,18 +174,42 @@ filled.contour(lon, 1:13, uvw.mer.mean,
 
 #################################################
 ##
-filled.contour(lon, lat, u.mean[,,11], 
+filled.contour(lon, lat, u.mean[,,9], 
                xlab = "Längengrad in (deg)", 
                ylab = "Breitengrad in (deg)",
                main = "Meridional gemittelter Zonal-Wind in (m/s)",
                plot.axes = {
                  axis(1, at = seq(0, 360, 40))
-                 axis(2, at = seq(-90, 90, 10))
-                 contour(lon, lat, u.mean[,,11], nlevels = 16,
+                 axis(2, at = seq(-90, 90, 20))
+                 contour(lon, lat, u.mean[,,9], nlevels = 16,
                          drawlabels = TRUE, axes = FALSE, 
                          frame.plot = FALSE, add = TRUE,
                          col = "grey0", lty = 3, lwd = 1)
                },
                color.palette = tim.colors, nlevels = 16
 )
+
+
+filled.contour(lon, lat, u.mean[,(which(lat < 25) : which(lat > 75)),9], 
+               xlab = "Längengrad in (deg)", 
+               ylab = "Breitengrad in (deg)",
+               main = "Meridional gemittelter Zonal-Wind in (m/s)",
+               plot.axes = {
+                 axis(1, at = seq(0, 360, 40))
+                 axis(2, at = seq(-90, 90, 20))
+                 contour(lon, lat, u.mean[,,9], nlevels = 16,
+                         drawlabels = TRUE, axes = FALSE, 
+                         frame.plot = FALSE, add = TRUE,
+                         col = "grey0", lty = 3, lwd = 1)
+               },
+               color.palette = tim.colors, nlevels = 16
+)
+
+image.plot(lon, lat[(which(lat > 25 & lat < 85))], u.mean[,(which(lat > 25 & lat < 85)),9])
+
+
+
+
+
+
 
