@@ -184,35 +184,34 @@ cheb.deriv.2nd <- function(x.axis, cheb.coeff) {
 #' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
 #' cheb.list <- cheb.fit(d, x.axis, n)
-cheb.fit <- function(d, x.axis, n, tp.return = 'NULL'){
-  x.cheb <- cheb.scale(x.axis)
-  cheb.t <- cheb.1st(x.axis, n)
-  # Fallunterscheidung
-  if (tp.return == 'all') {
-    ## modell berechnungen
-    # berechnung der koeffizienten des polyfits
-    cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
-    # berechnung des gefilterten modells
-    cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
-    # berechnung des abgeleiteten modells
-    cheb.model.deriv.1st <- cheb.deriv.1st(x.cheb, cheb.coeff)
-    ## Übergabe der Var.
-    cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st)
-    return(cheb.list)
-  } else {
-    ## modell berechnungen
-    # berechnung der koeffizienten des polyfits
-    cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
-    # berechnung des gefilterten modells
-    cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
-    # Übergabe der Var.
-    return(cheb.model)
+cheb.fit <- function(d, x.axis, n, harmonic = FALSE){
+  # Fallunterscheidung für harmonische Randbedingung
+  if (harmonic == FALSE) {
+    x.cheb <- cheb.scale(x.axis)
+    cheb.t <- cheb.1st(x.axis, n)
+  } else if (harmonic == TRUE) {
+    d <- c(d, d[1])
+    x.axis <- c(x.axis, (x.axis[1] + 360))
+    x.cheb <- cheb.scale(x.axis)
+    cheb.t <- cheb.1st(x.axis, n)
   }
+
+  ## modell berechnungen
+  # berechnung der koeffizienten des polyfits
+  cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
+  # berechnung des gefilterten modells
+  cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
+  # löschen des letzten eintrags für den harmonischen fall
+  cheb.model <- if (harmonic == TRUE) cheb.model[-(length(cheb.model))]
+
+  # Übergabe der Variablen
+  return(cheb.model)
 }
 
 
+
 ##
-#' @title Curve Fitting with Chebyshev Polynomials
+#' @title Curve Fitting with Chebyshev Polynomials and Finding of its Roots
 #' @param d Zu fittender Datensatz/Zeitreihe (Vektor)
 #' @param x.axis Beliebige X-Achse (Vektor)
 #' @param n Ordnung des Polynoms (Skalar)
@@ -253,47 +252,34 @@ cheb.fit.roots <- function(d, x.axis, n){
 #' Fittet ein Chebyshev Polynom beliebiger Ordnung an einen sequenzierten Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
 #' cheb.fit.seq(d, x.axis, n, l)
-cheb.fit.seq <- function(d, x.axis, n, l){
-  library(rootSolve)
+cheb.fit.seq <- function(d, x.axis, n, l, harmonic == FALSE){
   x.mat <- matrix(x.axis, ncol = l, byrow = TRUE)
   d.mat <- matrix(d, ncol = l, byrow = TRUE)
+  end.loop <- length(x.mat[,1])
 
   # schleife über sequenzen des Datensatzes
-  for (i in 1:length(x.mat[,1])) {
-    # print(i)
-    # erstellung der sequenzen
-    x.seq <- if (i == 1) c(x.mat[i,]) else c(x.mat[(i - 1), dim(x.mat)[2]], x.mat[i,])
+  for (i in 1:end.loop) {
+    # erstellung der sequenzen und fallunterscheidung für harmonische randbedingung
+    if (harmonic == FALSE) {
+      d.seq <- if (i != end.loop) c(d.mat[i,], d.mat[(i + 1), 1]) else c(d.mat[i,])
+      x.seq <- if (i != end.loop) c(x.mat[i,], x.mat[(i + 1), 1]) else c(x.mat[i,])
+    } else if (harmonic == TRUE) {
+      d.seq <- if (i != end.loop) c(d.mat[i,], d.mat[(i + 1), 1]) else c(d.mat[i,], d.mat[1,1])
+      x.seq <- if (i != end.loop) c(x.mat[i,], x.mat[(i + 1), 1]) else c(x.mat[i,], x.mat[1,1] + 360)
+    }
     x.cheb.seq <- cheb.scale(x.seq)
-    d.seq <- if (i == 1) c(d.mat[i,]) else c(d.mat[(i - 1), dim(d.mat)[2]], d.mat[i,])
     cheb.t.seq <- cheb.1st(x.seq, n)
+
     ## modell berechnungen
     # berechnung der koeffizienten des polyfits
     cheb.coeff.seq <- solve(t(cheb.t.seq) %*% cheb.t.seq) %*% t(cheb.t.seq) %*% d.seq
     cheb.coeff <- if (i == 1) cheb.coeff.seq else cbind(cheb.coeff, cheb.coeff.seq)
     # berechnung des gefilterten modells
     cheb.model.seq <- cheb.model.filter(x.cheb.seq, cheb.coeff.seq)
-    cheb.model <- if (i == 1) cheb.model.seq else c(cheb.model, cheb.model.seq[2:(l+1)])
-    # berechnung des abgeleiteten modells
-    cheb.model.deriv.1st.seq <- cheb.deriv.1st(x.cheb.seq, cheb.coeff.seq)
-    cheb.model.deriv.1st <- if (i == 1) cheb.model.deriv.1st.seq else c(cheb.model.deriv.1st, cheb.model.deriv.1st.seq[2:(l+1)])
-
-    # berechnung der nullstellen
-    extr.seq <- rootSolve::uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff.seq, lower = (-1), upper = 1)
-    # reskalierung der Nullstellen auf normale Lat- Achse
-    x.extr.seq <- if (length(extr.seq) != 0) cheb.rescale(extr.seq, x.axis = x.seq)
-    y.extr.seq <- if (length(extr.seq) != 0) cheb.model.filter(x.axis = extr.seq, cheb.coeff = cheb.coeff.seq)
-    #
-    if (exists("x.extr.seq") == TRUE & exists("x.extr") == FALSE) {
-      x.extr <- x.extr.seq
-      y.extr <- y.extr.seq
-    } else if (exists("x.extr.seq") == TRUE & exists("x.extr") == TRUE) {
-      x.extr <- c(x.extr, x.extr.seq)
-      y.extr <- c(y.extr, y.extr.seq)
-    }
+    cheb.model <- if (i == 1) cheb.model.seq[-l] else c(cheb.model, cheb.model.seq[-l])
   }
 
-  ## übergabe der variablen als liste
-  cheb.list <- list(cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st, extr.x = x.extr, extr.y = y.extr)
-  return(cheb.list)
+  ## übergabe der variable
+  return(cheb.model)
 }
 
