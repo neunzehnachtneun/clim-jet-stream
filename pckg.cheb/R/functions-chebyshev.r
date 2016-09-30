@@ -252,7 +252,7 @@ cheb.fit.roots <- function(d, x.axis, n){
 #' Fittet ein Chebyshev Polynom beliebiger Ordnung an einen sequenzierten Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
 #' cheb.fit.seq(d, x.axis, n, l)
-cheb.fit.seq <- function(d, x.axis, n, l, harmonic == FALSE){
+cheb.fit.seq <- function(d, x.axis, n, l, harmonic = FALSE){
   x.mat <- matrix(x.axis, ncol = l, byrow = TRUE)
   d.mat <- matrix(d, ncol = l, byrow = TRUE)
   end.loop <- length(x.mat[,1])
@@ -276,7 +276,11 @@ cheb.fit.seq <- function(d, x.axis, n, l, harmonic == FALSE){
     cheb.coeff <- if (i == 1) cheb.coeff.seq else cbind(cheb.coeff, cheb.coeff.seq)
     # berechnung des gefilterten modells
     cheb.model.seq <- cheb.model.filter(x.cheb.seq, cheb.coeff.seq)
-    cheb.model <- if (i == 1) cheb.model.seq[-l] else c(cheb.model, cheb.model.seq[-l])
+    if (harmonic == FALSE) {
+      cheb.model <- if (i == 1) cheb.model.seq[-(l + 1)] else if (i > 1 & i != end.loop) c(cheb.model, cheb.model.seq[-(l + 1)]) else c(cheb.model, cheb.model.seq)
+    } else if (harmonic == TRUE) {
+      cheb.model <- if (i == 1) cheb.model.seq[-(l + 1)] else if (i > 1 & i != end.loop) c(cheb.model, cheb.model.seq[-(l + 1)]) else c(cheb.model, cheb.model.seq[-(l + 1)])
+    }
   }
 
   ## übergabe der variable
