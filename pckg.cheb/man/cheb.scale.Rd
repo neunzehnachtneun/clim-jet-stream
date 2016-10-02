@@ -4,7 +4,7 @@
 \alias{cheb.scale}
 \title{Scaling of X-Axis}
 \usage{
-cheb.scale(x.axis)
+cheb.scale(x.axis, x.val = NA)
 }
 \arguments{
 \item{x.axis}{ursprüngliche beliebige X-Achse (Vektor)}

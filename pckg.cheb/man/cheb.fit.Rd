@@ -4,7 +4,7 @@
 \alias{cheb.fit}
 \title{Curve Fitting with Chebyshev Polynomials}
 \usage{
-cheb.fit(d, x.axis, n)
+cheb.fit(d, x.axis, n, bc.harmonic = FALSE)
 }
 \arguments{
 \item{d}{Zu fittender Datensatz/Zeitreihe (Vektor)}

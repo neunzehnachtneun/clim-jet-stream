@@ -4,7 +4,7 @@
 \alias{cheb.fit.seq}
 \title{Curve Fitting with Chebyshev Polynomials over Sequences}
 \usage{
-cheb.fit.seq(d, x.axis, n, l)
+cheb.fit.seq(d, x.axis, n, l, bc.harmonic = FALSE)
 }
 \description{
 Fittet ein Chebyshev Polynom beliebiger Ordnung an einen sequenzierten Datensatz/Zeitreihe mittels Least Squares Verfahren
