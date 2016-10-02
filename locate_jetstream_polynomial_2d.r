@@ -17,7 +17,7 @@ library(parallel)
 library(chron)
 
 # eigenes package für least squares fit mit chebyshev polynomen
-# install.packages("pckg.cheb_0.2.tar.gz", repos = NULL, type = "source")
+# install.packages("pckg.cheb_0.9.tar.gz", repos = NULL, type = "source")
 library(pckg.cheb)
 
 setwd("~/Master_Thesis/02-r-code-git/")
@@ -75,8 +75,6 @@ uv.monmean <- sqrt( u.monmean ** 2 + v.monmean **2 )
 n.cpu <- 24 # Anzahl der CPUs für parApply
 n.order.lat <- 31 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
 n.order.lon <- 8 # Ordnung des Least-Square-Verfahrens für Fit über Längengrad
-# n.order.lat.seq <- 3 # Ordnung des Least-Square-Verfahrens für sequentiellen Fit über Breitengrad
-# len.seq <- 8 # Länge der ersten Sequenz des seq. Least-Squares
 
 ## Räumliche Auflösung
 n.lat <- length(lat)
@@ -110,7 +108,7 @@ dts.year <- years(dts)
 
 # list.model.lat <- apply(u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
 cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-list.model.lat <- parApply(cl, u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
+list.model.lat <- parApply(cl, u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit.roots, x.axis = lat, n = n.order.lat, bc.harmonic = FALSE, roots.bound.l = 20, roots.bound.u = 80)
 stopCluster(cl)
 dim.list <- dim(list.model.lat)
 
@@ -154,7 +152,7 @@ rm(list.model.lat, dim.list)
 
 #list.model.lon <- apply(model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = n.order.lon)
 cl <- makeCluster(getOption("cl.cores", n.cpu))
-list.model.lon <- parApply(cl, model.max.lat, 2, pckg.cheb:::cheb.fit, x.axis = lon, n = n.order.lon)
+list.model.lon <- parApply(cl, model.max.lat, 2, pckg.cheb:::cheb.fit.roots, x.axis = lon, n = n.order.lon, bc.harmonic = TRUE)
 stopCluster(cl)
 
 ## Gefiltertes Modell für Maxima des Zonal-Wind in Zonalrichtung
