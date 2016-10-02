@@ -286,8 +286,10 @@ cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA
   # berechnung des abgeleiteten modells
   cheb.model.deriv.1st <- cheb.deriv.1st(x.cheb, cheb.coeff)
   # löschen der letzten einträge des modells und der ableitung für den harmonischen fall
-  cheb.model <- if (bc.harmonic == TRUE) cheb.model[-(length(cheb.model))]
-  cheb.model.deriv.1st <- if (bc.harmonic == TRUE) cheb.model.deriv.1st[-(length(cheb.model.deriv.1st))]
+  if (bc.harmonic == TRUE) {
+    cheb.model <- cheb.model[-(length(cheb.model))]
+    cheb.model.deriv.1st <- cheb.model.deriv.1st[-(length(cheb.model.deriv.1st))]
+  }
 
   # berechnung der nullstellen über extremwerte der ableitung
   if (is.na(roots.bound.l) == TRUE) {
