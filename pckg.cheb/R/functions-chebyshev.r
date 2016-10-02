@@ -17,18 +17,18 @@
 #' @examples
 #' x.axis <- c(0:30)
 #' x.cheb.scaled <- cheb.scale(x.axis)
-cheb.scale <- function(x.axis, x.val = NULL) {#, scale) {
+cheb.scale <- function(x.axis, x.val = NA) {#, scale) {
   ## Funktion zur Skalierung von Stützpunkten
   ## von beliebigen Gittern auf [-1, 1]
   ## ##
-  x.cheb.scaled <- 2 * (x.axis - min(x.axis)) / (max(x.axis) - min(x.axis)) -1
-  if ( x.val == NULL) {
-    return(x.cheb.scaled)
+  if ( is.na(x.val) == TRUE ) {
+    x.cheb.scaled <- 2 * (x.axis - min(x.axis)) / (max(x.axis) - min(x.axis)) - 1
+    #return(x.cheb.scaled)
   }
-  if (x.val != NULL) {
-    x.val.scaled <- 2 * (x.val - min(x.axis)) / (max(x.axis) - min(x.axis)) - 1
-    return(x.val.scaled)
+  if ( is.na(x.val) == FALSE ) {
+    x.cheb.scaled <- 2 * (x.val - min(x.axis)) / (max(x.axis) - min(x.axis)) - 1
   }
+  return(x.cheb.scaled)
 }
 
 
@@ -44,12 +44,8 @@ cheb.scale <- function(x.axis, x.val = NULL) {#, scale) {
 cheb.rescale <- function(x.cheb, x.axis) {
   ## Funktion zur Reskalierung vom [-1, 1]-Gitter
   ## auf das Ursprungsgitter (in diesem Fall - Lat)
-  ## ##
-  if (x.cheb >= -1 & x.cheb <= 1) {
-    x.rescaled <- (1/2 * (x.cheb + 1) * (max(x.axis) - min(x.axis))) + x.axis[1]
-    return(x.rescaled)
-  } else
-    print("Error: x.cheb went out of boundaries (less -1 or greater 1).")
+  x.rescaled <- (1/2 * (x.cheb + 1) * (max(x.axis) - min(x.axis))) + x.axis[1]
+  return(x.rescaled)
 }
 
 
@@ -206,7 +202,9 @@ cheb.fit <- function(d, x.axis, n, bc.harmonic = FALSE){
   # berechnung des gefilterten modells
   cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
   # löschen des letzten eintrags für den harmonischen fall
-  cheb.model <- if (bc.harmonic == TRUE) cheb.model[-(length(cheb.model))]
+  if (bc.harmonic == TRUE) {
+    cheb.model <- cheb.model[-(length(cheb.model))]
+  }
 
   # Übergabe der Variablen
   return(cheb.model)
@@ -265,15 +263,15 @@ cheb.fit.seq <- function(d, x.axis, n, l, bc.harmonic = FALSE){
 #' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
 #' cheb.list <- cheb.fit(d, x.axis, n)
-cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NULL, roots.bound.u = NULL){
+cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA, roots.bound.u = NA){
   library(rootSolve)
   # Fallunterscheidung für harmonische Randbedingung
   if (bc.harmonic == FALSE) {
     x.cheb <- cheb.scale(x.axis)
     cheb.t <- cheb.1st(x.axis, n)
-  } else if (bc.harmonic == TRUE){
+  } else if (bc.harmonic == TRUE) {
     d <- c(d, d[1])
-    x.axis <- c(x.axis, (x.axis[1] + 360))
+    x.axis <- c(x.axis, (x.axis[1] + 360)) ## 360 sinnvoll? besser length() ??
     x.cheb <- cheb.scale(x.axis)
     cheb.t <- cheb.1st(x.axis, n)
   }
@@ -291,10 +289,19 @@ cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NU
   cheb.model <- if (bc.harmonic == TRUE) cheb.model[-(length(cheb.model))]
   cheb.model.deriv.1st <- if (bc.harmonic == TRUE) cheb.model.deriv.1st[-(length(cheb.model.deriv.1st))]
 
-  # berechnung der nullstellen
-  lower <- cheb.scale(x.axis, x.val = roots.bound.l)
-  upper <- cheb.scale(x.axis, x.val = roots.bound.u)
-  extr <- rootSolve::uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff, lower, upper)
+  # berechnung der nullstellen über extremwerte der ableitung
+  if (is.na(roots.bound.l) == TRUE) {
+    lower <- -1
+  } else if (is.na(roots.bound.l) == FALSE) {
+    lower <- cheb.scale(x.axis, x.val = roots.bound.l)
+  }
+  if (is.na(roots.bound.u) == TRUE) {
+    upper <- 1
+  } else if (is.na(roots.bound.u) == FALSE) {
+    upper <- cheb.scale(x.axis, x.val = roots.bound.u)
+  }
+
+  extr <- rootSolve::uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff, lower = lower, upper = upper)
   # reskalierung der Nullstellen auf normale Lat- Achse
   x.extr <- if (length(extr) != 0) cheb.rescale(extr, x.axis = x.axis)
   y.extr <- if (length(extr) != 0) cheb.model.filter(x.axis = extr, cheb.coeff = cheb.coeff)
