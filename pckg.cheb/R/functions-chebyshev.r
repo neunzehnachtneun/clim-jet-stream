@@ -9,7 +9,7 @@
 
 
 ##
-#' @title Scaling of X-Axis
+#' @title Scaling of X-Axis (as vector or as scalar)
 #' @param x.axis ursprüngliche beliebige X-Achse (Vektor)
 #' @return x.cheb.scaled skalierte X-Achse (Vektor)
 #' @description
@@ -33,7 +33,7 @@ cheb.scale <- function(x.axis, x.val = NA) {#, scale) {
 
 
 ##
-#' @title Rescaling of X-Axis
+#' @title Rescaling of X-Axis (as vector or as scalar)
 #' @param x.cheb skalierte X-Achse (Skalar oder Vektor)
 #' @param x.axis beliebige X-Achse (Vektor)
 #' @return x.rescaled reskalierte X-Achse (Skalar oder Sektor)
@@ -258,7 +258,10 @@ cheb.fit.seq <- function(d, x.axis, n, l, bc.harmonic = FALSE){
 #' @param d Zu fittender Datensatz/Zeitreihe (Vektor)
 #' @param x.axis Beliebige X-Achse (Vektor)
 #' @param n Ordnung des Polynoms (Skalar)
-#' @return cheb.list Berechnete Parameter (Koeffizienten, gefiltertes Modell, erste und zweite Ableitung des gefilterten Modells, Extremstellen und -Werte) (Liste)
+#' @param bc.harmonic Parameter für harmonische Randbedingung (Wahr / Falsch)
+#' @param roots.bound.l Unterer Rand des Bereichs der Nullstellensuche
+#' @param roots.bound.u Oberer Rand des Bereichs der Nullstellensuche
+#' @return cheb.list Liste berechneter Parameter (Koeffizienten, gefiltertes Modell, erste und zweite Ableitung des gefilterten Modells, Extremstellen und -Werte)
 #' @description
 #' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @examples
