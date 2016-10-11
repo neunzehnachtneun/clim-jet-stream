@@ -3,7 +3,8 @@
 .RData
 .Ruserdata
 
-/visu/
-/data/
+/002-data/
+/004-visu/
+
 
 *.pdf
