@@ -4,8 +4,11 @@ Title: Curve Fitting with Chebyshev Polynomials
 Version: 0.9
 Author: Sebastian Kiefer <s.kiefer@posteo.de>
 Maintainer: Sebastian Kiefer <s.kiefer@posteo.de>
-Description: The aim of this package is to fit a chebyshev polynomial of order n to a dataset with least squares, to derive the curve and calculate its roots. So we can find the extrema of the dataset.
-Imports: rootSolve
+Description: The aim of this package is to fit a chebyshev polynomial of order n
+    to a dataset with least squares, to derive the curve and calculate its roots. So
+    we can find the extrema of the dataset.
+Imports:
+    rootSolve
 License: MIT
 LazyData: TRUE
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 5.0.1

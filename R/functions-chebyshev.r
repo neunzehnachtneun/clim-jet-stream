@@ -138,8 +138,8 @@ cheb.deriv.1st <- function(x.axis, cheb.coeff) {
     # berechnung der ableitung der polynome erster art
     # rekursionsformel 0
     # dT/dx = n * U_(n-1)
-    cheb.t.deriv <- if (length(x.axis) == 1) (2:m)*t(cheb.u[,1:n]) else t((2:m)*t(cheb.u[,1:n]))
-    cheb.model.deriv.1st <- cheb.t.deriv %*% cheb.coeff[2:m]
+    cheb.t.deriv.1st <- if (length(x.axis) == 1) (2:m)*t(cheb.u[,1:n]) else t((2:m)*t(cheb.u[,1:n]))
+    cheb.model.deriv.1st <- cheb.t.deriv.1st %*% cheb.coeff[2:m]
     return(cheb.model.deriv.1st)
   }
 }
@@ -309,10 +309,11 @@ cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA
 
   extr <- uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff, lower = lower, upper = upper)
   # reskalierung der Nullstellen auf normale Lat- Achse
-  x.extr <- if (length(extr) != 0) cheb.rescale(extr, x.axis = x.axis)
-  y.extr <- if (length(extr) != 0) cheb.model.filter(x.axis = extr, cheb.coeff = cheb.coeff)
+  extr.x <- if (length(extr) != 0) cheb.rescale(extr, x.axis = x.axis)
+  extr.y <- if (length(extr) != 0) cheb.model.filter(x.axis = extr, cheb.coeff = cheb.coeff)
+  extr.deriv.2nd <- if (length(extr) != 0) cheb.deriv.2nd(x.axis = extr, cheb.coeff = cheb.coeff)
 
-  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st, x.extr = x.extr, y.extr = y.extr)
+  cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st, extr.x = extr.x, extr.y = extr.y, extr.deriv.2nd = extr.deriv.2nd)
   return(cheb.list)
 }
 
