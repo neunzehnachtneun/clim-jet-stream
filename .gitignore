@@ -4,6 +4,7 @@
 .Ruserdata
 
 
+*.RData
 *.pdf
 *.nc
 *.grib

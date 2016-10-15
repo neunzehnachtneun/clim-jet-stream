@@ -2,7 +2,7 @@
 ######################################################################
 ## ROUTINE ZUM EINLESEN VON ERA-DATEN (ZONAL-WIND) IM NCDF-FORMAT
 ## UND AUFFINDEN DES JETSTREAMS AUF NORDHEMISPHÄRE
-## source('~/Master_Thesis/02-r-code-git/locate_jetstream_polynomial_2d.r')
+## source('~/Master_Thesis/02-r-code-git/a-locate_jetstream_polynomial_2d.r')
 ######################################################################
 ######################################################################
 
@@ -21,7 +21,7 @@ library(chron)
 library(pckg.cheb)
 
 setwd("~/Master_Thesis/02-r-code-git/")
-path <- "data/"
+path <- "03-data-nc/"
 # path <- "/home/skiefer/era/raw/"
 file <- "era-t63-1957-2016.nh-trop-inv.nc"  # Nordhemisphäre + Tropen
 
@@ -65,7 +65,7 @@ date.help <- ncvar_get(nc, "time")
 nc_close(nc)
 rm(nc)
 
-uv.monmean <- sqrt( u.monmean ** 2 + v.monmean **2 )
+uv.monmean <- sqrt( u.monmean ** 2 + v.monmean ** 2 )
 
 ######################################################################
 ## VARIABLEN UND PARAMETER
@@ -127,10 +127,14 @@ model.u.deriv.1st <- apply(array(data = model.u.deriv.1st, dim = c(n.lat, dim.li
 ## Extrema des Modells (Positionen und Werte)
 model.extr.lat <- sapply(list.model.lat, "[[", 4)
 model.extr.u <- sapply(list.model.lat, "[[", 5)
+model.extr.deriv.2nd <- sapply(list.model.lat, "[[", 6)
 model.extr.lat <- sapply(model.extr.lat, fun.fill, n = 24)
 model.extr.lat <- apply(array(model.extr.lat, c(24, dim.list[1], dim.list[2])), c(1,3), t)
 model.extr.u <- sapply(model.extr.u, fun.fill, n = 24)
 model.extr.u <- apply(array(model.extr.u, c(24, dim.list[1], dim.list[2])), c(1,3), t)
+model.extr.deriv.2nd <- sapply(model.extr.deriv.2nd, fun.fill, n = 24)
+model.extr.deriv.2nd <- apply(array(model.extr.deriv.2nd, c(24, dim.list[1], dim.list[2])), c(1,3), t)
+
 
 ## Maxima des Modells (Positionen und Werte)
 model.max.u <- apply(model.extr.u, c(1,3), max, na.rm = TRUE)
@@ -167,11 +171,11 @@ stopCluster(cl)
 ######################################################################
 ##
 
-residuals.cheb <- u.monmean - model.u
+#residuals.cheb <- u.monmean - model.u
 #residuals.cheb.seq <- u.monmean - model.u.seq
-mse <- sum(residuals.cheb ** 2) / length(residuals.cheb)
+#mse <- sum(residuals.cheb ** 2) / length(residuals.cheb)
 #mse.seq <- sum(residuals.cheb.seq **2) / length(residuals.cheb.seq)
-rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
+#rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
 #rmse.seq <- sqrt(sum(residuals.cheb.seq **2) / length(residuals.cheb.seq))
 
 ## rmse.seq = 0.4079846  ## mse.seq = 0.1664514
@@ -180,7 +184,7 @@ rmse <- sqrt(sum(residuals.cheb ** 2) / length(residuals.cheb))
 
 ######################################################################
 ######################################################################
-save.image(file = ".RData")
+save.image(file = "monthly.RData")
 
 
 
