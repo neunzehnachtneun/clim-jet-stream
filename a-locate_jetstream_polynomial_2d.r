@@ -16,8 +16,10 @@ library(ncdf4)
 library(parallel)
 library(chron)
 
+# options(unzip = 'internal')
 # eigenes package für least squares fit mit chebyshev polynomen
 # install.packages("pckg.cheb_0.9.tar.gz", repos = NULL, type = "source")
+# install_github("sebaki/pckg.cheb", auth_token = "d789940fbff70c9eaa8baa41b7d77adef138eebd")
 library(pckg.cheb)
 
 setwd("~/Master_Thesis/02-r-code-git/")
