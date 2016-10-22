@@ -16,7 +16,6 @@ load(file = "monthly.RData")
 
 dts.year.mn <- seq(1960, 2013)
 n.time <- length(dts.year.mn)
-seas <- "jja" # jja son djf
 for (seas in (c("mam", "jja", "son", "djf"))) {
   if (seas == "mam") {
     ind.seas <- which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")
@@ -63,23 +62,90 @@ for (seas in (c("mam", "jja", "son", "djf"))) {
 
 
 
+# 
+# seas <- "jja"
+# 
+# ## Vorbereiten der Daten für ggplot2
+# ##
+# range(model.max.lat.seas.mean.mam, model.max.lat.seas.mean.jja, model.max.lat.seas.mean.son, model.max.lat.seas.mean.djf)
+# gg.data.hovm <- melt(model.max.lat.seas.mean.jja)
+# 
+# 
+# ## Plotroutine
+# gg.hovm <- ggplot(data = gg.data.hovm, mapping = aes(x = lon[Var1], y = dts.year.mn[Var2], z = value, fill = value))
+# gg.hovm <- gg.hovm + geom_raster() + scale_fill_gradientn(
+#   colours = brewer.pal(11, "RdYlBu"),
+#   limits = c(20, 75),
+#   guide_colourbar(title = "Latitude")) +
+#   theme(legend.position = "bottom") +
+#   geom_contour(binwidth = 5, color = "gray0") +
+#   xlab("Longitude") + ylab("Year") +
+#   scale_x_continuous(breaks = seq(0, 360, 30)) +
+#   scale_y_continuous(breaks = seq(1960, 2010, 10)) +
+#   coord_fixed(3)
+# 
+# 
+# gg.data.hovm.yr <- aggregate(gg.data.hovm[,3], list(gg.data.hovm$Var2), mean)
+# colnames(gg.data.hovm.yr) <- c("year", "Value")
+# # gg.data.hovm.yr <- (apply(model.max.lat.seas.mean, 2, mean))
+# gg.hovm.yr <- ggplot(data = gg.data.hovm.yr, mapping = aes(x = "", y = dts.year.mn[year], fill = Value)) +
+#   geom_raster() +
+#   scale_fill_gradientn(limits = c(20, 75),
+#                        colours = brewer.pal(11, "RdYlBu")) +
+#   theme(legend.position = "none",
+#         axis.title.x = element_blank(),
+#         axis.title.y = element_blank(),
+#         axis.ticks = element_blank(),
+#         axis.text.x = element_blank(),
+#         axis.text.y = element_blank())
+# 
+# gg.data.hovm.mer <- aggregate(gg.data.hovm[,3], list(gg.data.hovm$Var1), mean)
+# colnames(gg.data.hovm.mer) <- c("Lon", "Value")
+# gg.hovm.mer <- ggplot(data = gg.data.hovm.mer, mapping = aes(x = lon[Lon], y = "", fill = Value)) +
+#   geom_raster() +
+#   scale_fill_gradientn(limits = c(20, 75),
+#                        colours = brewer.pal(11, "RdYlBu")) +
+#   theme(legend.position = "none",
+#         axis.title.x = element_blank(),
+#         axis.title.y = element_blank(),
+#         axis.ticks = element_blank(),
+#         axis.text.x = element_blank(),
+#         axis.text.y = element_blank()) +
+#   ggtitle(paste0("Position of Jet Stream - ", toupper(seas), "\n", "(five yearly moving average)"))
+# 
+# 
+# 
+# 
+# 
+# ##
+# ## Zusammenfügen der Plots
+# empty <- ggplot() + coord_fixed()
+# ggarrange(gg.hovm.mer, empty, gg.hovm, gg.hovm.yr, heights = c(1,10), widths = c(10,1))
+# 
 
-seas <- "jja"
-
-## Vorbereiten der Daten für ggplot2
-##
-range(model.max.lat.seas.mean.mam, model.max.lat.seas.mean.jja, model.max.lat.seas.mean.son, model.max.lat.seas.mean.djf)
-gg.data.hovm <- melt(model.max.lat.seas.mean.jja)
 
 
+
+
+
+################################################################################
+################################################################################
+### PLOT FUER FARBENBLINDE !!!
+###  
+## Datenvorbereitung für ggplot2
+gg.data.raw <- model.max.lat.seas.mean.djf
+
+# gg.data.raw <- matrix(70/10368*(1:10368), ncol = 192, nrow = 54) #matrix(rnorm(10368,45,15), ncol = 192, nrow=54)
+breaks <- c(-Inf,seq(30, 70, 5),Inf)
+gg.data.hovm <- melt(gg.data.raw)
+gg.data.hovm$color <- as.character(cut(gg.data.hovm$value, breaks = breaks, labels = FALSE))
+col.pal <- brewer.pal(10, "RdYlBu")
+names(col.pal) <- as.character(1:10)
 ## Plotroutine
-gg.hovm <- ggplot(data = gg.data.hovm, mapping = aes(x = lon[Var1], y = dts.year.mn[Var2], z = value, fill = value))
-gg.hovm <- gg.hovm + geom_raster() + scale_fill_gradientn(
-  colours = brewer.pal(11, "RdYlBu"),
-  limits = c(20, 75),
-  guide_colourbar(title = "Latitude")) +
-  theme(legend.position = "bottom") +
-  geom_contour(binwidth = 5, color = "gray0") +
+gg.hovm <- ggplot(gg.data.hovm, aes(x = lon[Var1], y = dts.year.mn[Var2], z = value, fill = color)) + 
+  geom_raster() + 
+  scale_fill_manual(values = col.pal, guide_colourbar(title = "Latitude")) + 
+  geom_contour(data = gg.data.hovm, aes(x = lon[Var1], y = dts.year.mn[Var2], z = value, fill = value), binwidth = 10, color = "gray0") +
   xlab("Longitude") + ylab("Year") +
   scale_x_continuous(breaks = seq(0, 360, 30)) +
   scale_y_continuous(breaks = seq(1960, 2010, 10)) +
@@ -87,12 +153,12 @@ gg.hovm <- gg.hovm + geom_raster() + scale_fill_gradientn(
 
 
 gg.data.hovm.yr <- aggregate(gg.data.hovm[,3], list(gg.data.hovm$Var2), mean)
-colnames(gg.data.hovm.yr) <- c("year", "Value")
-# gg.data.hovm.yr <- (apply(model.max.lat.seas.mean, 2, mean))
-gg.hovm.yr <- ggplot(data = gg.data.hovm.yr, mapping = aes(x = "", y = dts.year.mn[year], fill = Value)) +
+colnames(gg.data.hovm.yr) <- c("year", "value")
+gg.data.hovm.yr$color <- as.character(cut(gg.data.hovm.yr$value, breaks = breaks, labels = FALSE))
+
+gg.hovm.yr <- ggplot(data = gg.data.hovm.yr, mapping = aes(x = "", y = dts.year.mn[year], z = value, fill = color)) +
   geom_raster() +
-  scale_fill_gradientn(limits = c(20, 75),
-                       colours = brewer.pal(11, "RdYlBu")) +
+  scale_fill_manual(values = col.pal) +
   theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
@@ -100,98 +166,26 @@ gg.hovm.yr <- ggplot(data = gg.data.hovm.yr, mapping = aes(x = "", y = dts.year.
         axis.text.x = element_blank(),
         axis.text.y = element_blank())
 
+
 gg.data.hovm.mer <- aggregate(gg.data.hovm[,3], list(gg.data.hovm$Var1), mean)
-colnames(gg.data.hovm.mer) <- c("Lon", "Value")
-gg.hovm.mer <- ggplot(data = gg.data.hovm.mer, mapping = aes(x = lon[Lon], y = "", fill = Value)) +
+colnames(gg.data.hovm.mer) <- c("lon", "value")
+gg.data.hovm.mer$color <- as.character(cut(gg.data.hovm.mer$value, breaks = breaks, labels = FALSE))
+
+gg.hovm.mer <- ggplot(data = gg.data.hovm.mer, mapping = aes(x = lon[lon], y = "", z = value, fill = color)) +
   geom_raster() +
-  scale_fill_gradientn(limits = c(20, 75),
-                       colours = brewer.pal(11, "RdYlBu")) +
+  scale_fill_manual(values = col.pal) +
   theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         axis.ticks = element_blank(),
         axis.text.x = element_blank(),
-        axis.text.y = element_blank()) +
-  ggtitle(paste0("Position of Jet Stream - ", toupper(seas), "\n", "(five yearly moving average)"))
-  
-
-
-
+        axis.text.y = element_blank()) #+
+  #ggtitle(paste0("Position of Jet Stream - ", toupper(seas), "\n", "(five yearly moving average)"))
 
 ##
 ## Zusammenfügen der Plots
 empty <- ggplot() + coord_fixed()
 ggarrange(gg.hovm.mer, empty, gg.hovm, gg.hovm.yr, heights = c(1,10), widths = c(10,1))
-
-
-
-gg.hovm <- ggplot(data = gg.data.hovm, mapping = aes(x = lon[Var1], y = dts.year.mn[Var2], z = value, fill = value))
-gg.hovm <- gg.hovm + geom_raster() + scale_fill_manual(
-  colours = brewer.pal(11, "RdYlBu")) +
-  geom_contour(binwidth = 5, color = "gray0") +
-  xlab("Longitude") + ylab("Year") +
-  scale_x_continuous(breaks = seq(0, 360, 30)) +
-  scale_y_continuous(breaks = seq(1960, 2010, 10)) +
-  coord_fixed(3)
-
-
-
-
-
-################################################################################
-################################################################################
-
-lat = runif(10, 10,45)
-lon = runif(10, -120,-80)
-data = runif(10, -3,2)
-
-xy = cbind(x = lon, y = lat)
-
-dummy = rasterize(xy, r, field=data, fun=mean)
-dummy.df = as.data.frame(dummy, row.names=NULL, optional = TRUE, xy = TRUE, centroids = TRUE)
-colnames(dummy.df) <- c("lon", "lat", "data")
-
-breaks2 <-seq(-2.5,2,0.5)
-dummy.df$Col<-as.character(cut(dummy.df$data,breaks = breaks2, labels = FALSE))
-#there not enouth colours in this palette so I added green
-Colors <- c(brewer.pal(10, "RdYlBu"))
-names(Colors) <- as.character(1:10)
-ggplot(data = dummy.df, aes(x=lon,y=lat)) + geom_tile(aes(fill = Col))+
-  scale_fill_manual(values=c(Colors))
-
-
-
-range(model.max.lat.seas.mean.mam, model.max.lat.seas.mean.jja, model.max.lat.seas.mean.son, model.max.lat.seas.mean.djf)
-breaks <- c(-Inf, seq(30, 70, 5), Inf)
-gg.data.hovm <- melt(model.max.lat.seas.mean.jja)
-
-gg.data.hovm$color <- as.character(cut(gg.data.hovm$value ,breaks = breaks, labels = FALSE))
-col.pal <- brewer.pal(11, "RdYlBu")
-names(col.pal) <- as.character(1:10)
-
-ggplot(data = gg.data.hovm, mapping = aes(x = lon[Var1], y = dts.year.mn[Var2], z = value, fill = color))  + geom_raster(aes(fill = color)) + scale_fill_manual(values = col.pal)
-
-
-
-
-## TESTEN !!!
-## 
-
-gg.data.raw <- model.max.lat.seas.mean.mam
-
-#a <- matrix(rnorm(10368,45,15), ncol = 192, nrow=54)
-breaks <- c(-Inf,seq(30, 70, 5),Inf)
-gg.data.hovm <- melt(gg.data.raw)
-gg.data.hovm$color <- as.character(cut(gg$value, breaks = breaks, labels = FALSE))
-col.pal <- brewer.pal(10, "RdYlBu")
-names(col.pal) <- as.character(1:10)
-ggplot(gg.data.hovm, aes(x = Var1, y = Var2, fill = color)) + geom_raster() + scale_fill_manual(values = col.pal)
-ggplot(gg.data.hovm, aes(x = lon[Var1], y = dts.year.mn[Var2], fill = color)) + geom_raster() + scale_fill_manual(values = col.pal)
-
-
-
-
-
 
 
 
