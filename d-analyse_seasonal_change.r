@@ -1,9 +1,15 @@
-######################################################################
-## Berechnung von Mean und Sd
-## über fünf Jahre & saisonal
-######################################################################
+## source('~/Master_Thesis/02-r-code-git/d-analyse_seasonal_change.r')
+## 
+## BERECHNUNG VON GLEITENDEM MITTEL U SD ####
+## ÜBER FÜNF JAHRE U SAISONAL              ## 
+####
+####
 
-# library(fields)
+
+####
+## AUFRUF WICHTIGER BIBLIOTHEKEN UND PAKETE ####
+####
+
 library(raster)
 library(RColorBrewer)
 library(reshape2)
@@ -122,6 +128,16 @@ gg.hovm.mer <- ggplot(data = gg.data.hovm.mer, mapping = aes(x = lon[lon], y = "
 empty <- ggplot() + coord_fixed()
 ggarrange(gg.hovm.mer, empty, gg.hovm, gg.hovm.yr, heights = c(1,10), widths = c(10,1))
 
+##
+## TEST FÜR 
+## BOXPLOT ZONAL-WIND
 
+a <- matrix(data = rnorm(192 * 54), nrow = 192, ncol = 54)
+b <- matrix(data = rnorm(192 * 54), nrow = 192, ncol = 54)
+c <- abind(a, b, along = 3)
+d <- melt(c)
 
+e <- melt(u.monmean)
+boxp <- ggplot(e, aes(x = lat[Var2], y = value)) + geom_boxplot(aes(group = Var2))
+print(boxp)
 
