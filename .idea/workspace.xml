@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c02efbe5-b729-4fde-9af3-22c0298edeb2" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/a-locate_jetstream_polynomial_2d.r" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/b-locate_jetstream_discrete_2d.r" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/c-compare_seq_vs_std_fit.r" afterPath="$PROJECT_DIR$/c-compare_seq_vs_std_fit.r" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/d-analyse_seasonal_change.r" afterPath="$PROJECT_DIR$/d-analyse_seasonal_change.r" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/02-ecmwf.py/.ipynb_checkpoints/a-get-era-40-checkpoint.ipynb" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/02-ecmwf.py/a-get-era-40.ipynb" afterPath="" />
     </list>
     <ignored path="02-r-code-git.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -56,7 +54,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -67,7 +65,7 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -91,7 +89,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="27" width="1280" height="773" extended-state="6" />
+    <frame x="0" y="27" width="1280" height="773" extended-state="7" />
     <editor active="false" />
     <layout>
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24609375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
