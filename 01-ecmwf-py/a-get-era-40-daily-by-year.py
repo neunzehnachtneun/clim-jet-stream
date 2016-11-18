@@ -15,8 +15,8 @@ dir = "/automount/agh/Projects/skiefer/"
 #date_last_end = dt.date(1978, 12, 1)
 #date_last_end = dt.date(1978, 12, 31)
 
-year_first = 1959
-year_last = 1978
+year_first = 1958
+year_last = 1958
 
 years_vec = np.arange(year_first, (year_last + 1))
 months_vec = np.arange(1, 13)

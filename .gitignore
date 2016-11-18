@@ -4,6 +4,8 @@
 .RData
 .Ruserdata
 .directory
+nohup.out
+.ipynb_checkpoints
 
 # excluded folders
 .idea/
@@ -16,3 +18,5 @@
 *.out
 *.iml
 *.xml
+*.json
+
