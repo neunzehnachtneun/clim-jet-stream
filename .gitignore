@@ -1,10 +1,18 @@
+# excluded files
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.directory
 
+# excluded folders
+.idea/
 
+# excluded data types
 *.RData
 *.pdf
 *.nc
 *.grib
+*.out
+*.iml
+*.xml
