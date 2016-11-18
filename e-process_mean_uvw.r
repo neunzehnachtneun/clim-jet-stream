@@ -19,8 +19,15 @@ library(chron)
 library(fields)
 library(clim.pact)
 
+library(raster)
+library(RColorBrewer)
+library(reshape2)
+library(ggplot2)
+library(egg)
+
+
 setwd("~/Master_Thesis/02-r-code-git/")
-path <- "data/"
+path <- "03-data-nc/"
 # path <- "/home/skiefer/era/raw/"
 file <- "era-t63-mean_uvw_13z.nh-trop-inv.nc"  # Nordhemisphäre + Südhemisphäre
 
@@ -57,58 +64,60 @@ uvw.mean <- sqrt( u.mean ** 2 + v.mean **2 + w.mean ** 2 )
 u.zon.mean <- apply(u.mean[,,], c(2,3), mean)
 u.zon.sd <- apply(u.mean[,,], c(2,3), sd)
 v.zon.mean <- apply(v.mean[,,], c(2,3), mean)
+w.zon.mean <- apply(w.mean[,,], c(2,3), mean)
 uvw.zon.mean <- apply(uvw.mean[,,], c(2,3), mean)
 
 ## ZONAL-WIND U
-filled.contour(lat, 1:13, u.zon.mean, 
-               xlab = "Breitengrad in (deg)", 
-               ylab = "Druckniveaus in (hPa)",
-               main = "Zonal gemittelter Zonal-Wind in (m/s)",
-               plot.axes = {
-                 axis(1, at = seq(-90, 90, 10))
-                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
-                 contour(lat, 1:13, u.zon.mean, nlevels = 16,
-                         drawlabels = TRUE, axes = FALSE, 
-                         frame.plot = FALSE, add = TRUE,
-                         col = "grey0", lty = 3, lwd = 1)
-                 
-               },
-               color.palette = tim.colors, nlevels = 16
-)
+
+gg.data.raw <- u.zon.mean
+breaks <- c(-Inf,seq(-5,35, 5),Inf)
+gg.data.hovm <- melt(gg.data.raw)
+gg.data.hovm$color <- as.character(cut(gg.data.hovm$value, breaks = breaks, labels = FALSE))
+col.pal <- brewer.pal(11, "RdYlBu")
+names(col.pal) <- as.character(1:10)
+
+ggplot(gg.data.hovm, aes(x = lat[Var1], y = Var2, z = value, fill = color)) + 
+  geom_raster() + scale_fill_manual(values = col.pal, guide_colourbar(title = "Zonal wind speed", reverse = FALSE)) +
+  geom_contour(data = gg.data.hovm, aes(x = lat[Var1], y = Var2, z = value, fill = value), binwidth = 5, color = "gray0") +
+  xlab("Latitude") + ylab("Pressure level") +
+  scale_x_continuous(breaks = seq(-90, 90, 30)) +
+  scale_y_continuous(breaks = lev)+
+  coord_fixed(3)
 
 
 ## MERIDIONAL-WIND V
-filled.contour(lat, 1:13, v.zon.mean, 
-               xlab = "Breitengrad in (deg)", 
-               ylab = "Druckniveaus in (hPa)",
-               main = "Zonal gemittelter Meridional-Wind in (m/s)",
-               plot.axes = {
-                 axis(1, at = seq(-90, 90, 10))
-                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
-                 contour(lat, 1:13, v.zon.mean, nlevels = 16,
-                         drawlabels = TRUE, axes = FALSE, 
-                         frame.plot = FALSE, add = TRUE,
-                         col = "grey0", lty = 3, lwd = 1)
-               },
-               color.palette = tim.colors, nlevels = 16
-)
 
-## BETRAG DES WINDFELDES
-filled.contour(lat, 1:13, uvw.zon.mean, 
-               xlab = "Breitengrad in (deg)", 
-               ylab = "Druckniveaus in (hPa)",
-               main = "Zonal gemittelter Wind in (m/s)",
-               plot.axes = {
-                 axis(1, at = seq(-90, 90, 10))
-                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
-                 contour(lat, 1:13, uvw.zon.mean, nlevels = 16,
-                         drawlabels = TRUE, axes = FALSE, 
-                         frame.plot = FALSE, add = TRUE,
-                         col = "grey0", lty = 3, lwd = 1)
-               },
-               color.palette = tim.colors, nlevels = 16
-)
+gg.data.raw <- v.zon.mean
+breaks <- c(-Inf,seq(-2,2,0.5),Inf)
+gg.data.hovm <- melt(gg.data.raw)
+gg.data.hovm$color <- as.character(cut(gg.data.hovm$value, breaks = breaks, labels = FALSE))
+col.pal <- brewer.pal(11, "RdYlBu")
+names(col.pal) <- as.character(1:10)
 
+ggplot(gg.data.hovm, aes(x = lat[Var1], y = Var2, z = value, fill = color)) + 
+  geom_raster() + scale_fill_manual(values = col.pal, guide_colourbar(title = "Mer wind speed", reverse = FALSE)) +
+  geom_contour(data = gg.data.hovm, aes(x = lat[Var1], y = Var2, z = value, fill = value), binwidth = 5, color = "gray0") +
+  xlab("Latitude") + ylab("Pressure level") +
+  scale_x_continuous(breaks = seq(-90, 90, 30)) +
+  scale_y_continuous(breaks = lev)+
+  coord_fixed(3)
+
+## vertical wind speed
+
+gg.data.raw <- w.zon.mean
+breaks <- c(-Inf,0,Inf)
+gg.data.hovm <- melt(gg.data.raw)
+gg.data.hovm$color <- as.character(cut(gg.data.hovm$value, breaks = breaks, labels = FALSE))
+col.pal <- brewer.pal(3, "RdYlBu")
+names(col.pal) <- as.character(1:3)
+
+ggplot(gg.data.hovm, aes(x = lat[Var1], y = Var2, z = value, fill = color)) + 
+  geom_raster() + scale_fill_manual(values = col.pal, guide_colourbar(title = "Mer wind speed")) +
+  geom_contour(data = gg.data.hovm, aes(x = lat[Var1], y = Var2, z = value, fill = value), binwidth = 5, color = "gray0") +
+  xlab("Latitude") + ylab("Pressure level") +
+  scale_x_continuous(breaks = seq(-90, 90, 30)) +
+  scale_y_continuous(breaks = lev)+
+  coord_fixed(3)
 
 
 #################################################
@@ -120,53 +129,12 @@ v.mer.mean <- apply(v.mean[,,], c(1,3), mean)
 uvw.mer.mean <- apply(uvw.mean[,,], c(1,3), mean)
 
 ## ZONAL-WIND U
-filled.contour(lon, 1:13, u.mer.mean, 
-               xlab = "Längengrad in (deg)", 
-               ylab = "Druckniveaus in (hPa)",
-               main = "Meridional gemittelter Zonal-Wind in (m/s)",
-               plot.axes = {
-                 axis(1, at = seq(0, 360, 40))
-                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
-                 contour(lon, 1:13, u.mer.mean, nlevels = 16,
-                         drawlabels = TRUE, axes = FALSE, 
-                         frame.plot = FALSE, add = TRUE,
-                         col = "grey0", lty = 3, lwd = 1)
-               },
-               color.palette = tim.colors, nlevels = 16
-)
+
 
 ## MERIDIONAL-WIND V
-filled.contour(lon, 1:13, v.mer.mean, 
-               xlab = "Längengrad in (deg)", 
-               ylab = "Druckniveaus in (hPa)",
-               main = "Meridional gemittelter Meridional-Wind in (m/s)",
-               plot.axes = {
-                 axis(1, at = seq(0, 360, 40))
-                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
-                 contour(lon, 1:13, v.mer.mean, nlevels = 16,
-                         drawlabels = TRUE, axes = FALSE, 
-                         frame.plot = FALSE, add = TRUE,
-                         col = "grey0", lty = 3, lwd = 1)
-               },
-               color.palette = tim.colors, nlevels = 16
-)
+
 
 ## BETRAG DES WINDFELDES
-filled.contour(lon, 1:13, uvw.mer.mean, 
-               xlab = "Längengrad in (deg)", 
-               ylab = "Druckniveaus in (hPa)",
-               main = "Meridional gemittelter Wind in (m/s)",
-               plot.axes = {
-                 axis(1, at = seq(0, 360, 40))
-                 axis(2, at = seq(1,13,2), labels = c('1000', '850', '700', '500',  '300',  '200', '100'))
-                 contour(lon, 1:13, uvw.mer.mean, nlevels = 16,
-                         drawlabels = TRUE, axes = FALSE, 
-                         frame.plot = FALSE, add = TRUE,
-                         col = "grey0", lty = 3, lwd = 1)
-               },
-               color.palette = tim.colors, nlevels = 16
-)
-
 
 
 
