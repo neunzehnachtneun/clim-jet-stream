@@ -11,10 +11,10 @@
 library(ncdf4)
 library(chron)
 
-setwd("~/Master_Thesis/02-r-code-git/")
+setwd("~/01-Master-Thesis/02-r-code-git/")
 path <- "03-data-nc/"
 # path <- "/home/skiefer/era/raw/"
-file <- "era-t63-1957-2016.nh-trop-inv.nc"  # Nordhemisphäre + Tropen
+file <- "1958-2015-e4ei-t63-nh-uv-monmean.nc"  # Nordhemisphäre
 
 ####
 ## EINLESEN DER DATEN   ####
@@ -26,16 +26,13 @@ file <- "era-t63-1957-2016.nh-trop-inv.nc"  # Nordhemisphäre + Tropen
 
 nc <- nc_open(paste(path, file, sep = ""))
 # print(nc)
-u.era <- ncvar_get(nc, "var131") # U-Wind-Komponente
-v.era <- ncvar_get(nc, "var132") # V-Wind-Komponente
-# w.monmean <- ncvar_get(nc, "var135") # W-Wind-Komponente
-# z.monmean <- ncvar_get(nc, "var129") # Geopotenzial
-# t.monmean <- ncvar_get(nc, "var130") # Temperatur
-# d.monmean <- ncvar_get(nc, "var155") # Divergenz
+u.era <- ncvar_get(nc, "u") # U-Wind-Komponente
+v.era <- ncvar_get(nc, "v") # V-Wind-Komponente
+
 
 lon <- ncvar_get(nc, "lon") # Längengrad
 lat <- ncvar_get(nc, "lat") # Breitengrad
-lev <- ncvar_get(nc, "lev") # Drucklevel
+lev <- ncvar_get(nc, "level") # Drucklevel
 date.help <- ncvar_get(nc, "time")
 
 nc_close(nc)
@@ -52,7 +49,8 @@ lat.len <- length(lat)
 lon.len <- length(lon)
 
 ## Zeitliche Auflösung
-dts = chron(dates. = date.help/24, origin. = c(month = 9,day = 1,year = 1957), format = "day mon year")
+date.help. <- date.help - min(date.help)
+dts = chron(dates. = date.help./24, origin. = c(month = 1,day = 15, year = 1958))
 dts.month <- months(dts, abbreviate = TRUE)
 dts.year <- years(dts)
 
@@ -76,5 +74,9 @@ uv.era <- sqrt( u.era ** 2 + v.era ** 2 )
 ## ÜBERGABE D VARIABLEN ####
 ####
 
-save.image(file = 'data.RData')
+# save.image(file = 'data.RData')
 
+
+read.uv <- function(path, file) {
+  
+}

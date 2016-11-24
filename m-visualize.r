@@ -2,9 +2,10 @@
 ######################################################################
 ## source('~/Master_Thesis/r-code-git/visualize.r')
 
-library(fields)
-library(clim.pact)
+# library(fields)
+# library(clim.pact)
 library(ggplot2)
+library(reshape2)
 
 
 #load(".RData")
@@ -201,3 +202,50 @@ for (i in 1:11) {
   contour(lon, lat, u.seas.djf.sd[,,i], add = TRUE)
 }
 dev.off()
+
+
+
+
+
+
+
+#####################################################
+#####################################################
+## Plotroutinen als Funktionen
+## 
+
+
+library(raster)
+library(RColorBrewer)
+library(reshape2)
+library(ggplot2)
+library(egg)
+
+x <- 0:10
+y <- 5:12
+data <- matrix(rnorm(88, mean = 0, sd = 10), nrow = length(x), ncol = length(y))
+
+plot.image <- function(x, y, data, title, xlabel, ylabel) {
+  gg.data.hovm <- melt(data)
+  col.pal <- brewer.pal(11, "RdYlBu")
+  ggplot(gg.data.hovm, aes(x = x[Var1], y = y[Var2], z = value, fill = value)) +
+    geom_raster() + 
+    scale_fill_gradientn(colours = col.pal) +
+    xlab(xlabel) + ylab(ylabel) + ggtitle(title)
+}
+
+plot.image(x,y,data, "title", "xlab", "ylab")
+
+plot.image.contour <- function(x, y, data, title, xlabel, ylabel) {
+  gg.data.hovm <- melt(data)
+  col.pal <- brewer.pal(11, "RdYlBu")
+ggplot(gg.data.hovm, aes(x = x[Var1], y = y[Var2], z = value, fill = value)) +
+    geom_raster() + 
+    scale_fill_gradientn(colours = col.pal) + 
+    geom_contour(data = gg.data.hovm, aes(x = x[Var1], y = y[Var2], z = value), binwidth = 10, color = "gray0") +
+  xlab(xlabel) + ylab(ylabel) + ggtitle(title)
+}
+
+plot.image.contour(x,y,data, "title", "xlab", "ylab")
+
+qplot(x)

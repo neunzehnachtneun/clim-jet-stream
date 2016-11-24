@@ -9,7 +9,10 @@
 ####
 
 # Working Directory
-setwd("~/Master_Thesis/02-r-code-git/")
+setwd("~/01-Master-Thesis/02-r-code-git/")
+path <- "03-data-nc/"
+file <- "03-data-nc/1958-2015-e4ei-t63-nh-uv-monmean.nc"
+read.uv(path, file)
 
 # Einleseroutine
 # source('a-read_era_ncdf.r')
