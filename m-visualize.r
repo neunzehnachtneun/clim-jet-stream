@@ -221,31 +221,53 @@ library(reshape2)
 library(ggplot2)
 library(egg)
 
-x <- 0:10
-y <- 5:12
-data <- matrix(rnorm(88, mean = 0, sd = 10), nrow = length(x), ncol = length(y))
+axis.x <- 0:10
+axis.y <- 5:12
+data.xy <- matrix(rnorm(88, mean = 0, sd = 10), nrow = length(axis.x), ncol = length(axis.y))
+data.y <- rnorm(11)
+data.y2 <- rnorm(11)
 
-plot.image <- function(x, y, data, title, xlabel, ylabel) {
-  gg.data.hovm <- melt(data)
+
+plot.image <- function(axis.x, axis.y, data.xy, title, label.x, label.y) {
+  gg.data.hovm <- melt(data.xy)
   col.pal <- brewer.pal(11, "RdYlBu")
-  ggplot(gg.data.hovm, aes(x = x[Var1], y = y[Var2], z = value, fill = value)) +
+  ggplot(gg.data.hovm, aes(x = axis.x[Var1], y = axis.y[Var2], z = value, fill = value)) +
     geom_raster() + 
     scale_fill_gradientn(colours = col.pal) +
-    xlab(xlabel) + ylab(ylabel) + ggtitle(title)
+    labs(x = label.x, y = label.y, title = title)
 }
 
-plot.image(x,y,data, "title", "xlab", "ylab")
+plot.image(axis.x, axis.y, data.xy, "title", "xlab", "ylab")
 
-plot.image.contour <- function(x, y, data, title, xlabel, ylabel) {
-  gg.data.hovm <- melt(data)
+plot.image.contour <- function(axis.x, axis.y, data.xy, title, label.x, label.y) {
+  gg.data.hovm <- melt(data.xy)
   col.pal <- brewer.pal(11, "RdYlBu")
-ggplot(gg.data.hovm, aes(x = x[Var1], y = y[Var2], z = value, fill = value)) +
+  ggplot(gg.data.hovm, aes(x = axis.x[Var1], y = axis.y[Var2], z = value, fill = value)) +
     geom_raster() + 
     scale_fill_gradientn(colours = col.pal) + 
-    geom_contour(data = gg.data.hovm, aes(x = x[Var1], y = y[Var2], z = value), binwidth = 10, color = "gray0") +
-  xlab(xlabel) + ylab(ylabel) + ggtitle(title)
+    geom_contour(data = gg.data.hovm, aes(x = axis.x[Var1], y = axis.y[Var2], z = value), binwidth = 10, color = "gray0") +
+    labs(x = label.x, y = label.y, title = title)
 }
 
-plot.image.contour(x,y,data, "title", "xlab", "ylab")
+plot.image.contour(axis.x, axis.y, data.xy, "title", "xlab", "ylab")
 
-qplot(x)
+data.t <- data.frame(
+  axis.x, data.y, data.y2
+)
+
+ggplot(data.t, aes(x = axis.x, y = data.y)) + geom_point(aes(x = axis.x, y = data.y)) + geom_line(aes(x = axis.x, y = data.y2))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+qplot(data.y)
