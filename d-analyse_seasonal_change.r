@@ -5,7 +5,6 @@
 ####
 ####
 
-
 ####
 ## AUFRUF WICHTIGER BIBLIOTHEKEN UND PAKETE ####
 ####
@@ -16,8 +15,13 @@ library(reshape2)
 library(ggplot2)
 library(egg)
 
+setwd("~/01-Master-Thesis/02-r-code-git/")
+path <- "03-data-nc/"
+filename <- "1958-2015-e4ei-t63-nh-uv-seasmean.nc"
 
-load(file = "monthly.RData")
+source("a-read_era_ncdf.r")
+source("b-locate_jetstream_1polynomial_2d.r")
+
 
 
 dts.year.mn <- seq(1960, 2013)
