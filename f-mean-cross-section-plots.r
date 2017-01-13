@@ -159,7 +159,7 @@ gg.hovm.mer <- ggplot(data = gg.data.hovm.mer, mapping = aes(x = lon[lon], y = "
         axis.ticks = element_blank(),
         axis.text.x = element_blank(),
         axis.text.y = element_blank()) #+
-  #ggtitle(paste0("Position of Jet Stream - ", toupper(seas), "\n", "(five yearly moving average)"))
+#ggtitle(paste0("Position of Jet Stream - ", toupper(seas), "\n", "(five yearly moving average)"))
 
 ##
 ## Zusammenfügen der Plots
