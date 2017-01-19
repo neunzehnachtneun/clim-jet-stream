@@ -40,12 +40,12 @@ f <- matrix(rnorm(nx * ny), nx, ny)
 
 
 # mit titel für präsi
-master.plt.imc.ttl <- function(x.ax, y.ax, xy.data, x.data, tit, x.lab, y.lab) {
+plt.image.contr.title <- function(x.ax, y.ax, xy.data, x.data, label.title, label.x, label.y) {
   image.plot(x.ax, y.ax, xy.data, axes = FALSE,
              col = brewer.pal(11, "RdYlBu"), 
-             main = tit, #sub = "Untertitel",
-             xlab = x.lab, 
-             ylab = y.lab,
+             main = label.title, #sub = "Untertitel",
+             xlab = label.x, 
+             ylab = label.y,
              cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)
   points(x.ax, x.data, pch = 18, col = "gray0")
@@ -55,11 +55,11 @@ master.plt.imc.ttl <- function(x.ax, y.ax, xy.data, x.data, tit, x.lab, y.lab) {
 } 
 
 # ohne titel
-master.plt.imc <- function(x.ax, y.ax, xy.data, x.data, x.lab, y.lab) {
+plt.image.contr <- function(x.ax, y.ax, xy.data, x.data, label.x, label.y) {
   image.plot(x.ax, y.ax, xy.data, axes = FALSE,
              col = brewer.pal(11, "RdYlBu"), 
-             xlab = x.lab, 
-             ylab = y.lab,
+             xlab = label.x, 
+             ylab = label.y,
              cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)
   points(x.ax, x.data, pch = 18, col = "gray0")
@@ -68,9 +68,10 @@ master.plt.imc <- function(x.ax, y.ax, xy.data, x.data, x.lab, y.lab) {
   box()
 } 
 
-
-# master.plt.imc.ttl(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, tit = "Titel", x.lab = "X-Achse", y.lab = "Y-Achse")
-# master.plt.imc(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, x.lab = "X-Achse", y.lab = "Y-Achse")
+##
+# master.plt.imc.ttl(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, label.title = "Titel", label.x = "X-Achse", label.y = "Y-Achse")
+#
+# master.plt.imc(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, label.x = "X-Achse", label.y = "Y-Achse")
 
 
 
@@ -79,12 +80,12 @@ master.plt.imc <- function(x.ax, y.ax, xy.data, x.data, x.lab, y.lab) {
 ####
 
 # mit titel für präsi
-master.plt.iml.ttl <- function(x.ax, y.ax, xy.data, x.data, tit, x.lab, y.lab) {
+plt.image.land.title <- function(x.ax, y.ax, xy.data, x.data, label.title, label.x, label.y) {
   image.plot(x.ax, y.ax, xy.data, axes = FALSE,
              col = brewer.pal(11, "RdYlBu"), 
-             main = tit, #sub = "Untertitel",
-             xlab = x.lab, 
-             ylab = y.lab,
+             main = label.title, #sub = "Untertitel",
+             xlab = label.x, 
+             ylab = label.y,
              cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   addland(col = "black", lwd = 1)
   points(x.ax, x.data, pch = 18, col = "gray0")
@@ -94,11 +95,11 @@ master.plt.iml.ttl <- function(x.ax, y.ax, xy.data, x.data, tit, x.lab, y.lab) {
 } 
 
 # ohne titel
-master.plt.iml <- function(x.ax, y.ax, xy.data, x.data, x.lab, y.lab) {
+plt.image.land <- function(x.ax, y.ax, xy.data, x.data, label.x, label.y) {
   image.plot(x.ax, y.ax, xy.data, axes = FALSE,
              col = brewer.pal(11, "RdYlBu"), 
-             xlab = x.lab, 
-             ylab = y.lab,
+             xlab = label.x, 
+             ylab = label.y,
              cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   addland(col = "black", lwd = 1)
   points(x.ax, x.data, pch = 18, col = "gray0")
@@ -107,9 +108,10 @@ master.plt.iml <- function(x.ax, y.ax, xy.data, x.data, x.lab, y.lab) {
   box()
 } 
 
-
-master.plt.iml.ttl(x.ax = x1, y.ax = y1, xy.data = f,tit = "Titel", x.data = x2, x.lab = "X-Achse", y.lab = "Y-Achse")
-master.plt.iml(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, x.lab = "X-Achse", y.lab = "Y-Achse")
+##
+# master.plt.iml.ttl(x.ax = x1, y.ax = y1, xy.data = f, label.title = "Titel", x.data = x2, label.x = "X-Achse",label.y = "Y-Achse")
+#
+# master.plt.iml(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, label.x = "X-Achse", label.y = "Y-Achse")
 
 
 ####
@@ -117,26 +119,26 @@ master.plt.iml(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, x.lab = "X-Achse"
 ####
 
 # mit titel für präsi
-master.plt.pts.ttl <- function(x.ax, x.data1, x.data2, x.data3, tit, x.lab, y.lab, leg.1, leg.2, leg.3) {
+plt.points.title <- function(x.ax, x.data1, x.data2, x.data3, label.title, label.x, label.y, leg.1, leg.2, leg.3) {
   plot(x.ax, x.data1, pch = 0, col = brewer.pal(3, "Dark2")[1],
-       xlab = x.lab, 
-       ylab = y.lab,
-       main = tit,
+       main = label.title,
+       xlab = label.x,
+       ylab = label.y,
        cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5,
        axes = FALSE)
   points(x.ax, x.data2, pch = 21, col = brewer.pal(3, "Dark2")[2])
   points(x.ax, x.data3, pch = 17, col = brewer.pal(3, "Dark2")[3])
-  legend("topright", pch= c(0, 21, 17), col = brewer.pal(3, "Dark2"), c(leg.1, leg.2, leg.3))
+  legend("topright", pch = c(0, 21, 17), col = brewer.pal(3, "Dark2"), c(leg.1, leg.2, leg.3))
   axis(1, at = seq(min(x.ax), max(x.ax), length.out = 9))
   axis(2, at = seq(floor(min(x.data1, x.data2, x.data3)), ceiling(max(x.data1, x.data2, x.data3)), length.out = 7))
   box()
 }
 
 # ohne titel für ma
-master.plt.pts <- function(x.ax, x.data1, x.data2, x.data3, x.lab, y.lab, leg.1, leg.2, leg.3) {
+plt.points <- function(x.ax, x.data1, x.data2, x.data3, label.x, label.y, leg.1, leg.2, leg.3) {
   plot(x.ax, x.data1, pch = 0, col = brewer.pal(3, "Dark2")[1],
-       xlab = x.lab, 
-       ylab = y.lab,
+       xlab = label.x, 
+       ylab = label.y,
        cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5,
        axes = FALSE)
   points(x.ax, x.data2, pch = 21, col = brewer.pal(3, "Dark2")[2])
@@ -147,11 +149,10 @@ master.plt.pts <- function(x.ax, x.data1, x.data2, x.data3, x.lab, y.lab, leg.1,
   box()
 }
 
-
-
-master.plt.pts.ttl(x.ax = x1, x.data1 = x2, x.data2 = x3, x.data3 = x4, tit = "Titel", x.lab = "bla", y.lab = "alb", leg.1 = "a1", leg.2 = "b2", leg.3 = "c3")
-
-master.plt.pts(x.ax = x1, x.data1 = x2, x.data2 = x3, x.data3 = x4, tit, x.lab = "bla", y.lab = "alb", leg.1 = "a1", leg.2 = "b2", leg.3 = "c3")
+##
+# master.plt.pts.ttl(x.ax = x1, x.data1 = x2, x.data2 = x3, x.data3 = x4, label.title = "Titel", label.x = "bla", label.y = "alb", leg.1 = "a1", leg.2 = "b2", leg.3 = "c3")
+#
+# master.plt.pts(x.ax = x1, x.data1 = x2, x.data2 = x3, x.data3 = x4, label.x = "bla", label.y = "alb", leg.1 = "a1", leg.2 = "b2", leg.3 = "c3")
 
 
 
