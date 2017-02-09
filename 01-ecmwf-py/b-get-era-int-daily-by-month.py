@@ -10,8 +10,8 @@ server = ECMWFDataServer()
 
 dir = "/automount/agh/Projects/skiefer/"
 
-year_first = 2012
-year_last = 2015
+year_first = 2016
+year_last = 2016
 
 years_vec = np.arange(year_first, (year_last + 1))
 months_vec = np.arange(1, 13)
