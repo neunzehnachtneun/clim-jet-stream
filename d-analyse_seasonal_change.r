@@ -9,29 +9,17 @@
 ## AUFRUF WICHTIGER BIBLIOTHEKEN UND PAKETE ####
 ####
 
-# library(raster)
-# library(RColorBrewer)
-# library(reshape2)
-# library(ggplot2)
-# library(egg)
-
-library(fields)
-library(clim.pact)
-
 setwd("~/01-Master-Thesis/02-r-code-git/")
 path <- "03-data-nc/"
-filename <- "1958-2015-e4ei-t63-nh-uv-seasmean.nc"
 
-source("a-read_era_ncdf.r")
-source("b-locate_jetstream_1polynomial_2d.r")
+#source("m-plots-master.r")
 
 ####
 ## SEASONALLY YEARLY MEANS
 ####
+####
 
-setwd("~/01-Master-Thesis/02-r-code-git/")
-path <- "03-data-nc/"
-filename <- "1958-2015-e4ei-t63-nh-uv-seasmean.nc"
+filename <- "c-1958-2015-e4ei-t63-nh-uv-seasmean.nc"
 
 source("a-read_era_ncdf.r")
 source("b-locate_jetstream_1polynomial_2d.r")

@@ -2,7 +2,7 @@
 ######################################################################
 ## ROUTINEN UND FUNKTIONEN FÜR PLOT TEMPLATES
 ## AUFBAUEND AUF PLOT(), IMAGE.PLOT(), CONTOUR(), POINTS()
-## source('~/Master_Thesis/r-code-git/m-plots-master.r')
+## source('~/01-Master-Thesis/02-r-code-git/m-plots-master.r')
 ######################################################################
 ######################################################################
 
@@ -17,21 +17,21 @@ library(fields)
 library(clim.pact)
 library(RColorBrewer)
 
-####
-## BEISPIEL DATENSATZ
-####
-
-nx <- 192
-ny <- 48
-
-x1 <- seq(0, 360, length.out = nx)
-x2 <- rnorm(nx, 45, 5)
-x3 <- rnorm(nx, 45, 5)
-x4 <- rnorm(nx, 45, 5)
-y1 <- seq(0, 90, length.out = ny)
-y2 <- rnorm(n = ny)
-
-f <- matrix(rnorm(nx * ny), nx, ny)
+# ####
+# ## BEISPIEL DATENSATZ
+# ####
+# 
+# nx <- 192
+# ny <- 48
+# 
+# x1 <- seq(0, 360, length.out = nx)
+# x2 <- rnorm(nx, 45, 5)
+# x3 <- rnorm(nx, 45, 5)
+# x4 <- rnorm(nx, 45, 5)
+# y1 <- seq(0, 90, length.out = ny)
+# y2 <- rnorm(n = ny)
+# 
+# f <- matrix(rnorm(nx * ny), nx, ny)
 
 
 ####
