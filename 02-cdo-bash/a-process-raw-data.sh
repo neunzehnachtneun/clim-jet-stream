@@ -1,38 +1,81 @@
-# Programm zum Verarbeiten der Raw-nc-files
+#!/bin/bash
 
-# t63-grid
-# cdo -invertlat -remapbil,t63grid 1958-2015_e4-ei.nc 1958-2015_e4-ei-t63.nc
 
-# monatliche mittelwerte
-# cdo monmean 1958-2015-e4ei-t63.nc 1958-2015-e4ei-t63-monmean.nc
-# cdo selparam,-5,-6 1958-2015-e4ei-t63-monmean.nc 1958-2015-e4ei-t63-uv-monmean.nc
-# monatliche standardabweichungen
-# cdo monstd 1958-2015-e4ei-t63.nc 1958-2015-e4ei-t63-monstd.nc
-# cdo selparam,-5,-6 1958-2015-e4ei-t63-monstd.nc 1958-2015-e4ei-t63-uv-monstd.nc
+# change working directory
+cd /automount/agh/Projects/skiefer/01-raw-by-month/	####
 
-# u- und v-windkomponente aus datensatz ziehen
-cdo selparam,-5,-6 1958-2015-e4ei-t63.nc 1958-2015-e4ei-t63-uv.nc
+# merge monthly datasets to yearly datasetsi
+#cdo -b F32 mergetime 1957* ../02-raw-by-year/1957-e4.nc
+#cdo -b F32 mergetime 1958* ../02-raw-by-year/1958-e4.nc
+#cdo -b F32 mergetime 2012* ../02-raw-by-year/2012-ei.nc
+#cdo -b F32 mergetime 2013* ../02-raw-by-year/2013-ei.nc
+#cdo -b F32 mergetime 2014* ../02-raw-by-year/2014-ei.nc
+#cdo -b F32 mergetime 2015* ../02-raw-by-year/2015-ei.nc
+#cdo -b F32 mergetime 2016* ../02-raw-by-year/2016-ei.nc
 
-# nord- und südhemisphäre trennen
-cdo distgrid,1,2 1958-2015-e4ei-t63-uv.nc ofile
-mv ofile00000.nc 1958-2015-e4ei-t63-sh-uv.nc
-mv ofile00001.nc 1958-2015-e4ei-t63-nh-uv.nc 
+# change wd to folder with yearly datasets		####
+cd ../02-raw-by-year/
 
-# saisonale mittelwerte
-cdo seasmean 1958-2015-e4ei-t63-nh-uv.nc 1958-2015-e4ei-t63-nh-uv-seasmean.nc
-# saisonale standardabweichungen
-cdo seasstd 1958-2015-e4ei-t63-nh-uv.nc 1958-2015-e4ei-t63-nh-uv-seasstd.nc
+# merge yearly datasets to at-a-stretch-dataset
+#cdo -b F32 mergetime *.nc ../03-raw-full/a-1958-2015-e4ei-1deg.nc
 
-# monatliche mittelwerte
-cdo monmean 1958-2015-e4ei-t63-nh-uv.nc 1958-2015-e4ei-t63-nh-uv-monmean.nc
-# monatliche standardabweichungen
-cdo monstd 1958-2015-e4ei-t63-nh-uv.nc 1958-2015-e4ei-t63-nh-uv-monstd.nc
+# change wd to complete dataset				####
+cd ../03-raw-full/
 
-# Orographie-Datenei-invariant.nc
-cdo selparam,-5 e4-invariant.nc e4-orography.nc
-cdo selparam,-6 ei-invariant.nc ei-orography.nc
-cdo -v -W -b F32 mergetime e4-orography.nc ei-orography.nc e4ei-orography.nc
-cdo timmean e4ei-orography.nc e4ei-geopotential.nc
-cdo -invertlat -remapbil,t63grid e4ei-geopotential.nc e4ei-t63-geopotential.nc
+# interpolate to t63-grid
+#cdo remapbil,t63grid a-1958-2015-e4ei-1deg.nc b-1958-2015-e4ei-t63.nc
+
+# calculate daily means
+#cdo daymean b-1958-2015-e4ei-t63.nc c-1958-2015-e4ei-t63-daymean.nc
+
+# interpolate to t63 and calculate daily means in one step
+# cdo -daymean -remapbil,t63grid a-1958-2015-e4ei-1deg.nc c-1958-2015-e4ei-t63-daymean.nc
+
+# distribute horizontal grid
+# cdo -distgrid,1,2 c-1958-2015-e4ei-t63-daymean.nc d-1958-2015-e4ei-t63-daymean-
+# mv d-1958-2015-e4ei-t63-daymean-00000.nc  d-1958-2015-e4ei-t63-daymean-sh.nc
+# mv d-1958-2015-e4ei-t63-daymean-00001.nc  d-1958-2015-e4ei-t63-daymean-nh.nc
+
+# extract u v
+# cdo -selparam,-5,-6 d-1958-2015-e4ei-t63-daymean-nh.nc e-1958-2015-e4ei-t63-daymean-nh-uv.nc
+
+# change wd to root-directory				####
+cd ../
+
+# calculate fields of mean and sd
+# cdo -timmean 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc a-1958-2015-e4ei-t63-nh-uv-timmean.nc
+# cdo -timstd 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc a-1958-2015-e4ei-t63-nh-uv-timsd.nc
+
+# monthly means
+# cdo -monmean 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc b-1958-2015-e4ei-t63-nh-uv-monmean.nc
+# cdo -ymonmean 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc b-1958-2015-e4ei-t63-nh-uv-ymonmean.nc
+# cdo -monstd 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc b-1958-2015-e4ei-t63-nh-uv-monsd.nc
+# cdo -ymonstd 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc b-1958-2015-e4ei-t63-nh-uv-ymonsd.nc
+
+# seasonal means
+# cdo -seasmean 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc c-1958-2015-e4ei-t63-nh-uv-seasmean.nc
+# cdo -yseasmean 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc c-1958-2015-e4ei-t63-nh-uv-yseasmean.nc
+# cdo -seasstd 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc c-1958-2015-e4ei-t63-nh-uv-seassd.nc
+# cdo -yseasstd 03-raw-full/e-1958-2015-e4ei-t63-daymean-nh-uv.nc c-1958-2015-e4ei-t63-nh-uv-yseassd.nc
+
+# seasonal running means
+cdo -b F32 -mergetime -runmean,2 -selseason,DJF c-1958-2015-e4ei-t63-nh-uv-seasmean.nc -runmean,2 -selseason,MAM c-1958-2015-e4ei-t63-nh-uv-seasmean.nc -runmean,2 -selseason,JJA c-1958-2015-e4ei-t63-nh-uv-seasmean.nc -runmean,2 -selseason,SON c-1958-2015-e4ei-t63-nh-uv-seasmean.nc d-1958-2015-e4ei-t63-nh-uv-seasmean-runmean.nc
+
+
+## Orographie-Datenei-invariant.nc
+#cdo selparam,-5 e4-invariant.nc e4-orography.nc
+#cdo selparam,-6 ei-invariant.nc ei-orography.nc
+#cdo -v -W -b F32 mergetime e4-orography.nc ei-orography.nc e4ei-orography.nc
+#cdo timmean e4ei-orography.nc e4ei-geopotential.nc
+#cdo -invertlat -remapbil,t63grid e4ei-geopotential.nc e4ei-t63-geopotential.nc
+
+
+
+
+###
+# change wd to folder with bash-script
+cd "$(dirname "$0")"
+
+
 
 
