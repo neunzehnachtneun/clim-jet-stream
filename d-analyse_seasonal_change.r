@@ -12,14 +12,14 @@
 setwd("~/01-Master-Thesis/02-r-code-git/")
 path <- "03-data-nc/"
 
-#source("m-plots-master.r")
+source("m-plots-master.r")
 
 ####
 ## SEASONALLY YEARLY MEANS
 ####
 ####
 
-filename <- "c-1958-2015-e4ei-t63-nh-uv-seasmean.nc"
+filename <- "d-1957-2016-e4ei-t63-uv-nh-seasmean-runmean.nc"
 
 source("a-read_era_ncdf.r")
 source("b-locate_jetstream_1polynomial_2d.r")
