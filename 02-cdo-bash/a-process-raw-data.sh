@@ -29,37 +29,32 @@ cd ../03-raw-full/
 #cdo daymean b-1957-2016-e4ei-t63.nc c-1957-2016-e4ei-t63-daymean.nc
 
 # interpolate to t63 and calculate daily means in one step
-# cdo -daymean -remapbil,t63grid a-1957-2016-e4ei-1deg.nc c-1957-2016-e4ei-t63-daymean.nc
+# cdo -daymean -remapbil,t63grid a-1957-2016-e4ei-1deg.nc b-1957-2016-e4ei-t63-daymean.nc
 
-# distribute horizontal grid
-# cdo -distgrid,1,2 c-1957-2016-e4ei-t63-daymean.nc d-1957-2016-e4ei-t63-daymean-
-# mv d-1957-2016-e4ei-t63-daymean-00000.nc  d-1957-2016-e4ei-t63-daymean-sh.nc
-# mv d-1957-2016-e4ei-t63-daymean-00001.nc  d-1957-2016-e4ei-t63-daymean-nh.nc
-
-# extract u v
-# cdo -selparam,-5,-6 d-1957-2016-e4ei-t63-daymean-nh.nc e-1957-2016-e4ei-t63-daymean-nh-uv.nc
+# select parameters u,v, select grid northern hemisphere, and invert latitude  
+cdo -invertlat -sellonlatbox,0,360,90,0 -selparam,-5,-6 b-1957-2016-e4ei-t63-daymean.nc c-1957-2016-e4ei-t63-daymean-uv-nh.nc
 
 # change wd to root-directory				####
 cd ../
 
 # calculate fields of mean and sd
-# cdo -timmean 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc a-1957-2016-e4ei-t63-nh-uv-timmean.nc
-# cdo -timstd 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc a-1957-2016-e4ei-t63-nh-uv-timsd.nc
+cdo -timmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc a-1957-2016-e4ei-t63-uv-nh-timmean.nc
+cdo -timstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc a-1957-2016-e4ei-t63-uv-nh-timsd.nc
 
 # monthly means
-# cdo -monmean 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc b-1957-2016-e4ei-t63-nh-uv-monmean.nc
-# cdo -ymonmean 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc b-1957-2016-e4ei-t63-nh-uv-ymonmean.nc
-# cdo -monstd 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc b-1957-2016-e4ei-t63-nh-uv-monsd.nc
-# cdo -ymonstd 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc b-1957-2016-e4ei-t63-nh-uv-ymonsd.nc
+cdo -monmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-monmean.nc
+cdo -ymonmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-ymonmean.nc
+cdo -monstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-monsd.nc
+cdo -ymonstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-ymonsd.nc
 
 # seasonal means
-# cdo -seasmean 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc c-1957-2016-e4ei-t63-nh-uv-seasmean.nc
-# cdo -yseasmean 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc c-1957-2016-e4ei-t63-nh-uv-yseasmean.nc
-# cdo -seasstd 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc c-1957-2016-e4ei-t63-nh-uv-seassd.nc
-# cdo -yseasstd 03-raw-full/e-1957-2016-e4ei-t63-daymean-nh-uv.nc c-1957-2016-e4ei-t63-nh-uv-yseassd.nc
+cdo -seasmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-seasmean.nc
+cdo -yseasmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-yseasmean.nc
+cdo -seasstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-seassd.nc
+cdo -yseasstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-yseassd.nc
 
 # seasonal running means
-cdo -b F32 -mergetime -runmean,2 -selseason,DJF c-1957-2016-e4ei-t63-nh-uv-seasmean.nc -runmean,2 -selseason,MAM c-1957-2016-e4ei-t63-nh-uv-seasmean.nc -runmean,2 -selseason,JJA c-1957-2016-e4ei-t63-nh-uv-seasmean.nc -runmean,2 -selseason,SON c-1957-2016-e4ei-t63-nh-uv-seasmean.nc d-1957-2016-e4ei-t63-nh-uv-seasmean-runmean.nc
+cdo -b F32 -mergetime -runmean,2 -selseason,DJF c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,MAM c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,JJA c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,SON c-1957-2016-e4ei-t63-uv-nh-seasmean.nc d-1957-2016-e4ei-t63-uv-nh-seasmean-runmean.nc
 
 
 ## Orographie-Datenei-invariant.nc
@@ -72,9 +67,9 @@ cdo -b F32 -mergetime -runmean,2 -selseason,DJF c-1957-2016-e4ei-t63-nh-uv-seasm
 
 
 
-###
-# change wd to folder with bash-script
-cd "$(dirname "$0")"
+
+
+
 
 
 
