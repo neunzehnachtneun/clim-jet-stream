@@ -20,7 +20,7 @@ library(RColorBrewer)
 # ####
 # ## BEISPIEL DATENSATZ
 # ####
-# 
+
 # nx <- 192
 # ny <- 48
 # 
@@ -34,84 +34,42 @@ library(RColorBrewer)
 # f <- matrix(rnorm(nx * ny), nx, ny)
 
 
-####
-## IMAGE.PLOT MIT CONTOUR UND POINTS
-####
-
-
-# mit titel für präsi
-plt.image.contr.title <- function(x.ax, y.ax, xy.data, x.data, label.title, label.x, label.y) {
-  image.plot(x.ax, y.ax, xy.data, axes = FALSE,
-             col = brewer.pal(11, "RdYlBu"), 
-             main = label.title, #sub = "Untertitel",
-             xlab = label.x, 
-             ylab = label.y,
-             cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)
-  points(x.ax, x.data, pch = 18, col = "gray0")
-  axis(1, at = seq(min(x.ax), max(x.ax), length.out = 9))
-  axis(2, at = seq(min(y.ax), max(y.ax), length.out = 6))
-  box()
-} 
-
-# ohne titel
-plt.image.contr <- function(x.ax, y.ax, xy.data, x.data, label.x, label.y) {
-  image.plot(x.ax, y.ax, xy.data, axes = FALSE,
-             col = brewer.pal(11, "RdYlBu"), 
-             xlab = label.x, 
-             ylab = label.y,
-             cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)
-  points(x.ax, x.data, pch = 18, col = "gray0")
-  axis(1, at = seq(min(x.ax), max(x.ax), length.out = 9))
-  axis(2, at = seq(min(y.ax), max(y.ax), length.out = 6))
-  box()
-} 
-
-##
-# master.plt.imc.ttl(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, label.title = "Titel", label.x = "X-Achse", label.y = "Y-Achse")
-#
-# master.plt.imc(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, label.x = "X-Achse", label.y = "Y-Achse")
-
 
 
 ####
-## IMAGE.PLOT MIT ADDLAND
+## IMAGE.PLOT MIT WAHLWEISE CONTOUR, LAND, PUNKTEN, TITEL ####
 ####
 
-# mit titel für präsi
-plt.image.land.title <- function(x.ax, y.ax, xy.data, x.data, label.title, label.x, label.y) {
-  image.plot(x.ax, y.ax, xy.data, axes = FALSE,
-             col = brewer.pal(11, "RdYlBu"), 
-             main = label.title, #sub = "Untertitel",
-             xlab = label.x, 
-             ylab = label.y,
-             cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  addland(col = "black", lwd = 1)
-  points(x.ax, x.data, pch = 18, col = "gray0")
-  axis(1, at = seq(min(x.ax), max(x.ax), length.out = 9))
-  axis(2, at = seq(min(y.ax), max(y.ax), length.out = 6))
-  box()
+plt.image <- function(x.ax, y.ax, xy.data, colbreaks, nx = 9, ny = 6, x.dts = FALSE, y.dts = FALSE, label.title = NA, label.x, label.y, land = FALSE, cntr = FALSE, pnts = FALSE) {
+  par(mar = c(5.1, 5.1, 4.1, 6.6)) 
+  if (is.character(label.title)) {
+    image(x.ax, y.ax, xy.data, axes = FALSE,
+          col = brewer.pal(11, "RdYlBu"), breaks = colbreaks,
+          main = label.title, xlab = label.x, ylab = label.y,
+          cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+    if (x.dts) {axis.POSIXct(1, x = x.ax)} else {axis(1, at = round(seq(min(x.ax), max(x.ax), length.out = nx)))}
+    if (y.dts) {axis.POSIXct(2, x = y.ax)} else {axis(2, at = round(seq(min(y.ax), max(y.ax), length.out = ny)))}
+    if (cntr == TRUE) {contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)}
+    if (land == TRUE) {addland(col = "black", lwd = 1)}
+    box()
+    image.plot(x.ax, y.ax, xy.data, col = brewer.pal(11, "RdYlBu"), breaks = colbreaks, legend.only = TRUE) 
+  } else {
+    image(x.ax, y.ax, xy.data, axes = FALSE,
+          col = brewer.pal(11, "RdYlBu"), breaks = colbreaks, 
+          xlab = label.x, ylab = label.y,
+          cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+    if (x.dts) {axis.POSIXct(1, x = x.ax)} else {axis(1, at = round(seq(min(x.ax), max(x.ax), length.out = nx)))}
+    if (y.dts) {axis.POSIXct(2, x = y.ax)} else {axis(2, at = round(seq(min(y.ax), max(y.ax), length.out = ny)))}
+    if (cntr == TRUE) {contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)}
+    if (land == TRUE) {  addland(col = "black", lwd = 1)}
+    box()
+    image.plot(x.ax, y.ax, xy.data, col = brewer.pal(11, "RdYlBu"), breaks = colbreaks, legend.only = TRUE) 
+  }
+  par(mar = c(5.1, 5.1, 4.1, 2.1)) 
 } 
 
-# ohne titel
-plt.image.land <- function(x.ax, y.ax, xy.data, x.data, label.x, label.y) {
-  image.plot(x.ax, y.ax, xy.data, axes = FALSE,
-             col = brewer.pal(11, "RdYlBu"), 
-             xlab = label.x, 
-             ylab = label.y,
-             cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  addland(col = "black", lwd = 1)
-  points(x.ax, x.data, pch = 18, col = "gray0")
-  axis(1, at = seq(min(x.ax), max(x.ax), length.out = 9))
-  axis(2, at = seq(min(y.ax), max(y.ax), length.out = 6))
-  box()
-} 
 
-##
-# master.plt.iml.ttl(x.ax = x1, y.ax = y1, xy.data = f, label.title = "Titel", x.data = x2, label.x = "X-Achse",label.y = "Y-Achse")
-#
-# master.plt.iml(x.ax = x1, y.ax = y1, xy.data = f, x.data = x2, label.x = "X-Achse", label.y = "Y-Achse")
+
 
 
 ####
@@ -119,7 +77,7 @@ plt.image.land <- function(x.ax, y.ax, xy.data, x.data, label.x, label.y) {
 ####
 
 # mit titel für präsi
-plt.points.title <- function(x.ax, x.data1, x.data2, x.data3, label.title, label.x, label.y, leg.1, leg.2, leg.3) {
+#plt.points.title <- function(x.ax, x.data1, x.data2, x.data3, label.title, label.x, label.y, leg.1, leg.2, leg.3) {
   plot(x.ax, x.data1, pch = 0, col = brewer.pal(3, "Dark2")[1],
        main = label.title,
        xlab = label.x,
@@ -135,7 +93,7 @@ plt.points.title <- function(x.ax, x.data1, x.data2, x.data3, label.title, label
 }
 
 # ohne titel für ma
-plt.points <- function(x.ax, x.data1, x.data2, x.data3, label.x, label.y, leg.1, leg.2, leg.3) {
+#plt.points <- function(x.ax, x.data1, x.data2, x.data3, label.x, label.y, leg.1, leg.2, leg.3) {
   plot(x.ax, x.data1, pch = 0, col = brewer.pal(3, "Dark2")[1],
        xlab = label.x, 
        ylab = label.y,
