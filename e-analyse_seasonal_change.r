@@ -29,6 +29,15 @@ filename <- "d-1957-2016-e4ei-t63-uv-nh-seasmean-runmean.nc"
 source("a-read_era_ncdf.r")
 source("b-locate_jetstream_1polynomial_2d.r")
 
+####
+## LOOP OVER DIFFERENT PRESSURE LEVELS
+####
+pl <- 2:6
+print(lev[pl])
+for (i in pl) {
+  print(lev[i])
+}
+
 
 ####
 ## DATENAUFBEREITUNG ####

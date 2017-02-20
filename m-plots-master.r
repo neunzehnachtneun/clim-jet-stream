@@ -77,7 +77,7 @@ plt.image <- function(x.ax, y.ax, xy.data, colbreaks, nx = 9, ny = 6, x.dts = FA
 ####
 
 # mit titel für präsi
-#plt.points.title <- function(x.ax, x.data1, x.data2, x.data3, label.title, label.x, label.y, leg.1, leg.2, leg.3) {
+plt.points.title <- function(x.ax, x.data1, x.data2, x.data3, label.title, label.x, label.y, leg.1, leg.2, leg.3) {
   plot(x.ax, x.data1, pch = 0, col = brewer.pal(3, "Dark2")[1],
        main = label.title,
        xlab = label.x,
@@ -93,7 +93,7 @@ plt.image <- function(x.ax, y.ax, xy.data, colbreaks, nx = 9, ny = 6, x.dts = FA
 }
 
 # ohne titel für ma
-#plt.points <- function(x.ax, x.data1, x.data2, x.data3, label.x, label.y, leg.1, leg.2, leg.3) {
+plt.points <- function(x.ax, x.data1, x.data2, x.data3, label.x, label.y, leg.1, leg.2, leg.3) {
   plot(x.ax, x.data1, pch = 0, col = brewer.pal(3, "Dark2")[1],
        xlab = label.x, 
        ylab = label.y,
