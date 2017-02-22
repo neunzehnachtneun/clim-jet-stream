@@ -20,7 +20,7 @@ library(pckg.cheb)
 # setwd("~/01-Master-Thesis/02-r-code-git/")
 # path <- "03-data-nc/"
 # path <- "/home/skiefer/era/raw/"
-file <- "1958-2015-e4ei-t63-uv-timmean.nc"  # Nordhemisphäre + Südhemisphäre
+file <- "a-1957-2016-e4ei-t63-uv-nh-timmean.nc"  # Nordhemisphäre
 
 
 
@@ -39,8 +39,8 @@ u.mean <- ncvar_get(nc, "u") # U-Wind-Komponente
 v.mean <- ncvar_get(nc, "v") # V-Wind-Komponente
 # w.mean <- ncvar_get(nc, "var135") # W-Wind-Komponente
 
-#lon <- ncvar_get(nc, "lon") # Längengrad
-#lat <- ncvar_get(nc, "lat") # Breitengrad
+lon <- ncvar_get(nc, "lon") # Längengrad
+lat <- ncvar_get(nc, "lat") # Breitengrad
 #lev <- ncvar_get(nc, "level") # Drucklevel
 # date.help <- ncvar_get(nc, "time")
 
@@ -73,8 +73,8 @@ fun.fill <- function(x, n) {
 ## VARIABLEN UND PARAMETER ####
 ####
 
-n.cpu <- 4 # Anzahl der CPUs für parApply
-n.order.lat <- 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
+#n.cpu <- 2 # Anzahl der CPUs für parApply
+#n.order.lat <- 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengrad
 #n.order.lon <- 8 # Ordnung des Least-Square-Verfahrens für Fit über Längengrad
 
 
@@ -86,15 +86,9 @@ n.order.lat <- 23 # Ordnung des Least-Square-Verfahrens für Fit über Breitengr
 
 # list.model.lat <- apply(u.monmean[,,], c(1,3), pckg.cheb:::cheb.fit, x.axis = lat, n = n.order.lat)
 cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-list.model.lat <- parApply(cl, u.era[,,4,], c(1,3), cheb.fit.roots, x.axis = lat, n = n.order.lat, bc.harmonic = FALSE, roots.bound.l = 20, roots.bound.u = 80)
+list.model.lat <- parApply(cl, u.mean[,,4], 1, cheb.fit.roots, x.axis = lat, n = n.order.lat, bc.harmonic = FALSE, roots.bound.l = 20, roots.bound.u = 80)
 stopCluster(cl)
-list.model.dim <- dim(list.model.lat)
-list.model.nrow <- nrow(list.model.lat)
-list.model.ncol <- ncol(list.model.lat)
-
-## Chebyshev-Koeffizienten
-cheb.coeff <- sapply(list.model.lat, "[[", 1)
-cheb.coeff <- apply(array(data = cheb.coeff, dim = c((n.order.lat + 1), list.model.dim)), c(1,3), t)
+list.model.len <- length(list.model.lat)
 
 ## Gefiltertes Modell für Zonal-Wind
 model.u <- sapply(list.model.lat, "[[", 2)
@@ -109,24 +103,19 @@ model.extr.lat <- sapply(list.model.lat, "[[", 4)
 model.extr.u <- sapply(list.model.lat, "[[", 5)
 model.extr.deriv.2nd <- sapply(list.model.lat, "[[", 6)
 model.extr.lat <- sapply(model.extr.lat, fun.fill, n = 24)
-model.extr.lat <- apply(array(model.extr.lat, c(24, list.model.dim)), c(1,3), t)
 model.extr.u <- sapply(model.extr.u, fun.fill, n = 24)
-model.extr.u <- apply(array(model.extr.u, c(24, list.model.nrow, list.model.ncol)), c(1,3), t)
 model.extr.deriv.2nd <- sapply(model.extr.deriv.2nd, fun.fill, n = 24)
-model.extr.deriv.2nd <- apply(array(model.extr.deriv.2nd, c(24, list.model.dim)), c(1,3), t)
 
 
 ## Maxima des Modells (Positionen und Werte)
 model.max.u <- apply(model.extr.u, c(1,3), max, na.rm = TRUE)
 model.max.u[which(model.max.u == -Inf)] <- NA
 
-model.max.lat <- array(rep(NA, 192*664), c(list.model.dim))
-for (i in 1:list.model.ncol) {
-  for (j in 1:list.model.nrow) {
-    max.lat <- model.extr.lat[j,which.max(model.extr.u[j,,i]),i]
-    if (length(max.lat) == 1) {
-      model.max.lat[j,i] <- max.lat
-    }
+model.max.lat <- rep(NA, 192)
+for (i in 1:list.model.len) {
+  max.lat <- model.extr.lat[which.max(model.extr.u[,i]),i]
+  if (length(max.lat) == 1) {
+    model.max.lat[i] <- max.lat
   }
 }
 
