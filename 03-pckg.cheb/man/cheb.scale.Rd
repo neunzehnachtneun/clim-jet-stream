@@ -17,4 +17,3 @@ x.cheb.scaled Abhängig von Eingangsparametern: Skalierte X-Achse (Vektor) oder 
 \description{
 \code{cheb.scale} skaliert beliebige X-Achse auf Achse, die für Polynom-fits verträglich ist.
 }
-

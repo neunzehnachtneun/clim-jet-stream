@@ -17,4 +17,3 @@ cheb.t Chebyshev-Polynome Erster Art (Vektor)
 \description{
 cheb.1st erzeugt Chebyshev Polynome erster Art aus beliebiger X-Achse
 }
-

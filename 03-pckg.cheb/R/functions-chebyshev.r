@@ -2,6 +2,7 @@
 ##
 ## library(devtools)
 ## library(roxygen2)
+## library(testthat)
 ##
 ## Build and Reload Package:  'Ctrl + Shift + B'
 ## Check Package:             'Ctrl + Shift + E'

@@ -23,4 +23,3 @@ cheb.model Modellwerte aus Least-Squares-Verfahren
 \description{
 Fittet ein Chebyshev Polynom beliebiger Ordnung an einen sequenzierten Datensatz/Zeitreihe mittels Least Squares Verfahren
 }
-

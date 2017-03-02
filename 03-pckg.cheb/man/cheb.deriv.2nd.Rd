@@ -17,4 +17,3 @@ cheb.model.deriv Zweite Ableitung des gefilterten Modells (Skalar oder Vektor)
 \description{
 cheb.deriv.2nd berechnet aus den Chebyshev-Koeffizienten die Werte der zweiten Ableitung
 }
-

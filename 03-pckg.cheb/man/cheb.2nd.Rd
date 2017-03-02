@@ -17,4 +17,3 @@ cheb.u Chebyshev-Polynome Zweiter Art (Vektor)
 \description{
 cheb.2nd erzeugt Chebyshev Polynome zweiter Art aus beliebiger X-Achse
 }
-

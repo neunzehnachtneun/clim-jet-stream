@@ -17,4 +17,3 @@ cheb.model gefiltertes Modell (Skalar oder Vektor)
 \description{
 cheb.model berechnet aus den Chebyshev-Koeffizienten die Y-Werte
 }
-

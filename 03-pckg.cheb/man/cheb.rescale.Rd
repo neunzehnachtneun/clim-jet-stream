@@ -17,4 +17,3 @@ x.rescaled reskalierte X-Achse (Skalar oder Sektor)
 \description{
 cheb.rescale reskaliert die für den Fit erzeugte Achse auf die Ursprüngliche
 }
-

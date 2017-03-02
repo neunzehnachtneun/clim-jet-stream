@@ -17,4 +17,3 @@ cheb.model.deriv.1st Erste Ableitung des gefilterten Modells (Skalar oder Vektor
 \description{
 cheb.deriv.1st berechnet aus den Chebyshev-Koeffizienten die Werte der ersten Ableitung
 }
-

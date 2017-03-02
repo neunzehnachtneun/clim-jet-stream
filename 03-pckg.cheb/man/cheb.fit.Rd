@@ -21,4 +21,3 @@ cheb.model Werte des gefilterten Modells
 \description{
 \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 }
-
