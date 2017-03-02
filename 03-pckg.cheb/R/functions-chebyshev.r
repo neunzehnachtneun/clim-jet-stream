@@ -1,4 +1,4 @@
-## source('~/Master_Thesis/pckg.cheb/R/functions-chebyshev.r')
+## source('~/01-Master-Thesis/02-code-git/03-pckg.cheb/R/functions-chebyshev.r')
 ##
 ## library(devtools)
 ## library(roxygen2)
@@ -58,7 +58,7 @@ cheb.rescale <- function(x.cheb, x.axis) {
 cheb.1st <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Erster Art
   ## ##
-  x.cheb <- if (max(x.axis) - min(x.axis) > 2) cheb.scale(x.axis) else x.axis  ### ###
+  x.cheb <- cheb.scale(x.axis)
   m <- n + 1
   # Rekursionsformel Wiki / Bronstein
   cheb.t.0 <- 1;  cheb.t.1 <- x.cheb;
@@ -85,7 +85,7 @@ cheb.1st <- function(x.axis, n){
 cheb.2nd <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Zweiter Art
   ## ##
-  x.cheb <- if (max(x.axis) - min(x.axis) > 2) cheb.scale(x.axis) else x.axis
+  x.cheb <- cheb.scale(x.axis)
   m <- n + 1
   cheb.u.0 <- 1; cheb.u.1 <-  2*x.cheb
   cheb.u <- cbind(cheb.u.0, cheb.u.1)
@@ -138,8 +138,11 @@ cheb.deriv.1st <- function(x.axis, cheb.coeff) {
     # berechnung der ableitung der polynome erster art
     # rekursionsformel 0
     # dT/dx = n * U_(n-1)
-    cheb.t.deriv.1st <- if (length(x.axis) == 1) (2:m)*t(cheb.u[,1:n]) else t((2:m)*t(cheb.u[,1:n]))
-    cheb.model.deriv.1st <- cheb.t.deriv.1st %*% cheb.coeff[2:m]
+
+    cheb.t.deriv.1st <- t((1:n) * t(cheb.u[,1:n]))
+    cheb.t.deriv.1st <- cbind(0, cheb.t.deriv.1st)
+    cheb.model.deriv.1st <- cheb.t.deriv.1st %*% cheb.coeff
+
     return(cheb.model.deriv.1st)
   }
 }
@@ -155,17 +158,18 @@ cheb.deriv.1st <- function(x.axis, cheb.coeff) {
 #' @export
 cheb.deriv.2nd <- function(x.axis, cheb.coeff) {
   n <- length(cheb.coeff) - 1
-#  m <- n + 1
+  #  m <- n + 1
   l <- length(x.axis)
   cheb.t <- cheb.1st(x.axis, n)
   cheb.u <- cheb.2nd(x.axis, n)
   x.cheb <- cheb.scale(x.axis)
 
-  cheb.t.deriv.2nd <- t((0:n) * t((t((0:n + 1) * t(cheb.t)) - cheb.u) / (x.cheb ** 2 - 1)))
+  cheb.t.deriv.2nd <- t((0:n) * t(t((0:n + 1) * t(cheb.t )) - cheb.u)) / (x.cheb ** 2 - 1)
   cheb.t.deriv.2nd[1,] <- (-1) ** (0:n) * ((0:n) ** 4 - (0:n) ** 2) / (3)
   cheb.t.deriv.2nd[l,] <- ((0:n) ** 4 - (0:n) ** 2) / (3)
 
   cheb.model.deriv.2nd <- cheb.t.deriv.2nd %*% cheb.coeff
+
   return(cheb.model.deriv.2nd)
 }
 
@@ -268,7 +272,7 @@ cheb.fit.seq <- function(d, x.axis, n, l, bc.harmonic = FALSE){
 #' @export
 #' @importFrom rootSolve uniroot.all
 cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA, roots.bound.u = NA){
-#  library(rootSolve)
+  #  library(rootSolve)
   # Fallunterscheidung für harmonische Randbedingung
   if (bc.harmonic == FALSE) {
     x.cheb <- cheb.scale(x.axis)
