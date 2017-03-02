@@ -57,8 +57,8 @@ cheb.rescale <- function(x.cheb, x.axis) {
 #' @export
 cheb.1st <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Erster Art
-  ## ##
-  x.cheb <- cheb.scale(x.axis)
+  ## ## Fehlerabfrage nur mit Schwellwert. Korrigieren! Auch cheb.2nd
+  x.cheb <- if (length(x.axis) > 7) cheb.scale(x.axis) else x.axis
   m <- n + 1
   # Rekursionsformel Wiki / Bronstein
   cheb.t.0 <- 1;  cheb.t.1 <- x.cheb;
@@ -85,7 +85,7 @@ cheb.1st <- function(x.axis, n){
 cheb.2nd <- function(x.axis, n){
   ## Funktion zur Erzeugung von Chebyshev-Polynomen Zweiter Art
   ## ##
-  x.cheb <- cheb.scale(x.axis)
+  x.cheb <- if (length(x.axis) > 7) cheb.scale(x.axis) else x.axis
   m <- n + 1
   cheb.u.0 <- 1; cheb.u.1 <-  2*x.cheb
   cheb.u <- cbind(cheb.u.0, cheb.u.1)
@@ -139,7 +139,7 @@ cheb.deriv.1st <- function(x.axis, cheb.coeff) {
     # rekursionsformel 0
     # dT/dx = n * U_(n-1)
 
-    cheb.t.deriv.1st <- t((1:n) * t(cheb.u[,1:n]))
+    cheb.t.deriv.1st <- if (length(x.axis) == 1) (1:n)*t(cheb.u[,1:n]) else t((1:n) * t(cheb.u[,1:n]))
     cheb.t.deriv.1st <- cbind(0, cheb.t.deriv.1st)
     cheb.model.deriv.1st <- cheb.t.deriv.1st %*% cheb.coeff
 
@@ -272,7 +272,7 @@ cheb.fit.seq <- function(d, x.axis, n, l, bc.harmonic = FALSE){
 #' @export
 #' @importFrom rootSolve uniroot.all
 cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA, roots.bound.u = NA){
-  #  library(rootSolve)
+  # library(rootSolve)
   # Fallunterscheidung für harmonische Randbedingung
   if (bc.harmonic == FALSE) {
     x.cheb <- cheb.scale(x.axis)
@@ -320,6 +320,61 @@ cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA
   cheb.list <- list(cheb.coeff = cheb.coeff, cheb.model = cheb.model, cheb.model.deriv.1st = cheb.model.deriv.1st, extr.x = extr.x, extr.y = extr.y, extr.deriv.2nd = extr.deriv.2nd)
   return(cheb.list)
 }
+
+
+##
+#' @title Routine to find maximum values of a curve
+#' @param d
+#' @param x.axis
+#' @param n
+#' @param max.bound.l
+#' @param max.bound.u
+#' @return max.list
+#' @description
+#' \code{cheb.find.max} fittet ein Polynom und sucht mittel dessen Ableitung die Maxima des Datensatzes
+#' @export
+#' @importFrom rootSolve uniroot.all
+cheb.find.max <- function(d, x.axis, n, max.bound.l = NA, max.bound.u = NA){
+  x.cheb <- cheb.scale(x.axis)
+  cheb.t <- cheb.1st(x.axis, n)
+
+  ## modell berechnungen
+  # koeffizienten d poly fits
+  cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
+
+  ## nullstellenberechnung mittels rootSolve
+  # setzen der intervallgrenzen für nullstellensuche
+  if (is.na(max.bound.l) == TRUE) {
+    lower <- -1
+  } else if (is.na(max.bound.l) == FALSE) {
+    lower <- cheb.scale(x.axis, x.val = max.bound.l)
+  }
+  if (is.na(max.bound.u) == TRUE) {
+    upper <- 1
+  } else if (is.na(max.bound.u) == FALSE) {
+    upper <- cheb.scale(x.axis, x.val = max.bound.u)
+  }
+
+  # berechnen d maxima
+  # nullstellen d ableitung
+  extr <- uniroot.all(cheb.deriv.1st, cheb.coeff = cheb.coeff, lower = lower, upper = upper)
+  if (length(extr) != 0) {
+    extr.model <- cheb.model.filter(x.axis = extr, cheb.coeff = cheb.coeff)
+    extr.deriv.1st <- cheb.deriv.1st(x.axis = extr, cheb.coeff = cheb.coeff)
+    extr.deriv.2nd <- cheb.deriv.2nd(x.axis = extr, cheb.coeff = cheb.coeff)
+
+    # filtern der maxima | wert d zweiten ableitung < 0
+    max <- extr[which(extr.deriv.2nd < 0)]
+    max.x <- cheb.rescale(max, x.axis = x.axis)
+    max.y <- cheb.model.filter(x.axis = max, cheb.coeff = cheb.coeff)
+  } else {
+    max.x <- NA; max.y <- NA;
+  }
+  max.list <- list(max.x = max.x, max.y = max.y)
+  return(max.list)
+}
+
+
 
 
 
