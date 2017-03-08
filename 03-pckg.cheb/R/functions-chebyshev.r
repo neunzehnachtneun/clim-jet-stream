@@ -269,10 +269,10 @@ cheb.fit.seq <- function(d, x.axis, n, l, bc.harmonic = FALSE){
 #' @param roots.bound.u Oberer Rand des Bereichs der Nullstellensuche
 #' @return cheb.list Liste berechneter Parameter (Koeffizienten, gefiltertes Modell, erste und zweite Ableitung des gefilterten Modells, Extremstellen und -Werte)
 #' @description
-#' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
+#' \code{cheb.fit.extr} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @export
 #' @importFrom rootSolve uniroot.all
-cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA, roots.bound.u = NA){
+cheb.fit.extr <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA, roots.bound.u = NA){
   # library(rootSolve)
   # Fallunterscheidung für harmonische Randbedingung
   if (bc.harmonic == FALSE) {
@@ -325,12 +325,12 @@ cheb.fit.roots <- function(d, x.axis, n, bc.harmonic = FALSE, roots.bound.l = NA
 
 ##
 #' @title Routine to find maximum values of a curve
-#' @param d
-#' @param x.axis
-#' @param n
-#' @param max.bound.l
-#' @param max.bound.u
-#' @return max.list
+#' @param d Zu fittender Datensatz
+#' @param x.axis beliebiege X-Achse
+#' @param n Ordnung des Skalars
+#' @param max.bound.l Unterer Rand des Bereichs der Maxima-Suche
+#' @param max.bound.u Oberer Rand des Bereichs der Maxima-Suche
+#' @return max.list Positionen und Werte der Maxima als Liste
 #' @description
 #' \code{cheb.find.max} fittet ein Polynom und sucht mittel dessen Ableitung die Maxima des Datensatzes
 #' @export
@@ -366,8 +366,12 @@ cheb.find.max <- function(d, x.axis, n, max.bound.l = NA, max.bound.u = NA){
 
     # filtern der maxima | wert d zweiten ableitung < 0
     max <- extr[which(extr.deriv.2nd < 0)]
-    max.x <- cheb.rescale(max, x.axis = x.axis)
-    max.y <- cheb.model.filter(x.axis = max, cheb.coeff = cheb.coeff)
+    if (length(max) != 0) {
+      max.x <- cheb.rescale(max, x.axis = x.axis)
+      max.y <- cheb.model.filter(x.axis = max, cheb.coeff = cheb.coeff)
+    } else {
+      max.x <- NA; max.y <- NA
+    }
   } else {
     max.x <- NA; max.y <- NA;
   }

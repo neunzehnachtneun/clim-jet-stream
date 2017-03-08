@@ -6,8 +6,19 @@
 \usage{
 cheb.find.max(d, x.axis, n, max.bound.l = NA, max.bound.u = NA)
 }
+\arguments{
+\item{d}{Zu fittender Datensatz}
+
+\item{x.axis}{beliebiege X-Achse}
+
+\item{n}{Ordnung des Skalars}
+
+\item{max.bound.l}{Unterer Rand des Bereichs der Maxima-Suche}
+
+\item{max.bound.u}{Oberer Rand des Bereichs der Maxima-Suche}
+}
 \value{
-max.list
+max.list Positionen und Werte der Maxima als Liste
 }
 \description{
 \code{cheb.find.max} fittet ein Polynom und sucht mittel dessen Ableitung die Maxima des Datensatzes
