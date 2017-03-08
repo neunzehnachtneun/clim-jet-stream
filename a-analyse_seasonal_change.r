@@ -1,4 +1,4 @@
-## source('~/Master_Thesis/02-r-code-git/d-analyse_seasonal_change.r')
+## source('~/01-Master-Thesis/02-code-git/a-analyse_seasonal_change.r')
 ## 
 ## BERECHNUNG VON GLEITENDEM MITTEL U SD ####
 ## ÜBER FÜNF JAHRE U SAISONAL              ## 
@@ -9,25 +9,19 @@
 ## AUFRUF WICHTIGER BIBLIOTHEKEN UND PAKETE ####
 ####
 
-setwd("~/01-Master-Thesis/02-r-code-git/")
-path <- "03-data-nc/"
+setwd("~/01-Master-Thesis/02-code-git/")
 
-####
-## PLOTROUTINEN ####
-####
-
+## routinen zum einlesen und plotten
+source("d-read_era_ncdf.r")
 source("m-plots-master.r")
+source("f-locate_jetstream_polynomial_2d.r")
 
+## hilfsfunktion zur bestimmung der länge eines vektors ohne berücksichtigung von NAs
+len.na <- function(x) {
+  len <- sum(!is.na(x))
+  return(len)
+}
 
-####
-## SEASONALLY YEARLY MEANS
-####
-####
-
-filename <- "d-1957-2016-e4ei-t63-uv-nh-seasmean-runmean.nc"
-
-source("a-read_era_ncdf.r")
-source("b-locate_jetstream_1polynomial_2d.r")
 
 ####
 ## LOOP OVER DIFFERENT PRESSURE LEVELS
@@ -38,26 +32,46 @@ for (i in pl) {
   print(lev[i])
 }
 
+path <- "04-data-nc/"
+filename <- "c-1957-2016-e4ei-t63-uv-nh-seasmean.nc"
 
-####
-## DATENAUFBEREITUNG ####
-####
+list.era <- read.era.nc(path = path, file = filename)
+u.era <- list.era$u.era; v.era <- list.era$v.era; uv.era <- list.era$uv.era;
+lon <- list.era$lon; lat <- list.era$lat; lev <- list.era$lev;
+dts <- list.era$dts; dts.month <- list.era$dts.month; dts.year <- list.era$dts.year;
+rm(list.era)
+
+pl <- 1
+list.max <- locate.jetstream.poly(array = u.era[,,pl,], axis = lat, n.order = 8, n.cpu = 2)
+model.max.lat <- list.max$model.max.lat; model.max.u <- list.max$model.max.u;
+rm(list.max)
 
 
-model.max.lat.mam <- model.max.lat[, which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")]
-model.max.lat.jja <- model.max.lat[, which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")]
-model.max.lat.son <- model.max.lat[, which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")]
-model.max.lat.djf <- model.max.lat[, which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")]
+## Trennung der Daten nach Jahreszeiten
 
-model.max.u.mam <- model.max.u[, which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")]
-model.max.u.jja <- model.max.u[, which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")]
-model.max.u.son <- model.max.u[, which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")]
-model.max.u.djf <- model.max.u[, which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")]
+model.max.lat.mam <- model.max.lat[,, which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")]
+model.max.lat.jja <- model.max.lat[,, which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")]
+model.max.lat.son <- model.max.lat[,, which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")]
+model.max.lat.djf <- model.max.lat[,, which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")]
+
+model.max.u.mam <- model.max.u[,, which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")]
+model.max.u.jja <- model.max.u[,, which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")]
+model.max.u.son <- model.max.u[,, which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")]
+model.max.u.djf <- model.max.u[,, which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")]
 
 dts.mam <- dts[which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")]
 dts.jja <- dts[which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")]
 dts.son <- dts[which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")]
 dts.djf <- dts[which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")]
+
+
+## anzahl der maxima
+
+n.model.max.mam <- apply(model.max.lat.mam, c(1, 3), len.na)
+n.model.max.jja <- apply(model.max.lat.jja, c(1, 3), len.na)
+n.model.max.son <- apply(model.max.lat.son, c(1, 3), len.na)
+n.model.max.djf <- apply(model.max.lat.djf, c(1, 3), len.na)
+
 
 ####
 ## DATENVISUALISIERUNG ####
@@ -79,51 +93,5 @@ plt.image(lon, dts.jja, model.max.u.jja, colbreaks, y.dts = TRUE, label.x = "Lä
 plt.image(lon, dts.son, model.max.u.son, colbreaks, y.dts = TRUE, label.x = "Längengrad", label.y = "Jahr")
 plt.image(lon, dts.djf, model.max.u.djf, colbreaks, y.dts = TRUE, label.x = "Längengrad", label.y = "Jahr")
 
-
-
-
-####
-## RUNNING MEAN OVER FIVE YEARS ####
-## (STEP +/- TWO YEARS)
-####
-
-dts.year.mn <- seq(1960, 2013)
-n.time <- length(dts.year.mn)
-for (seas in (c("mam", "jja", "son", "djf"))) {
-  if (seas == "mam") {
-    ind.seas <- which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")
-  } else if (seas == "jja") {
-    ind.seas <- which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")
-  } else if (seas == "son") {
-    ind.seas <- which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")
-  } else if (seas == "djf") {
-    ind.seas <- which(dts.month == "Dec" | dts.month == "Jan" | dts.month == "Feb")
-  }
-  
-  ## Mittelwerte global
-  ## Vorbereiten der Matrizen
-  u.seas.mean <- array(NA , dim = c(n.lon, n.lat, n.time))
-  u.seas.sd <- array(NA , dim = c(n.lon, n.lat, n.time))
-  model.max.u.seas.mean <- array(NA , dim = c(n.lon, n.time))
-  model.max.u.seas.sd <- array(NA , dim = c(n.lon, n.time))
-  model.max.lat.seas.mean <- array(NA , dim = c(n.lon, n.time))
-  model.max.lat.seas.sd <- array(NA , dim = c(n.lon, n.time))
-  
-  for (i in seq(1, n.time)) {
-    print(i)
-    yr.i <- dts.year.mn[i]
-    ind.yr <- which(dts.year == (yr.i - 2) | dts.year == (yr.i - 1) | dts.year ==  yr.i | dts.year == (yr.i + 1) | dts.year == (yr.i + 2))
-    ind.seas.yr <- intersect(ind.yr, ind.seas)
-    #  print(ind.seas.yr)
-    u.seas.mean[,,i] <- apply(u.monmean[,, ind.seas.yr], c(1,2), mean)
-    u.seas.sd[,,i] <- apply(u.monmean[,, ind.seas.yr], c(1,2), sd)
-    model.max.u.seas.mean[,i] <- apply(model.max.u[, ind.seas.yr], 1, mean)
-    model.max.u.seas.sd[,i] <- apply(model.max.u[, ind.seas.yr], 1, sd)
-    model.max.lat.seas.mean[,i] <- apply(model.max.lat[, ind.seas.yr], 1, mean)
-    model.max.lat.seas.sd[,i] <- apply(model.max.lat[, ind.seas.yr], 1, sd)
-    
-    
-  }
-}
 
 
