@@ -6,35 +6,36 @@
 ## DATEN EINLESEN ####
 ####
 
-# source("a-read_era_ncdf.r")
 
 
-####
-## VARIABLEN PARAMETER PAKETE ####
-####
+locate.jetstream.disc <- function(array, axis, n.cpu) {
+  
 
-library(parallel) # Paralleles Rechnen m Apply
-n.cpu <- 2 # Anzahl der CPUs für parApply
+  ## VARIABLEN PARAMETER PAKETE
+  
+  library(parallel) # Paralleles Rechnen m Apply
 
-
-####
-## SUCHE DES MAXIMAS MITTELS APPLY ####
-####
-
-cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-model.max.u.discrete <- parApply(cl, u.era[,,2,], c(1,3), max)
-
-##
-model.max.lat.discrete <- matrix(NA, nrow = nrow(model.max.u.discrete), ncol = ncol(model.max.u.discrete))
-
-for (i in 1:nrow(model.max.u.discrete)) {
-  for (j in 1:ncol(model.max.u.discrete)) {
-    model.max.lat.discrete[i,j] <- lat[which(model.max.u.discrete[i,j] == u.era[i,,2,j])]
+  
+  ## SUCHE DES MAXIMAS MITTELS APPLY
+  
+  cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
+  array.max.y <- parApply(cl, array, c(1,3), max)
+  stopCluster(cl)
+  
+  ##
+  array.max.x <- matrix(NA, nrow = nrow(array.max.y), ncol = ncol(array.max.y))
+  
+  for (i in 1:nrow(array.max.y)) {
+    for (j in 1:ncol(array.max.y)) {
+      array.max.x[i,j] <- if (!is.na(array.max.y[i,j])) axis[which(array.max.y[i,j] == array[i,,j])]
+    }
   }
+  
+  # Vorbereiten der Liste für Übergabe
+  list.max <- list(model.max.lat = array.max.x, model.max.u = array.max.y)
+  return(list.max)
+  
 }
-
-
-
 
 
 
