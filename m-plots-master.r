@@ -44,7 +44,7 @@ plt.image <- function(x.ax, y.ax, xy.data, colbreaks, nx = 9, ny = 6, x.dts = FA
   par(mar = c(5.1, 5.1, 4.1, 6.6)) 
   if (is.character(label.title)) {
     image(x.ax, y.ax, xy.data, axes = FALSE,
-          col = brewer.pal(11, "RdYlBu"), breaks = colbreaks,
+          col = brewer.pal(length(colbreaks) - 1, "RdYlBu"), breaks = colbreaks,
           main = label.title, xlab = label.x, ylab = label.y,
           cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
     if (x.dts) {axis.POSIXct(1, x = x.ax)} else {axis(1, at = round(seq(min(x.ax), max(x.ax), length.out = nx)))}
@@ -52,10 +52,10 @@ plt.image <- function(x.ax, y.ax, xy.data, colbreaks, nx = 9, ny = 6, x.dts = FA
     if (cntr == TRUE) {contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)}
     if (land == TRUE) {addland(col = "black", lwd = 1)}
     box()
-    image.plot(x.ax, y.ax, xy.data, col = brewer.pal(11, "RdYlBu"), breaks = colbreaks, legend.only = TRUE) 
+    image.plot(x.ax, y.ax, xy.data, col = brewer.pal(length(colbreaks) - 1, "RdYlBu"), breaks = colbreaks, legend.only = TRUE) 
   } else {
     image(x.ax, y.ax, xy.data, axes = FALSE,
-          col = brewer.pal(11, "RdYlBu"), breaks = colbreaks, 
+          col = brewer.pal(length(colbreaks) - 1, "RdYlBu"), breaks = colbreaks, 
           xlab = label.x, ylab = label.y,
           cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
     if (x.dts) {axis.POSIXct(1, x = x.ax)} else {axis(1, at = round(seq(min(x.ax), max(x.ax), length.out = nx)))}
@@ -63,7 +63,7 @@ plt.image <- function(x.ax, y.ax, xy.data, colbreaks, nx = 9, ny = 6, x.dts = FA
     if (cntr == TRUE) {contour(x.ax, y.ax, xy.data, nlevels = 5, add = TRUE)}
     if (land == TRUE) {  addland(col = "black", lwd = 1)}
     box()
-    image.plot(x.ax, y.ax, xy.data, col = brewer.pal(11, "RdYlBu"), breaks = colbreaks, legend.only = TRUE) 
+    image.plot(x.ax, y.ax, xy.data, col = brewer.pal(length(colbreaks) - 1, "RdYlBu"), breaks = colbreaks, legend.only = TRUE) 
   }
   par(mar = c(5.1, 5.1, 4.1, 2.1)) 
 } 
