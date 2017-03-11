@@ -27,7 +27,7 @@ locate.jetstream.disc <- function(array, axis, n.cpu) {
   
   for (i in 1:nrow(array.max.y)) {
     for (j in 1:ncol(array.max.y)) {
-      array.max.x[i,j] <- if (!is.na(array.max.y[i,j])) axis[which(array.max.y[i,j] == array[i,,j])]
+      array.max.x[i,j] <- if (!is.na(array.max.y[i,j])) axis[which(array.max.y[i,j] == array[i,,j])][1]
     }
   }
   
