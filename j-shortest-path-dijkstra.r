@@ -24,11 +24,13 @@ norm.vec <- function(vec) {
 ## METHODIK NACH PIK - MOLNOS ETAL 2017
 ####
 
-find.jet.dijkstra <- function(u, v, lon, lat, w1 = 0.49846, w2 = 0.00154, w3 = 0.5, clim.jet) {
+find.jet.dijkstra.2d <- function(u, v, lon, lat, w1 = 0.49846, w2 = 0.00154, w3 = 0.5, clim.jet) {
   # Paket zur Berechnung von Distanzen in Graphen
   require(igraph)
   # Dimensionen des 2d-Datensatzes
   nlon <- length(lon); nlat <- length(lat);
+  d.lon <- lon[2] - lon[1]; d.lat <- lat[2] - lat[1];
+  R <- 6371000
   # zur erfüllung der bedingung start = end wird der erste längengrad an den letzten kopiert
   u <- u[c(1:nlon,1),]; v <- v[c(1:nlon,1),]; len <- length(u);
   lon <- c(lon, lon[1] + 360); nlon <- length(lon);
@@ -39,43 +41,55 @@ find.jet.dijkstra <- function(u, v, lon, lat, w1 = 0.49846, w2 = 0.00154, w3 = 0
   # zweite spalte zielknoten
   # dritte spalte kantengewicht (abh von windgeschwigkeit, windrichtung, breitengrad)
   nodes <- NULL
+  nghbrs.xx <- c(-1, -1, -1, 
+                  0,  0,  
+                  1,  1,  1)
+  nghbrs.yy <- c(-1,  0,  1, 
+                 -1,  1,
+                 -1,  0,  1)
+  nghbrs.ttl <- c("nghbr.sw", "nghbr.ww", "nghbr.nw",
+                  "nghbr.ss", "nghbr.nn", 
+                  "nghbr.se", "nghbr.ee", "nghbr.ne")
   for (i in 1:len) {
-    # ausschließen der letzten lon-datenreihe
-    if ( i %% nlon != 0) { 
-      int.st <- c(i, i + 1)
-      int.sw <- if (i > nlon) c(i, i + 1 - nlon)
-      int.nw <- if (i < (len - nlon)) c(i, i + 1 + nlon)
-      
-      # parameter für windgeschwindigkeit
-      max.uv <- max(sqrt(u ** 2 + v ** 2))
-      x.st <- 1 - ((sqrt(u[i] ** 2 + v[i] ** 2) + 
-                      sqrt(u[int.st[2]] ** 2 + v[int.st[2]] ** 2)) /
-                     (2 * max.uv))
-      x.sw <- if (i > nlon) 1 - ((sqrt(u[i] ** 2 + v[i] ** 2) + 
-                                    sqrt(u[int.sw[2]] ** 2 + v[int.sw[2]] ** 2)) /
-                                   (2 * max.uv))
-      x.nw <- if (i < (len - nlon)) 1 - ((sqrt(u[i] ** 2 + v[i] ** 2) + 
-                                            sqrt(u[int.nw[2]] ** 2 + v[int.nw[2]] ** 2)) /
-                                           (2 * max.uv))
-      # parameter für windrichtung
-      y.st <- (1 - norm.vec(c(u[i], v[i])) %*% norm.vec(c(mat.lon[int.st[2]], mat.lat[int.st[2]]) - c(mat.lon[i], mat.lat[i]))) / 2 
-      y.sw <- if (i > nlon) (1 - norm.vec(c(u[i], v[i])) %*% norm.vec(c(mat.lon[int.sw[2]], mat.lat[int.sw[2]]) - c(mat.lon[i], mat.lat[i]))) / 2 
-      y.nw <- if (i < (len - nlon)) (1 - norm.vec(c(u[i], v[i])) %*% norm.vec(c(mat.lon[int.nw[2]], mat.lat[int.nw[2]]) - c(mat.lon[i], mat.lat[i]))) / 2 
-      # parameter für breitengrad
-      z.st <- (mat.lat[i] - clim.lat) ** 4 / (max(clim.lat, 90 - clim.lat)) ** 4
-      z.sw <- if (i > nlon) (mat.lat[i] - clim.lat) ** 4 / (max(clim.lat, 90 - clim.lat)) ** 4
-      z.nw <- if (i < (len - nlon)) (mat.lat[i] - clim.lat) ** 4 / (max(clim.lat, 90 - clim.lat)) ** 4
-      # setzen der kanten
-      int.st <- c(int.st, w1 * x.st + w2 * y.st + w3 * z.st)
-      int.sw <- if (i > nlon) c(int.sw, w1 * x.sw + w2 * y.sw + w3 * z.sw)
-      int.nw <- if (i < (len - nlon)) c(int.nw, w1 * x.nw + w2 * y.nw + w3 * z.nw)
-    }
-    nodes <- rbind(nodes, int.sw, int.st, int.nw)
+      # festlegen der inizes der acht nachbarpunkte
+      nghbr.sw <- if (i > nlon & (i - 1) %% nlon != 0) c(i, i - nlon - 1)
+      nghbr.ww <- if ((i - 1) %% nlon != 0) c(i, i - 1)
+      nghbr.nw <- if ((i - 1) %% nlon != 0 & i <= len - nlon) c(i, i + nlon - 1)
+      nghbr.ss <- if (i > nlon) c(i, i - nlon)
+      nghbr.nn <- if (i <= len - nlon ) c(i, i + nlon)
+      nghbr.se <- if (i > nlon & i %% nlon != 0) c(i, i - nlon + 1)
+      nghbr.ee <- if (i %% nlon != 0) c(i, i + 1)
+      nghbr.ne <- if (i <= len - nlon & i %% nlon != 0) c(i, i + nlon + 1)
+      # zusammenführen der knoten
+      nodes <- rbind(nodes, nghbr.sw, nghbr.ww, nghbr.nw, nghbr.ss, nghbr.nn, nghbr.se, nghbr.ee, nghbr.ne)
+  }
+  nodes <- cbind(nodes, NA, NA, NA, NA)
+  # parameter für windgeschwindigkeit
+  max.uv <- max(sqrt(u ** 2 + v ** 2))
+  nodes[,3] <- 1 - ((sqrt(u[nodes[,1]] ** 2 + v[nodes[,1]] ** 2) + sqrt(u[nodes[,2]] ** 2 + v[nodes[,2]] ** 2)) / (2 * max.uv))
+
+  # parameter für windrichtung
+  for (i in 1:8) {
+    print(c(nghbrs.ttl[i], nghbrs.xx[i], nghbrs.yy[i]))
+    pnt.vec <- cbind(pi * R * cos(mat.lat[nodes[which(rownames(nodes) == nghbrs.ttl[i]),1]]*pi/180) * nghbrs.xx[i] * d.lon / 180, pi * R * nghbrs.yy[i] * d.lat / 180)
+    pnt.vec.nrm <- t(apply(pnt.vec, 1, norm.vec))
+    wnd.vec <- cbind(u[nodes[which(rownames(nodes) == nghbrs.ttl[i]),1]], v[nodes[which(rownames(nodes) == nghbrs.ttl[i]),1]])
+    wnd.vec.nrm <- t(apply(wnd.vec, 1, norm.vec))
+    nodes[which(rownames(nodes) == nghbrs.ttl[i]),4] <- (1 - rowSums(pnt.vec.nrm * wnd.vec.nrm)) / 2
   }
   
+  # parameter für klimatisches mittel
+  nodes[,5] <- (mat.lat[nodes[,1]] - clim.jet) ** 4 / max(clim.jet, 90 - clim.jet) ** 4
+  
+  # benennung der matrix
+  colnames(nodes) <- c("root", "target", "strength", "direction", "climate", "weight")
+  
+  # setzen der kanten
+  nodes[,6] <- w1 * nodes[,3] + w2 * nodes[,4] + w3 * nodes[,5]
+  
   # definieren des graphen über knoten und kanten gewichte
-  rownames(nodes) <- NULL
-  g <- add_edges(make_empty_graph(len), t(nodes[,1:2]), weight = nodes[,3])
+  #rownames(nodes) <- NULL
+  g <- add_edges(make_empty_graph(len), t(nodes[,1:2]), weight = nodes[,6])
   
   # start vektor bei lon[1]
   strt <- seq(1, len, nlon)
