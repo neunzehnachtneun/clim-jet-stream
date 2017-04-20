@@ -1,53 +1,38 @@
-####################################################################################################
-## source('~/Master_Thesis/Code/locate_jetstream_2d.r')
-
-
+## source("e-jetstream_detection_schemes.r")
+##
+## ROUTINEN ZUM AUFFINDEN DES/DER JETSTREAMS! ####
+## MAXIMUM, CHEBYSHEV-LS-FIT, DIJKSTRA
 ####
-## DATEN EINLESEN ####
 ####
 
+## BENÖTIGTE PACKAGES
+# install.packages("pckg.cheb_0.9.5-2.tar.gz", repos = NULL, type = "source")
+library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
+require(igraph)
 
 
-find.jet.maximum <- function(array, axis) {
-  
-  
-  ## VARIABLEN PARAMETER PAKETE
-  
-  #library(parallel) # Paralleles Rechnen m Apply
-  
+## Methode: Maximum des Zonalwinds in Meridionalrichtung 
+find.jet.maximum <- function(matrix, axis) {
   
   ## SUCHE DES MAXIMAS MITTELS APPLY
-  array.max.y <- apply(array, 1, max)
-  # cl <- makeCluster(getOption("cl.cores", n.cpu)) ## Variante für paralleles Rechnen
-  # array.max.y <- parApply(cl, array, c(1,3), max)
-  # stopCluster(cl)
+  vec.max.y <- apply(matrix, 1, max)
   
   ##
-  array.max.x <- matrix(NA, nrow(array.max.y), ncol(array.max.y))
+  vec.max.x <- rep(NA, length.out = length(vec.max.y))
   
-  for (i in 1:nrow(array.max.y)) {
-    for (j in 1:ncol(array.max.y)) {
-      array.max.x[i,j] <- if (!is.na(array.max.y[i,j])) axis[which(array.max.y[i,j] == array[i,,j])][1]
-    }
+  for (i in 1:length(vec.max.x)) {
+    #print(i)
+    vec.max.x[i] <- if (!is.na(vec.max.y[i])) axis[which(vec.max.y[i] == matrix[i,])]
   }
   
   # Vorbereiten der Liste für Übergabe
-  list.max <- list("MAxJ.lat" = array.max.x, "MaxJ.u" = array.max.y)
+  list.max.jet <- list("MaxJ.lat" = vec.max.x, "MaxJ.u" = vec.max.y)
   return(list.max.jet)
   
 }
 
-
-## source('~/Master_Thesis/02-r-code-git/a-locate_jetstream_1polynomial_2d.r')
-##
-## ROUTINE ZUM AUFFINDEN DES JETSTREAMS AUF NORDHEMISPHÄRE ANHAND DES ZONALWINDES ####
-####
-
-library(parallel) # Paralleles Rechnen m Apply
-library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
-# install.packages("pckg.cheb_0.9.5.tar.gz", repos = NULL, type = "source")
-
-
+## Methode: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
+#library(parallel) # Paralleles Rechnen m Apply
 find.jet.chebpoly <- function(array, axis, n.order = 8) {
   
   ####
@@ -127,28 +112,7 @@ find.jet.chebpoly <- function(array, axis, n.order = 8) {
   return(list.model.jet)
 }
 
-
-## source('~/01-Master-Thesis/02-code-git/j-shortest-path-dijkstra.r')
-##
-## ROUTINE ZUM AUFFINDEN DES JETSTREAMS ÜBER DIE ####
-## BESTIMMUNG DES KUERZESTEN PFADES IN EINEM GRAPHEN
-## MITTELS DIJKSTRA ALGORITHMUS VGL PIK MOLNOS ETAL 2017
-####
-####
-
-# Paket zur Berechnung von Distanzen in Graphen
-require(igraph)
-
-
-
-
-####
-## FUNKTION ZUR BESTIMMUNG DES KÜRZESTEN PFADES IN EINEM GRAPHEN ####
-## MITTELS DES DIJKSTRA-ALGORITHMUS ÜBER KNOTEN, VEBINDENDE KANTEN UND KANTENGEWICHTE
-## GEWICHTE SIND ABHÄNGIG VON WINDGESCHWINDIGKEIT, -RICHTUNG, UND DEM BREITENGRAD
-## METHODIK NACH PIK - MOLNOS ETAL 2017
-####
-
+## Methode: Kürzester Pfad mittels Dijkstra-Algorithmus. Nach Molnos/PIK.
 find.jet.dijkstra.2d <- function(u, v, lon, lat, jet, season) {
   # Anpassen der Wichtungen
   if (jet == "STJ" & season == "cold") {
@@ -243,6 +207,5 @@ find.jet.dijkstra.2d <- function(u, v, lon, lat, jet, season) {
                          "SP.J.u" = u.jet[-nlon], "SP.J.v" = v.jet[-nlon])
   return(list.model.jet)
 }
-
 
 
