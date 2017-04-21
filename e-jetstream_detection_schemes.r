@@ -33,7 +33,7 @@ find.jet.maximum <- function(matrix, axis) {
 
 ## Methode: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
 #library(parallel) # Paralleles Rechnen m Apply
-find.jet.chebpoly <- function(array, axis, n.order = 8) {
+find.jets.chebpoly <- function(matrix, axis, n.order = 8) {
   
   ####
   ## VARIABLEN UND PARAMETER ####
@@ -47,7 +47,7 @@ find.jet.chebpoly <- function(array, axis, n.order = 8) {
   ####
   ####
   
-  list.max <- apply(array, 1, cheb.find.max, x.axis = lat, n = n.order)
+  list.max <- apply(matrix, 1, cheb.find.max, x.axis = lat, n = n.order)
   list.max.len <- length(list.max)
   
   ## Maxima des Modells (Positionen und Werte)
@@ -66,8 +66,8 @@ find.jet.chebpoly <- function(array, axis, n.order = 8) {
   # Positionen als Indizes
   model.max.2.x <- sapply(model.max.2, "[[", 1) 
   # Umrechnung von Indizes zu Breitengraden
-  model.max.2.lat <- matrix(NA,nrow(array), ncol = 2)
-  for (i in 1:nrow(array)) {
+  model.max.2.lat <- matrix(NA,nrow(matrix), ncol = 2)
+  for (i in 1:nrow(matrix)) {
     #print(model.max.lat[model.max.2.x[,i],i])
     model.max.2.lat[i,] <- model.max.lat[model.max.2.x[,i],i]
   }
@@ -75,7 +75,7 @@ find.jet.chebpoly <- function(array, axis, n.order = 8) {
   model.max.2.u <- sapply(model.max.2, "[[", 2) 
   
   # Annahmen: PFJ nördliches Maximum, STJ südliches Maximum
-  PFJ.lat <- rep(NA, nrow(array)); 
+  PFJ.lat <- rep(NA, nrow(matrix)); 
   STJ.lat <- PFJ.lat; MaxJ.lat <- PFJ.lat
   PFJ.u <- PFJ.lat; STJ.u <- PFJ.lat; MaxJ.u <- PFJ.lat
   for (i in 1:192) {
@@ -203,9 +203,20 @@ find.jet.dijkstra.2d <- function(u, v, lon, lat, jet, season) {
   u.jet <- u[shrt.pth]; v.jet <- v[shrt.pth] 
   
   # übergabe der variablen jeweils ohne den letzten Wert
-  list.model.jet <- list("SP.J.lon" = lon.jet[-nlon], "SP.J.lon" = lat.jet[-nlon],
+  list.model.jet <- list("SP.J.lon" = lon.jet[-nlon], "SP.J.lat" = lat.jet[-nlon],
                          "SP.J.u" = u.jet[-nlon], "SP.J.v" = v.jet[-nlon])
   return(list.model.jet)
 }
 
+find.jets.dijkstra.2d <- function(u, v, lon, lat, season) {
+  STJ <- find.jet.dijkstra.2d(u, v, lon, lat, jet = "STJ", season)
+  PFJ <- find.jet.dijkstra.2d(u, v, lon, lat, jet = "PFJ", season)
+  
+  # Übergabe der Variablen
+  list.model.jet <- list("STJ.lon" = STJ$SP.J.lon, "STJ.lat" = STJ$SP.J.lat, 
+                         "STJ.u"   = STJ$SP.J.u,   "STJ.v"   = STJ$SP.J.v,
+                         "PFJ.lon" = PFJ$SP.J.lon, "PFJ.lat" = PFJ$SP.J.lat,
+                         "PFJ.u"   = PFJ$SP.J.u,   "PFJ.v"   = PFJ$SP.J.v)
+  return(list.model.jet)
+}
 
