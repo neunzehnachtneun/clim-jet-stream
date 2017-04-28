@@ -8,7 +8,7 @@
 ## BENÖTIGTE PACKAGES
 # install.packages("pckg.cheb_0.9.5-2.tar.gz", repos = NULL, type = "source")
 library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
-require(igraph)
+library(igraph)
 
 
 ## Methode: Maximum des Zonalwinds in Meridionalrichtung 
@@ -38,6 +38,7 @@ find.jets.chebpoly <- function(matrix, axis, n.order = 8) {
   ####
   ## VARIABLEN UND PARAMETER ####
   ####
+  library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
   
   
   ####
