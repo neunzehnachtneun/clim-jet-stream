@@ -28,28 +28,27 @@ Dieser Ordner enthält die mit cdo vorverarbeiteten Datensätzte bestehend aus j
 4. gleitende saisonale Mittelwerte über fünf Jahre
 
 ## Datei-/Skriptstruktur
-### a-analyse-seasonal-change.r
+### a-analyse_seasonal_change.r
 Hauptskript zur Untersuchung von saisonalen Änderungen
 
-### b-analyse-monthly-change.r
+### b-analyse_monthly_change.r
 Hauptskript zur Untersuchung von monatlichen Änderungen 
-> noch nicht fertig
+> in neuer Struktur Hauptskript
+> in Arbeit
 
-### d-read-era.r
+### d-read_era_ncdf.r
 Einleseroutine für ERA-Datensätze im nc-Format
+> obligatorisch, nicht länger benötigt.
 
-### e-locate-jetstream-discrete-2d.r
-Routine zum Auffinden des Jets über das zonale Maximum des Zonalwindes
-
-### f-locate-jetstream-polynomial-2d.r
-Routine zum Auffinden des Jetstreams über die Maxima eines zonalen Least-Squares-Fits mit Chebyshev-Polynomen
-
-### g-compare-seq-vs-std-fit.r
-Vergleich von sequentiellem (ähnlich spline) zu normalem Fit
-> noch nicht fertig
+### e-jetstream_detection_schemes.r
+Verschiedene Routinen zum Auffinden des Jets:
+1. Zonales Maximum des Zonalwindes
+2. Filtern der beiden stärksten zonalen Maxima des Least-Squares-Fits des Zonalwindes
+3. Kürzeste Wegstrecke über Dijkstra-Algorithmus (nach Molnos et al. 2017)
 
 ### h-mean-jet.r
 Analyse des mittleren Zustands
+> noch nicht fertig
 
 ### i-get-orography.r
 Berechnung der Orographie und Einfluss auf zonales Maximum des zonalen Vorticity-Anteils
@@ -57,8 +56,10 @@ Berechnung der Orographie und Einfluss auf zonales Maximum des zonalen Vorticity
 
 ### m-plots-master.r
 Routinen für einheitliche Plots mit image, contour, points, title etc.
+> Umstieg auf ggplot2 ??
 
 ## To-Do-Liste
-- [ ] Skripte vervollständigen und überprüfen
-- [ ] Code PIK implementieren
+- [x] Skripte vervollständigen und überprüfen
+- [x] Code PIK implementieren
+- [ ] Visualisierung der Ergebnisse
 - [ ] Bezier-Curves ausprobieren
