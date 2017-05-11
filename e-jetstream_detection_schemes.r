@@ -11,8 +11,8 @@ library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
 library(igraph)
 
 
-## Methode: Maximum des Zonalwinds in Meridionalrichtung 
-find.jet.maximum <- function(matrix, axis) {
+## Methode 0: Maximum des Zonalwinds in Meridionalrichtung 
+find.jet.maximum.2d <- function(matrix, axis) {
   
   ## SUCHE DES MAXIMAS MITTELS APPLY
   vec.max.y <- apply(matrix, 1, max)
@@ -31,9 +31,9 @@ find.jet.maximum <- function(matrix, axis) {
   
 }
 
-## Methode: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
+## Methode 1a: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
 #library(parallel) # Paralleles Rechnen m Apply
-find.jets.chebpoly <- function(matrix, axis, n.order = 8) {
+find.jets.chebpoly.2d <- function(matrix, axis, n.order = 8) {
   
   ####
   ## VARIABLEN UND PARAMETER ####
@@ -113,7 +113,40 @@ find.jets.chebpoly <- function(matrix, axis, n.order = 8) {
   return(list.model.jet)
 }
 
-## Methode: Kürzester Pfad mittels Dijkstra-Algorithmus. Nach Molnos/PIK.
+## Methode 1b: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
+find.jets.chebpoly.fit.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 8) {
+  
+  ## Aufruf von find.jet.chebpoly.2d zum Auffinden der Jets
+  jets <- find.jets.chebpoly.2d(matrix = matrix.u, axis = axis.y, n.order = n.order)
+  PFJ.lat <- jets$PFJ.lat; PFJ.u   <- jets$PFJ.u
+  STJ.lat <- jets$STJ.lat; STJ.u   <- jets$STJ.u
+  
+  PFJ.lat.fit <- cheb.fit(PFJ.lat[c(97:192, 1:192, 1:96)], c(1:384), 24)
+  PFJ.lat.fit <- PFJ.lat.fit[97:288]
+  STJ.lat.fit <- cheb.fit(STJ.lat[c(97:192, 1:192, 1:96)], c(1:384), 24)
+  STJ.lat.fit <- STJ.lat.fit[97:288]
+  
+  # Erkennen der zu den Breitengraden passenden Zonalwinde
+  PFJ.u <- rep(NA, length.out = length(lon)); PFJ.v <- rep(NA, length.out = length(lon))
+  STJ.u <- rep(NA, length.out = length(lon)); STJ.v <- rep(NA, length.out = length(lon))
+  for (i in 1:length(lon)) {
+    if (!is.na(PFJ.lat.fit[i])) {
+      PFJ.u[i] <- matrix.u[i, which.min(abs(lat - PFJ.lat.fit[i]))]
+      PFJ.v[i] <- matrix.v[i, which.min(abs(lat - PFJ.lat.fit[i]))]
+    }
+    if (!is.na(STJ.lat.fit[i])) {
+      STJ.u[i] <- matrix.u[i, which.min(abs(lat - STJ.lat.fit[i]))]
+      STJ.v[i] <- matrix.v[i, which.min(abs(lat - STJ.lat.fit[i]))]
+    }
+  }
+  
+  ## Übergabe von Variablen
+  list.model.jet <- list("PFJ.lat" = PFJ.lat.fit, "PFJ.u" = PFJ.u, "PFJ.v" = PFJ.v,
+                         "STJ.lat" = STJ.lat.fit, "STJ.u" = STJ.u, "STJ.v" = STJ.v)
+  return(list.model.jet)
+}
+
+## Methode2: Kürzester Pfad mittels Dijkstra-Algorithmus. Nach Molnos/PIK.
 find.jet.dijkstra.2d <- function(u, v, lon, lat, jet, season) {
   # Anpassen der Wichtungen
   if (jet == "STJ" & season == "cold") {
