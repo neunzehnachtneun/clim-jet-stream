@@ -1,7 +1,7 @@
 Package: pckg.cheb
 Type: Package
 Title: Curve Fitting with Chebyshev Polynomials
-Version: 0.9.5-2
+Version: 0.9.5-5
 Author: Sebastian Kiefer <s.kiefer@posteo.de>
 Maintainer: Sebastian Kiefer <s.kiefer@posteo.de>
 Description: The aim of this package is to fit a chebyshev polynomial of order n

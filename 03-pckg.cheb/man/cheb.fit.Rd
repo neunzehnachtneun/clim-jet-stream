@@ -4,7 +4,7 @@
 \alias{cheb.fit}
 \title{Curve Fitting with Chebyshev Polynomials}
 \usage{
-cheb.fit(d, x.axis, n, bc.harmonic = FALSE)
+cheb.fit(d, x.axis, n)
 }
 \arguments{
 \item{d}{Zu fittender Datensatz/Zeitreihe (Vektor)}
@@ -12,8 +12,6 @@ cheb.fit(d, x.axis, n, bc.harmonic = FALSE)
 \item{x.axis}{Beliebige X-Achse (Vektor)}
 
 \item{n}{Ordnung des Polynoms (Skalar)}
-
-\item{bc.harmonic}{Parameter für harmonische Randbedingung (Wahr / Falsch)}
 }
 \value{
 cheb.model Werte des gefilterten Modells

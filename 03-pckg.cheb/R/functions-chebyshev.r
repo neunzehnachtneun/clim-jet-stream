@@ -180,32 +180,45 @@ cheb.deriv.2nd <- function(x.axis, cheb.coeff) {
 #' @param d Zu fittender Datensatz/Zeitreihe (Vektor)
 #' @param x.axis Beliebige X-Achse (Vektor)
 #' @param n Ordnung des Polynoms (Skalar)
-#' @param bc.harmonic Parameter für harmonische Randbedingung (Wahr / Falsch)
 #' @return cheb.model Werte des gefilterten Modells
 #' @description
 #' \code{cheb.fit} fittet ein Chebyshev-Polynom beliebiger Ordnung an einen Datensatz/Zeitreihe mittels Least Squares Verfahren
 #' @export
-cheb.fit <- function(d, x.axis, n, bc.harmonic = FALSE){
-  # Fallunterscheidung für harmonische Randbedingung
-  if (bc.harmonic == FALSE) {
-    x.cheb <- cheb.scale(x.axis)
-    cheb.t <- cheb.1st(x.axis, n)
-  } else if (bc.harmonic == TRUE) {
-    d <- c(d, d[1])
-    x.axis <- c(x.axis, (x.axis[1] + 360))
-    x.cheb <- cheb.scale(x.axis)
+cheb.fit <- function(d, x.axis, n){
+  # Prüfdatensatz
+  # x.axis <- 1:10; d <- rnorm(10); d[4:5] <- NA; n <- 3
+  ## Herausfiltern von fehlenden Werten (NAs)
+  mss.ind  <- which(is.na(d))
+  # if (length(mss.ind) >= 1) {
+  #   x.axis.mss <- x.axis[mss.ind]; x.axis <- x.axis[-mss.ind];
+  #   d.mss <- NA; d <- d[-mss.ind]
+  # }
+
+
+  if (length(mss.ind) >= 1) {
+    cheb.t <- cheb.1st(x.axis[-mss.ind], n)
+  } else {
     cheb.t <- cheb.1st(x.axis, n)
   }
 
   ## modell berechnungen
   # berechnung der koeffizienten des polyfits
-  cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
-  # berechnung des gefilterten modells
-  cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
-  # löschen des letzten eintrags für den harmonischen fall
-  if (bc.harmonic == TRUE) {
-    cheb.model <- cheb.model[-(length(cheb.model))]
+  if (length(mss.ind) >= 1) {
+    cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d[-mss.ind]
+  } else {
+    cheb.coeff <- solve(t(cheb.t) %*% cheb.t) %*% t(cheb.t) %*% d
   }
+
+  # berechnung des gefilterten modells
+  x.cheb <- cheb.scale(x.axis)
+  cheb.model <- cheb.model.filter(x.cheb, cheb.coeff)
+
+  # # Ergänzen um fehlenden Wert
+  # if (length(mss.ind) >= 1) {
+  #   val <- c( cheb.model, rep(NA,length(mss.ind)) )
+  #   ind  <- c(x.axis, x.axis.mss)
+  #   cheb.model <- val[order(ind)]
+  # }
 
   # Übergabe der Variablen
   return(cheb.model)
