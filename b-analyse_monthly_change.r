@@ -4,6 +4,7 @@
 ## 1957 - 2016
 ####
 setwd("~/01-Master-Thesis/02-code-git/")
+# getwd()
 
 ## EINLESEN DER DATEN ####
 ##
@@ -43,148 +44,176 @@ dts.season[which(dts.month == "Mar" | dts.month == "Apr" | dts.month == "May")] 
 dts.season[which(dts.month == "Jun" | dts.month == "Jul" | dts.month == "Aug")] <- "jja"
 dts.season[which(dts.month == "Sep" | dts.month == "Oct" | dts.month == "Nov")] <- "son"
 
-
-## VERARBEITEN DER DATEN ####
-## 
-source("e-jetstream_detection_schemes.r")
-source("n-help-functions.r")
-
-
-####
-## SCHLEIFE ÜBER DRUCK LEVEL ####
-####
-for (p.lvl in 3:6) {
-  print(lev[p.lvl])
-}; p.lvl <- 4
-
-## ZEITSCHRITTE
-t.stp <- 1; print(paste(dts.month[t.stp], dts.year[t.stp]))
-#
-
-## METHODE 0: find.jet.maximum ####
-## 
-# m0 <- find.jet.maximum(matrix = u[,,p.lvl, t.stp], axis = lat)
-# apply(X = u[,,p.lvl,1:2], MARGIN = 3, FUN = find.jet.maximum, axis = lat)
-
-
-## METHODE 1: find.jet.chebpoly ####
-##
-library(parallel)
-cl.fork <- makeCluster(24, type = "FORK")
-# m1.t <- find.jets.chebpoly(matrix = u[,, p.lvl, t.stp], axis = lat, n.order = 8)
-m1 <- parApply(cl.fork, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jets.chebpoly, axis = lat)
-stopCluster(cl.fork)
-
-
-
-## METHODE 2: find.jet.dijkstra.2d ####
-## 
-library(foreach); library(doParallel)
-cl.psock <- makeCluster(16, type = "PSOCK")
-registerDoParallel(cl.psock)
-m2 <- foreach(t.stp = 1:length(dts), .packages = "igraph") %dopar% {
-  find.jets.dijkstra.2d(u = u[,, p.lvl, t.stp], 
-                        v = v[,, p.lvl, t.stp], 
-                        lon = lon, lat = lat, 
-                        season = dts.cld.wrm[t.stp])}
-stopCluster(cl.psock)
-
-
-## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
-# Speichern
-save.image("170503-a.RData")
-# Laden
-load("170503-a.RData")
-ls()
-# Nachladen der Packages
-library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
-
-## FORMATIEREN DER DATENSATZE UND LÖSCHEN ÜBERFLÜSSIGER VARIABLEN ####
-## 
-library(plyr); library(dplyr); library(reshape2)
-
-## Jetdatensatz M1 & M2
-# m1.STJ.lon  <- sapply(m1, "[[", "STJ.lon")
-m1.STJ.lat  <- sapply(m1, "[[", "STJ.lat"); colnames(m1.STJ.lat) <- dts; rownames(m1.STJ.lat) <- lon
-m1.STJ.u    <- sapply(m1, "[[", "STJ.u")
-# m1.STJ.v    <- sapply(m1, "[[", "STJ.v")
-m2.STJ.lon  <- sapply(m2, "[[", "STJ.lon")
-m2.STJ.lat  <- sapply(m2, "[[", "STJ.lat")
-m2.STJ.u    <- sapply(m2, "[[", "STJ.u")
-m2.STJ.v    <- sapply(m2, "[[", "STJ.v")
-
-# m1.PFJ.lon  <- sapply(m1, "[[", "PfJ.lon")
-m1.PFJ.lat  <- sapply(m1, "[[", "PFJ.lat")
-m1.PFJ.u    <- sapply(m1, "[[", "PFJ.u")
-# m1.PFJ.v    <- sapply(m1, "[[", "PFJ.v")
-m2.PFJ.lon  <- sapply(m2, "[[", "PFJ.lon")
-m2.PFJ.lat  <- sapply(m2, "[[", "PFJ.lat")
-m2.PFJ.u    <- sapply(m2, "[[", "PFJ.u")
-m2.PFJ.v    <- sapply(m2, "[[", "PFJ.v")
-
-
 ## UMRECHNEN DER DATEN VON PAZIFIKZENTRISCHEM AUF EUROPAZENTRISCHES GITTER ####
-## 
+##
 lon.hlp <- lon - 180
 # lon.hlp <- c( lon[97:192] - 360, lon[1:96] )
 lon[1]; lon.hlp[97];
 # cut.lon <- which(lon.hlp == lon[1])
 u <- u[c(97:192,1:96),,,]; dimnames(u) <- list(lon.hlp, lat, lev, dts)
 v <- v[c(97:192,1:96),,,]; dimnames(v) <- list(lon.hlp, lat, lev, dts)
-m1.STJ.lat  <- m1.STJ.lat[c(97:192,1:96),]; rownames(m1.STJ.lat) <- lon.hlp
-m1.STJ.u    <- m1.STJ.u[c(97:192,1:96),]
-m2.STJ.lon  <- m2.STJ.lon[c(97:192,1:96),]
-m2.STJ.lat  <- m2.STJ.lat[c(97:192,1:96),]
-m2.STJ.u    <- m2.STJ.u[c(97:192,1:96),]
-m2.STJ.v    <- m2.STJ.v[c(97:192,1:96),]
-m1.PFJ.lat  <- m1.PFJ.lat[c(97:192,1:96),]
-m1.PFJ.u    <- m1.PFJ.u[c(97:192,1:96),]
-m2.PFJ.lon  <- m2.PFJ.lon[c(97:192,1:96),]
-m2.PFJ.lat  <- m2.PFJ.lat[c(97:192,1:96),]
-m2.PFJ.u    <- m2.PFJ.u[c(97:192,1:96),]
-m2.PFJ.v    <- m2.PFJ.v[c(97:192,1:96),]
+lon <- lon.hlp
+# m1.STJ.lat  <- m1.STJ.lat[c(97:192,1:96),]; rownames(m1.STJ.lat) <- lon.hlp
+# m1.STJ.u    <- m1.STJ.u[c(97:192,1:96),]
+# m2.STJ.lon  <- m2.STJ.lon[c(97:192,1:96),]
+# m2.STJ.lat  <- m2.STJ.lat[c(97:192,1:96),]
+# m2.STJ.u    <- m2.STJ.u[c(97:192,1:96),]
+# m2.STJ.v    <- m2.STJ.v[c(97:192,1:96),]
+# m1.PFJ.lat  <- m1.PFJ.lat[c(97:192,1:96),]
+# m1.PFJ.u    <- m1.PFJ.u[c(97:192,1:96),]
+# m2.PFJ.lon  <- m2.PFJ.lon[c(97:192,1:96),]
+# m2.PFJ.lat  <- m2.PFJ.lat[c(97:192,1:96),]
+# m2.PFJ.u    <- m2.PFJ.u[c(97:192,1:96),]
+# m2.PFJ.v    <- m2.PFJ.v[c(97:192,1:96),]
 
+
+## LADEN NÖTIGER HILFSFUNKTIONEN ####
+## 
+source("e-jetstream_detection_schemes.r")
+source("n-help-functions.r")
+
+
+## SCHLEIFE ÜBER DRUCK LEVEL ####
+##
+# for (p.lvl in 3:6) {
+#   print(lev[p.lvl])
+# }
+p.lvl <- 4
+
+## ZEITSCHRITTE
+t.stp <- 1; # 
+print(paste(dts.month[t.stp], dts.year[t.stp]))
+
+
+## METHODE 0: find.jet.maximum.2d ####
+## 
+library(parallel)
+cl.fork.1 <- makeCluster(6, type = "FORK")
+# find.jet.maximum.2d(matrix = u[,,p.lvl, t.stp], axis = lat)
+m0 <- parApply(cl.fork.1, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jet.maximum.2d, axis = lat)
+stopCluster(cl.fork.1)
+
+## METHODE 1a: find.jet.chebpoly.2d ####
+##
+cl.fork.2 <- makeCluster(24, type = "FORK")
+# m1.t <- find.jets.chebpoly(matrix = u[,, p.lvl, t.stp], axis = lat, n.order = 8)
+m1a <- parApply(cl.fork.2, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jets.chebpoly.2d, axis = lat)
+stopCluster(cl.fork.2)
+
+## METHODE 1b: find.jet.chebpoly.fit.2d ####
+##
+library(foreach); library(doParallel)
+cl.fork.3 <- makeCluster(16, type = "FORK")
+registerDoParallel(cl.fork.3)
+m1b <- foreach(t.stp = 1:length(dts)) %dopar% {
+  find.jets.chebpoly.fit.2d(matrix.u = u[,,p.lvl,t.stp], 
+                            matrix.v = v[,,p.lvl,t.stp],
+                            axis.x = lon, axis.y = lat)}
+stopCluster(cl.fork.3)
+
+
+## METHODE 2: find.jet.dijkstra.2d ####
+## 
+cl.psock.1 <- makeCluster(16, type = "PSOCK")
+registerDoParallel(cl.psock.1)
+m2 <- foreach(t.stp = 1:length(dts), .packages = "igraph") %dopar% {
+  find.jets.dijkstra.2d(u = u[,, p.lvl, t.stp], 
+                        v = v[,, p.lvl, t.stp], 
+                        lon = lon, lat = lat, 
+                        season = dts.cld.wrm[t.stp]) }
+stopCluster(cl.psock.1)
+
+
+## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
+# Speichern
+save.image("stp-a.RData")
+# Laden
+load("stp-a.RData")
+ls()
+# Nachladen der Packages
+# library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
+
+## FORMATIEREN DER DATENSATZE UND LÖSCHEN ÜBERFLÜSSIGER VARIABLEN ####
+## 
+library(plyr); library(dplyr); library(reshape2)
+
+## Jetdatensatz M1a M1b & M2
+# Maximaljet M0
+m0.J.lat    <- sapply(m0, "[[", "MaxJ.lat"); colnames(m0.J.lat) <- dts; rownames(m0.J.lat) <- lon
+m0.J.u      <- sapply(m0, "[[", "MaxJ.u")
+# Subtropenjet
+m1a.STJ.lat <- sapply(m1a, "[[", "STJ.lat")
+m1a.STJ.u   <- sapply(m1a, "[[", "STJ.u")
+m1b.STJ.lat <- sapply(m1b, "[[", "STJ.lat")
+m1b.STJ.u   <- sapply(m1b, "[[", "STJ.u")
+m1b.STJ.v   <- sapply(m1b, "[[", "STJ.v")
+m2.STJ.lon  <- sapply(m2, "[[", "STJ.lon")
+m2.STJ.lat  <- sapply(m2, "[[", "STJ.lat")
+m2.STJ.u    <- sapply(m2, "[[", "STJ.u")
+m2.STJ.v    <- sapply(m2, "[[", "STJ.v")
+# Polarfrontjet
+m1a.PFJ.lat  <- sapply(m1a, "[[", "PFJ.lat")
+m1a.PFJ.u    <- sapply(m1a, "[[", "PFJ.u")
+m1b.PFJ.lat  <- sapply(m1b, "[[", "PFJ.lat")
+m1b.PFJ.u    <- sapply(m1b, "[[", "PFJ.u")
+m1b.PFJ.v    <- sapply(m1b, "[[", "PFJ.v")
+m2.PFJ.lon  <- sapply(m2, "[[", "PFJ.lon")
+m2.PFJ.lat  <- sapply(m2, "[[", "PFJ.lat")
+m2.PFJ.u    <- sapply(m2, "[[", "PFJ.u")
+m2.PFJ.v    <- sapply(m2, "[[", "PFJ.v")
 
 ## MELTEN DES DATENSATZES (RESHAPE2::MELT) FÜR GGPLOT2 ####
 ## 
-data.jets <- melt(m1.STJ.lat,varnames = c("lon", "dts"),value.name = "STJ.lat.m1")
+# Maximaljet
+data.jets <- melt(m0.J.lat,varnames = c("lon", "dts"),value.name = "J.lat.m0")
 # Einfügen der Jahreszahlen, Monate, Jahreszeiten
 data.jets$dts <- rep(dts, each = n.lon); data.jets$year <- rep(dts.year, each = n.lon)
 data.jets$month <- rep(dts.month, each = n.lon); data.jets$season <- rep(dts.season, each = n.lon)
+data.jets$J.u.m0 <- melt(m0.J.u)$value
 # Subtropenjet
-data.jets$STJ.u.m1    <- melt(m1.STJ.u)$value
-data.jets$STJ.lat.m2  <- melt(m2.STJ.lat)$value
-data.jets$STJ.u.m2    <- melt(m2.STJ.u)$value
-data.jets$STJ.v.m2    <- melt(m2.STJ.v)$value
-# Polarjet
-data.jets$PFJ.lat.m1  <- melt(m1.PFJ.lat)$value
-data.jets$PFJ.u.m1    <- melt(m1.PFJ.u)$value
-data.jets$PFJ.lat.m2  <- melt(m2.PFJ.lat)$value
-data.jets$PFJ.u.m2    <- melt(m2.PFJ.u)$value
-data.jets$PFJ.v.m2    <- melt(m2.PFJ.v)$value
+data.jets$STJ.lat.m1a  <- melt(m1a.STJ.lat)$value
+data.jets$STJ.u.m1a    <- melt(m1a.STJ.u)$value
+data.jets$STJ.lat.m1b  <- melt(m1b.STJ.lat)$value
+data.jets$STJ.u.m1b    <- melt(m1b.STJ.u)$value
+data.jets$STJ.v.m1b    <- melt(m1b.STJ.v)$value
+data.jets$STJ.lat.m2   <- melt(m2.STJ.lat)$value
+data.jets$STJ.u.m2     <- melt(m2.STJ.u)$value
+data.jets$STJ.v.m2     <- melt(m2.STJ.v)$value
+# Polarfrontjet
+data.jets$PFJ.lat.m1a  <- melt(m1a.PFJ.lat)$value
+data.jets$PFJ.u.m1a    <- melt(m1a.PFJ.u)$value
+data.jets$PFJ.lat.m1b  <- melt(m1b.PFJ.lat)$value
+data.jets$PFJ.u.m1b    <- melt(m1b.PFJ.u)$value
+data.jets$PFJ.v.m1b    <- melt(m1b.PFJ.v)$value
+data.jets$PFJ.lat.m2   <- melt(m2.PFJ.lat)$value
+data.jets$PFJ.u.m2     <- melt(m2.PFJ.u)$value
+data.jets$PFJ.v.m2     <- melt(m2.PFJ.v)$value
 # Umsortieren der Spalten des Datensatzes
-data.jets <- data.jets[,c("dts", "year", "month", "season", "lon", "STJ.lat.m1", "STJ.lat.m2", "STJ.u.m1","STJ.u.m2", "STJ.v.m2", "PFJ.lat.m1", "PFJ.lat.m2", "PFJ.u.m1", "PFJ.u.m2", "PFJ.v.m2")]
+data.jets <- data.jets[,c("dts", "year", "month", "season", "lon", "J.lat.m0", "J.u.m0", "STJ.lat.m1a", "STJ.lat.m1b", "STJ.lat.m2", "STJ.u.m1a", "STJ.u.m1b", "STJ.v.m1b", "STJ.u.m2", "STJ.v.m2", "PFJ.lat.m1a", "PFJ.lat.m1b", "PFJ.lat.m2", "PFJ.u.m1a", "PFJ.u.m1b", "PFJ.v.m1b", "PFJ.u.m2", "PFJ.v.m2")]
 # colnames(data.jets)
 # head(data.jets)
 
 ## U-V-Datensatz
 # Melten
-data.uv <- melt(u, varnames = c("lon", "lat", "p.lvl", "t.stp"), value.name = "u")
-data.uv$v <- melt(data = v)$value
+data.uv <- melt(u[,,p.lvl,], varnames = c("lon", "lat", "t.stp"), value.name = "u")
+data.uv$v <- melt(data = v[,,p.lvl,])$value
 data.uv$uv <- sqrt( data.uv$u ** 2 + data.uv$v ** 2 )
 
 ## Löschen überflüssiger Variablen
-rm(u, v, m1, m2, 
-   m1.STJ.lat, m1.STJ.u, m1.PFJ.lat, m1.PFJ.u, 
+rm(u, v, m0, m1a, m1b, m2, 
+   m0.J.lat, m0.J.u,
+   m1a.STJ.lat, m1a.STJ.u, m1a.PFJ.lat, m1a.PFJ.u, 
+   m1b.STJ.lat, m1b.STJ.u, m1b.STJ.v,
+   m1b.PFJ.lat, m1b.PFJ.u, m1b.PFJ.v,
    m2.STJ.lon, m2.STJ.lat, m2.STJ.u, m2.STJ.v, 
    m2.PFJ.lon, m2.PFJ.lat, m2.PFJ.u, m2.PFJ.v,
-   cl.fork, cl.psock)
+   cl.fork.1, cl.fork.2, cl.fork.3, cl.psock.1)
 
 ## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
 # Speichern
-save.image("170503-b.RData")
+save.image("stp-b.RData")
 # Laden
-load("170503-b.RData")
+load("stp-b.RData")
 ls()
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
@@ -192,9 +221,12 @@ ls()
 ## VISUALISIEREN DER DATEN ####
 ## 
 library(ggplot2)
-library(RColorBrewer)
+# library(RColorBrewer)
 library(ggsci)
 # library(maps)
+library(gridExtra)
+library(egg)
+
 
 # Initiieren einer passenden Weltkarte
 map_nh <- map_data("world")
@@ -210,58 +242,87 @@ ggp.nh.merc <-
   scale_y_continuous(name = "Breitengrad", breaks = c(0, 30, 60, 90)) +
   coord_map(xlim = c(-180,180), ylim = c(0,90))
 
-# Plot des zonalen Windfeldes und Chebyshev-Jets
-ggp.u.m1 <- 
-  ggplot(data = data.uv[which(data.uv$t.stp == dts[t.stp] & data.uv$p.lvl == lev[p.lvl]),], 
-         mapping = aes(x = lon, y = lat, fill = u)) +
-  ggtitle("bla") +
-  geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-  geom_point(mapping = aes(x = lon , y = PFJ.lat.m1, fill = NULL),
-             data = data.jets[which(data.jets$dts == dts[t.stp]),],
-             shape = 24, fill = "black", size = 1) +
-  geom_point(mapping = aes(x = lon , y = STJ.lat.m1, fill = NULL),
-             data = data.jets[which(data.jets$dts == dts[t.stp]),],
-             shape = 25, fill = "black", size = 1) +
-  scale_x_continuous(name = "Längengrad", 
-                     breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-  scale_y_continuous(name = "Breitengrad", 
-                     breaks = c(0, 30, 60, 90)) +
-  geom_polygon(mapping = aes(x = long, y = lat, group = group),
-               data = map_nh, fill = "gray50", alpha = 0.3) +
-  coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic() 
+for (t.stp in round(seq(1,length(dts), length.out = 6))) {
+  print(t.stp)
   
-# Plot des Betrags des horizontalen Windfeldes und Dijkstra-Jets
-ggp.uv.m2 <- 
-  ggplot(data = data.uv[which(data.uv$t.stp == dts[t.stp] & data.uv$p.lvl == lev[p.lvl]),], 
-         mapping = aes(x = lon, y = lat, fill = uv)) +
-  geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-  geom_point(mapping = aes(x = lon , y = PFJ.lat.m2, fill = NULL),
-             data = data.jets[which(data.jets$dts == dts[t.stp]),],
-             shape = 24, fill = "black", size = 1) +
-  geom_point(mapping = aes(x = lon , y = STJ.lat.m2, fill = NULL),
-             data = data.jets[which(data.jets$dts == dts[t.stp]),],
-             shape = 25, fill = "black", size = 1) +
-  scale_x_continuous(name = "Längengrad", 
-                     breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-  scale_y_continuous(name = "Breitengrad", 
-                     breaks = c(0, 30, 60, 90)) +
-  geom_polygon(mapping = aes(x = long, y = lat, group = group),
-               data = map_nh, fill = "gray50", alpha = 0.3) +
-  coord_fixed(xlim = c(-180,180), ylim = c(0,90))
+  # Plot des zonalen Windfeldes und der Position des maximalen Jets
+  ggp.u.m0 <- 
+    ggplot(data = data.uv[which(data.uv$t.stp == dts[t.stp]),], 
+           mapping = aes(x = lon, y = lat, fill = u)) +
+    geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
+    geom_point(mapping = aes(x = lon , y = J.lat.m0, fill = NULL),
+               data = data.jets[which(data.jets$dts == dts[t.stp]),],
+               shape = 20, fill = "black", size = 1) +
+    scale_x_continuous(name = "Längengrad", 
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Breitengrad", 
+                       breaks = c(0, 30, 60, 90)) +
+    geom_polygon(mapping = aes(x = long, y = lat, group = group),
+                 data = map_nh, fill = "gray50", alpha = 0.3) +
+    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic() 
+   
+  # Plot des zonalen Windfeldes und Chebyshev-Jets
+  ggp.u.m1a <- 
+    ggplot(data = data.uv[which(data.uv$t.stp == dts[t.stp]),], 
+           mapping = aes(x = lon, y = lat, fill = u)) +
+    geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
+    geom_point(mapping = aes(x = lon , y = PFJ.lat.m1a, fill = NULL),
+               data = data.jets[which(data.jets$dts == dts[t.stp]),],
+               shape = 24, fill = "black", size = 1) +
+    geom_point(mapping = aes(x = lon , y = STJ.lat.m1a, fill = NULL),
+               data = data.jets[which(data.jets$dts == dts[t.stp]),],
+               shape = 25, fill = "black", size = 1) +
+    scale_x_continuous(name = "Längengrad", 
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Breitengrad", 
+                       breaks = c(0, 30, 60, 90)) +
+    geom_polygon(mapping = aes(x = long, y = lat, group = group),
+                 data = map_nh, fill = "gray50", alpha = 0.3) +
+    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic() 
+  
+  ggp.u.m1b <- 
+    ggplot(data = data.uv[which(data.uv$t.stp == dts[t.stp] ),], 
+           mapping = aes(x = lon, y = lat, fill = u)) +
+    geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
+    geom_point(mapping = aes(x = lon , y = PFJ.lat.m1b, fill = NULL),
+               data = data.jets[which(data.jets$dts == dts[t.stp]),],
+               shape = 24, fill = "black", size = 1) +
+    geom_point(mapping = aes(x = lon , y = STJ.lat.m1b, fill = NULL),
+               data = data.jets[which(data.jets$dts == dts[t.stp]),],
+               shape = 25, fill = "black", size = 1) +
+    scale_x_continuous(name = "Längengrad", 
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Breitengrad", 
+                       breaks = c(0, 30, 60, 90)) +
+    geom_polygon(mapping = aes(x = long, y = lat, group = group),
+                 data = map_nh, fill = "gray50", alpha = 0.3) +
+    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic() 
+  
+  # Plot des Betrags des horizontalen Windfeldes und Dijkstra-Jets
+  ggp.uv.m2 <- 
+    ggplot(data = data.uv[which(data.uv$t.stp == dts[t.stp]),], 
+           mapping = aes(x = lon, y = lat, fill = uv)) +
+    geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
+    geom_point(mapping = aes(x = lon , y = PFJ.lat.m2, fill = NULL),
+               data = data.jets[which(data.jets$dts == dts[t.stp]),],
+               shape = 24, fill = "black", size = 1) +
+    geom_point(mapping = aes(x = lon , y = STJ.lat.m2, fill = NULL),
+               data = data.jets[which(data.jets$dts == dts[t.stp]),],
+               shape = 25, fill = "black", size = 1) +
+    scale_x_continuous(name = "Längengrad", 
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Breitengrad", 
+                       breaks = c(0, 30, 60, 90)) +
+    geom_polygon(mapping = aes(x = long, y = lat, group = group),
+                 data = map_nh, fill = "gray50", alpha = 0.3) +
+    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic()
+  
+
+  ggp.jets <- grid.arrange(ggp.u.m0, ggp.u.m1a, ggp.u.m1b, ggp.uv.m2, ncol = 1)
+  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], ".pdf"),
+       plot = ggp.jets,device = pdf, path = "05-visu-pdf/", width = 210, height = 297, units = "mm")
+}
 
 
-
-ggplot(data = data.jets, mapping = aes(x = lon, y = dts)) + 
-  geom_tile(mapping = aes(fill = STJ.lat.m1)) +
-  scale_y_datetime(date_breaks = "5 years", date_labels = "%Y") +
-  scale_fill_distiller(palette = 'RdYlBu')
-
-ggplot(data = data.jets, mapping = aes(x = lon, y = dts)) + 
-  geom_raster(mapping = aes(fill = STJ.lat.m1)) +
-  scale_y_datetime(date_breaks = "5 years", date_labels = "%Y") +
-  scale_fill_distiller(palette = 'RdYlBu')
-
-
-ggsave()
 
 ## ENDE ENDE ENDE ####
