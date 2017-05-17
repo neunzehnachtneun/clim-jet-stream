@@ -218,7 +218,7 @@ ls()
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
 
-## VISUALISIEREN DER DATEN ####
+## VISUALISIEREN DER DATEN MIT GGPLOT2() ####
 ## 
 library(ggplot2)
 # library(RColorBrewer)
@@ -227,6 +227,8 @@ library(ggsci)
 library(gridExtra)
 library(egg)
 
+## VISUALISIEREN DER BESTIMMTEN JETPOSITIONEN ####
+##
 
 # Initiieren einer passenden Weltkarte
 map_nh <- map_data("world")
@@ -323,6 +325,11 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
        plot = ggp.jets,device = pdf, path = "05-visu-pdf/", width = 210, height = 297, units = "mm")
 }
 
+## VISUALISIERUNG DER HOVMÖLLER-DIAGRAMME ####
+## 
 
+ggplot(data = data.jets[which(data.jets$season == "son"),], 
+       mapping = aes(x = lon, y = dts, fill = J.lat.m0)) +
+  geom_tile() + scale_fill_gsea()
 
 ## ENDE ENDE ENDE ####
