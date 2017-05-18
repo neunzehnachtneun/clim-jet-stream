@@ -28,38 +28,27 @@ Dieser Ordner enthält die mit cdo vorverarbeiteten Datensätzte bestehend aus j
 4. gleitende saisonale Mittelwerte über fünf Jahre
 
 ## Datei-/Skriptstruktur
-### a-analyse_seasonal_change.r
-Hauptskript zur Untersuchung von saisonalen Änderungen
+### a-analyse_monthly_data.r
+Skript zur Untersuchung von saisonalen Änderungen auf der Basis von Monatsmitteln
+> Hauptskript
 
-### b-analyse_monthly_change.r
-Hauptskript zur Untersuchung von monatlichen Änderungen 
-> in neuer Struktur Hauptskript
-> in Arbeit
-
-### d-read_era_ncdf.r
-Einleseroutine für ERA-Datensätze im nc-Format
-> obligatorisch, nicht länger benötigt.
-
-### e-jetstream_detection_schemes.r
+### d-jetstream_detection_schemes.r
 Verschiedene Routinen zum Auffinden des Jets:
 1. Zonales Maximum des Zonalwindes
 2. Filtern der beiden stärksten zonalen Maxima des Least-Squares-Fits des Zonalwindes
 3. Kürzeste Wegstrecke über Dijkstra-Algorithmus (nach Molnos et al. 2017)
 
-### h-mean-jet.r
-Analyse des mittleren Zustands
-> noch nicht fertig
-
-### i-get-orography.r
+### e-get-orography.r
 Berechnung der Orographie und Einfluss auf zonales Maximum des zonalen Vorticity-Anteils
 > noch nicht fertig
 
-### m-plots-master.r
-Routinen für einheitliche Plots mit image, contour, points, title etc.
-> Umstieg auf ggplot2 ??
+### f-help-functions.r
+Kleine Hilfsfunktionen
 
 ## To-Do-Liste
 - [x] Skripte vervollständigen und überprüfen
 - [x] Code PIK implementieren
-- [ ] Visualisierung der Ergebnisse
-- [ ] Bezier-Curves ausprobieren
+- [ ] Finalisierung der Methodik
+- [x] Visualisierung erster Ergebnisse
+- [ ] Berechnung und Visualisierung von Hovmöller-Diagrammen 
+- [ ] ~~Bezier-Curves ausprobieren~~
