@@ -6,6 +6,8 @@
 setwd("~/01-Master-Thesis/02-code-git/")
 # getwd()
 
+n.cluster <- 12
+
 ## EINLESEN DER DATEN ####
 ##
 library(ncdf4)
@@ -69,8 +71,8 @@ lon <- lon.hlp
 
 ## LADEN NÖTIGER HILFSFUNKTIONEN ####
 ## 
-source("e-jetstream_detection_schemes.r")
-source("n-help-functions.r")
+source("d-jetstream_detection_schemes.r")
+source("f-help-functions.r")
 
 
 ## SCHLEIFE ÜBER DRUCK LEVEL ####
@@ -88,14 +90,14 @@ print(paste(dts.month[t.stp], dts.year[t.stp]))
 ## METHODE 0: find.jet.maximum.2d ####
 ## 
 library(parallel)
-cl.fork.1 <- makeCluster(6, type = "FORK")
+cl.fork.1 <- makeCluster(n.cluster, type = "FORK")
 # find.jet.maximum.2d(matrix = u[,,p.lvl, t.stp], axis = lat)
 m0 <- parApply(cl.fork.1, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jet.maximum.2d, axis = lat)
 stopCluster(cl.fork.1)
 
 ## METHODE 1a: find.jet.chebpoly.2d ####
 ##
-cl.fork.2 <- makeCluster(24, type = "FORK")
+cl.fork.2 <- makeCluster(n.cluster, type = "FORK")
 # m1.t <- find.jets.chebpoly(matrix = u[,, p.lvl, t.stp], axis = lat, n.order = 8)
 m1a <- parApply(cl.fork.2, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jets.chebpoly.2d, axis = lat)
 stopCluster(cl.fork.2)
@@ -103,7 +105,7 @@ stopCluster(cl.fork.2)
 ## METHODE 1b: find.jet.chebpoly.fit.2d ####
 ##
 library(foreach); library(doParallel)
-cl.fork.3 <- makeCluster(16, type = "FORK")
+cl.fork.3 <- makeCluster(n.cluster, type = "FORK")
 registerDoParallel(cl.fork.3)
 m1b <- foreach(t.stp = 1:length(dts)) %dopar% {
   find.jets.chebpoly.fit.2d(matrix.u = u[,,p.lvl,t.stp], 
@@ -112,9 +114,18 @@ m1b <- foreach(t.stp = 1:length(dts)) %dopar% {
 stopCluster(cl.fork.3)
 
 
+## METHODE 1C: find.jets.chebpoly.sect.2d ####
+## 
+cl.fork.4 <- makeCluster(n.cluster, type = "FORK")
+registerDoParallel(cl.fork.4)
+m1c <- foreach(t.stp = 1:length(dts)) %dopar% {
+  find.jets.chebpoly.sect.2d(matrix.u = u[,,p.lvl,t.stp], 
+                             matrix.v = v[,,p.lvl,t.stp],
+                             axis.x = lon, axis.y = lat)}
+
 ## METHODE 2: find.jet.dijkstra.2d ####
 ## 
-cl.psock.1 <- makeCluster(16, type = "PSOCK")
+cl.psock.1 <- makeCluster(n.cluster, type = "PSOCK")
 registerDoParallel(cl.psock.1)
 m2 <- foreach(t.stp = 1:length(dts), .packages = "igraph") %dopar% {
   find.jets.dijkstra.2d(u = u[,, p.lvl, t.stp], 
@@ -147,6 +158,8 @@ m1a.STJ.u   <- sapply(m1a, "[[", "STJ.u")
 m1b.STJ.lat <- sapply(m1b, "[[", "STJ.lat")
 m1b.STJ.u   <- sapply(m1b, "[[", "STJ.u")
 m1b.STJ.v   <- sapply(m1b, "[[", "STJ.v")
+m1c.STJ.lat <- sapply(m1c, "[[", "STJ.lat")
+m1c.STJ.u   <- sapply(m1c, "[[", "STJ.u")
 m2.STJ.lon  <- sapply(m2, "[[", "STJ.lon")
 m2.STJ.lat  <- sapply(m2, "[[", "STJ.lat")
 m2.STJ.u    <- sapply(m2, "[[", "STJ.u")
@@ -157,6 +170,8 @@ m1a.PFJ.u    <- sapply(m1a, "[[", "PFJ.u")
 m1b.PFJ.lat  <- sapply(m1b, "[[", "PFJ.lat")
 m1b.PFJ.u    <- sapply(m1b, "[[", "PFJ.u")
 m1b.PFJ.v    <- sapply(m1b, "[[", "PFJ.v")
+m1c.PFJ.lat <- sapply(m1c, "[[", "PFJ.lat")
+m1c.PFJ.u   <- sapply(m1c, "[[", "PFJ.u")
 m2.PFJ.lon  <- sapply(m2, "[[", "PFJ.lon")
 m2.PFJ.lat  <- sapply(m2, "[[", "PFJ.lat")
 m2.PFJ.u    <- sapply(m2, "[[", "PFJ.u")
@@ -176,6 +191,8 @@ data.jets$STJ.u.m1a    <- melt(m1a.STJ.u)$value
 data.jets$STJ.lat.m1b  <- melt(m1b.STJ.lat)$value
 data.jets$STJ.u.m1b    <- melt(m1b.STJ.u)$value
 data.jets$STJ.v.m1b    <- melt(m1b.STJ.v)$value
+data.jets$STJ.lat.m1c  <- melt(m1c.STJ.lat)$value
+data.jets$STJ.u.m1c    <- melt(m1c.STJ.u)$value
 data.jets$STJ.lat.m2   <- melt(m2.STJ.lat)$value
 data.jets$STJ.u.m2     <- melt(m2.STJ.u)$value
 data.jets$STJ.v.m2     <- melt(m2.STJ.v)$value
@@ -185,11 +202,19 @@ data.jets$PFJ.u.m1a    <- melt(m1a.PFJ.u)$value
 data.jets$PFJ.lat.m1b  <- melt(m1b.PFJ.lat)$value
 data.jets$PFJ.u.m1b    <- melt(m1b.PFJ.u)$value
 data.jets$PFJ.v.m1b    <- melt(m1b.PFJ.v)$value
+data.jets$PFJ.lat.m1c  <- melt(m1c.PFJ.lat)$value
+data.jets$PFJ.u.m1c    <- melt(m1c.PFJ.u)$value
 data.jets$PFJ.lat.m2   <- melt(m2.PFJ.lat)$value
 data.jets$PFJ.u.m2     <- melt(m2.PFJ.u)$value
 data.jets$PFJ.v.m2     <- melt(m2.PFJ.v)$value
 # Umsortieren der Spalten des Datensatzes
-data.jets <- data.jets[,c("dts", "year", "month", "season", "lon", "J.lat.m0", "J.u.m0", "STJ.lat.m1a", "STJ.lat.m1b", "STJ.lat.m2", "STJ.u.m1a", "STJ.u.m1b", "STJ.v.m1b", "STJ.u.m2", "STJ.v.m2", "PFJ.lat.m1a", "PFJ.lat.m1b", "PFJ.lat.m2", "PFJ.u.m1a", "PFJ.u.m1b", "PFJ.v.m1b", "PFJ.u.m2", "PFJ.v.m2")]
+data.jets <- data.jets[,c("dts", "year", "month", "season", "lon", "J.lat.m0", "J.u.m0", 
+                          "STJ.lat.m1a", "STJ.lat.m1b", "STJ.lat.m1c", "STJ.lat.m2", 
+                          "STJ.u.m1a", "STJ.u.m1b", "STJ.v.m1b", "STJ.u.m1c", 
+                          "STJ.u.m2", "STJ.v.m2", 
+                          "PFJ.lat.m1a", "PFJ.lat.m1b", "PFJ.lat.m1c", "PFJ.lat.m2", 
+                          "PFJ.u.m1a", "PFJ.u.m1b", "PFJ.v.m1b", "PFJ.u.m1c",
+                          "PFJ.u.m2", "PFJ.v.m2")]
 # colnames(data.jets)
 # head(data.jets)
 
@@ -200,14 +225,15 @@ data.uv$v <- melt(data = v[,,p.lvl,])$value
 data.uv$uv <- sqrt( data.uv$u ** 2 + data.uv$v ** 2 )
 
 ## Löschen überflüssiger Variablen
-rm(u, v, m0, m1a, m1b, m2, 
+rm(u, v, m0, m1a, m1b, m1c, m2, 
    m0.J.lat, m0.J.u,
    m1a.STJ.lat, m1a.STJ.u, m1a.PFJ.lat, m1a.PFJ.u, 
    m1b.STJ.lat, m1b.STJ.u, m1b.STJ.v,
    m1b.PFJ.lat, m1b.PFJ.u, m1b.PFJ.v,
+   m1c.STJ.lat, m1c.STJ.u, m1c.PFJ.lat, m1c.PFJ.u,
    m2.STJ.lon, m2.STJ.lat, m2.STJ.u, m2.STJ.v, 
    m2.PFJ.lon, m2.PFJ.lat, m2.PFJ.u, m2.PFJ.v,
-   cl.fork.1, cl.fork.2, cl.fork.3, cl.psock.1)
+   cl.fork.1, cl.fork.2, cl.fork.3, cl.fork.4, cl.psock.1)
 
 ## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
 # Speichern
