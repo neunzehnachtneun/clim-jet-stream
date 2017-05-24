@@ -148,71 +148,80 @@ find.jets.chebpoly.fit.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.orde
 }
 
 ## Methode 1c: Zwei sektorielle Polynomfits in Meridionalrichtung, zur Unterscheidung von PFJ und STJ
-## very dirty !!!
-find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 8) {
+find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, n.order = 8) {
+  ## least squares fit achter ordnung und maximalstellensuche 
+  ## innerhalb unterschiedlicher breitengrad-grenzwerte für SPJ und PFJ
+  ## position (STJ) <- [20, 45]
+  ## position (PFJ) <- [45, 85]
   ## VARIABLEN UND PARAMETER ####
-  ####
-  library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
+
+  # library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
   
-  ####
-  ## LEAST SQUARES FIT                   ####
-  ## CHEBYSHEV POLYNOME 8-TER ORDNUNG      #
-  ## AN ZONAL WIND IN MERIDIONALER RICHTUNG #
-  ####
-  #### Subtropischer Jetstream
-  list.max.SPJ <- apply(matrix.u, 1, cheb.find.max, x.axis = axis.y, n = n.order, max.bound.l = 20, max.bound.u = 45)
-  list.max.SPJ.len <- length(list.max.SPJ)
-  ## Maxima des Modells (Positionen und Werte)
-  SPJ.max.lat <- sapply(list.max.SPJ, "[[", 1)
-  SPJ.max.u <- sapply(list.max.SPJ, "[[", 2)
-  
-  n.max.max <- max(sapply(SPJ.max.lat, length))
-  model.SPJ.lat <- sapply(SPJ.max.lat, fun.fill, n = n.max.max)
-  model.SPJ.u <- sapply(SPJ.max.u, fun.fill, n = n.max.max)
-  
-  Max.SPJ.lat <- rep(NA, 192); Max.SPJ.u <- rep(NA, 192)
-  # Position d stärksten Jets
-  for (i in 1:192) {
-    Max.SPJ.ind <- which.max(model.SPJ.u[,i])
- #   print(Max.SPJ.ind)
-    if (length(Max.SPJ.ind > 0)) {
-      Max.SPJ.lat[i] <- model.SPJ.lat[Max.SPJ.ind, i]
-      Max.SPJ.u[i] <- model.SPJ.u[Max.SPJ.ind, i]
-    } else {
-      Max.SPJ.lat[i] <- NA; Max.SPJ.u[i] <- NA;
+  ## Subtropischer Jetstream
+  list.max.STJ <- apply(matrix.u, 1, cheb.find.max, x.axis = axis.y, n = n.order, max.bound.l = 20, max.bound.u = 45)
+  list.max.STJ.len <- length(list.max.STJ)
+  # Extrahieren von lat und u aus der Liste
+  list.STJ.lat <- sapply(list.max.STJ, "[[", 1)
+  list.STJ.u <- sapply(list.max.STJ, "[[", 2)
+  # Transformieren der Liste in Vektor
+  # Abfrage, für den FALL, dass lediglich 1! Jet gefunden wurde.
+  if (typeof(list.STJ.lat) == "list") {
+    n.max.max <- max(sapply(list.STJ.lat, length))
+    array.STJ.lat <- sapply(list.STJ.lat, fun.fill, n = n.max.max)
+    array.STJ.u <- sapply(list.STJ.u, fun.fill, n = n.max.max)
+    
+    # Position und Intensität des stärksten Jets im Sektor
+    Max.STJ.lat <- rep(NA, 192); Max.STJ.u <- rep(NA, 192)
+    for (i in 1:192) {
+      Max.STJ.ind <- which.max(array.STJ.u[,i])
+      #   print(Max.SPJ.ind)
+      if (length(Max.STJ.ind > 0)) {
+        Max.STJ.lat[i] <- array.STJ.lat[Max.STJ.ind, i]
+        Max.STJ.u[i] <- array.STJ.u[Max.STJ.ind, i]
+      } else {
+        Max.STJ.lat[i] <- NA; Max.STJ.u[i] <- NA;
+      }
     }
+  } else {
+    Max.STJ.lat <- list.STJ.lat
+    Max.STJ.u <- list.STJ.u
   }
   
-  #### Polarfront Jetstream
+  ## Polarfront Jetstream
   list.max.PFJ <- apply(matrix.u, 1, cheb.find.max, x.axis = axis.y, n = n.order, max.bound.l = 45, max.bound.u = 85)
   list.max.PFJ.len <- length(list.max.PFJ)
-  ## Maxima des Modells (Positionen und Werte)
-  PFJ.max.lat <- sapply(list.max.PFJ, "[[", 1)
-  PFJ.max.u <- sapply(list.max.PFJ, "[[", 2)
-  
-  n.max.max <- max(sapply(PFJ.max.lat, length))
-  model.PFJ.lat <- sapply(PFJ.max.lat, fun.fill, n = n.max.max)
-  model.PFJ.u <- sapply(PFJ.max.u, fun.fill, n = n.max.max)
-  
-  Max.PFJ.lat <- rep(NA, 192); Max.PFJ.u <- rep(NA, 192)
-  # Position d stärksten Jets
-  for (i in 1:192) {
-    Max.PFJ.ind <- which.max(model.PFJ.u[,i])
-    if (length(Max.PFJ.ind > 0)) {
-      Max.PFJ.lat[i] <- model.PFJ.lat[Max.PFJ.ind, i]
-      Max.PFJ.u[i] <- model.PFJ.u[Max.PFJ.ind, i]
-    } else {
-      Max.PFJ.lat[i] <- NA; Max.PFJ.u[i] <- NA;
+  # Umformatieren der Listenelemente
+  list.PFJ.lat <- sapply(list.max.PFJ, "[[", 1)
+  list.PFJ.u <- sapply(list.max.PFJ, "[[", 2)
+  # Transformieren der Liste in Vektor
+  # Abfrage, für den FALL, dass lediglich 1! Jet gefunden wurde.
+  if (typeof(list.PFJ.lat) == "list") {
+    n.max.max <- max(sapply(list.PFJ.lat, length))
+    array.PFJ.lat <- sapply(list.PFJ.lat, fun.fill, n = n.max.max)
+    array.PFJ.u <- sapply(list.PFJ.u, fun.fill, n = n.max.max)
+    # Position und Intensität des stärksten Jets im Sektor
+    Max.PFJ.lat <- rep(NA, 192); Max.PFJ.u <- rep(NA, 192)
+    for (i in 1:192) {
+      Max.PFJ.ind <- which.max(array.PFJ.u[,i])
+      #   print(Max.SPJ.ind)
+      if (length(Max.PFJ.ind > 0)) {
+        Max.PFJ.lat[i] <- array.PFJ.lat[Max.PFJ.ind, i]
+        Max.PFJ.u[i] <- array.PFJ.u[Max.PFJ.ind, i]
+      } else {
+        Max.PFJ.lat[i] <- NA; Max.PFJ.u[i] <- NA;
+      }
     }
+  } else {
+    Max.PFJ.lat <- list.PFJ.lat
+    Max.PFJ.u <- list.PFJ.u
   }
   
   ## Übergabe von Variablen
   list.model.jet <- list("PFJ.lat" = Max.PFJ.lat, "PFJ.u" = Max.PFJ.u,
-                         "STJ.lat" = Max.SPJ.lat, "STJ.u" = Max.SPJ.u)
+                         "STJ.lat" = Max.STJ.lat, "STJ.u" = Max.STJ.u)
   return(list.model.jet)
 
 }
-
 
 
 ## Methode2: Kürzester Pfad mittels Dijkstra-Algorithmus. Nach Molnos/PIK.
