@@ -5,7 +5,6 @@
 ####
 setwd("~/01-Master-Thesis/02-code-git/")
 # getwd()
-
 n.cluster <- 12
 
 ## EINLESEN DER DATEN ####
@@ -114,13 +113,12 @@ m1b <- foreach(t.stp = 1:length(dts)) %dopar% {
 stopCluster(cl.fork.3)
 
 
-## METHODE 1C: find.jets.chebpoly.sect.2d ####
+## METHODE 1c: find.jets.chebpoly.sect.2d ####
 ## 
 cl.fork.4 <- makeCluster(n.cluster, type = "FORK")
 registerDoParallel(cl.fork.4)
-m1c <- foreach(t.stp = 1:length(dts)) %dopar% {
-  find.jets.chebpoly.sect.2d(matrix.u = u[,,p.lvl,t.stp], 
-                             matrix.v = v[,,p.lvl,t.stp],
+m1c <- foreach(t.stp = 1:length(dts), .combine = 'list') %dopar% {
+  find.jets.chebpoly.sect.2d(matrix.u = u[,,p.lvl,t.stp],
                              axis.x = lon, axis.y = lat)}
 
 ## METHODE 2: find.jet.dijkstra.2d ####
