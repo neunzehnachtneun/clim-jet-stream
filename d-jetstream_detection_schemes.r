@@ -153,74 +153,51 @@ find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, 
   ## innerhalb unterschiedlicher breitengrad-grenzwerte für SPJ und PFJ
   ## position (STJ) <- [20, 45]
   ## position (PFJ) <- [45, 85]
-  ## VARIABLEN UND PARAMETER ####
 
-  # library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
-  
-  ## Subtropischer Jetstream
-  list.max.STJ <- apply(matrix.u, 1, cheb.find.max, x.axis = axis.y, n = n.order, max.bound.l = 20, max.bound.u = 45)
-  list.max.STJ.len <- length(list.max.STJ)
-  # Extrahieren von lat und u aus der Liste
-  list.STJ.lat <- sapply(list.max.STJ, "[[", 1)
-  list.STJ.u <- sapply(list.max.STJ, "[[", 2)
-  # Transformieren der Liste in Vektor
-  # Abfrage, für den FALL, dass lediglich 1! Jet gefunden wurde.
-  if (typeof(list.STJ.lat) == "list") {
-    n.max.max <- max(sapply(list.STJ.lat, length))
-    array.STJ.lat <- sapply(list.STJ.lat, fun.fill, n = n.max.max)
-    array.STJ.u <- sapply(list.STJ.u, fun.fill, n = n.max.max)
+  ## alle möglichen zonalen windmaxima
+  list.max <- apply(matrix.u, 1, cheb.find.max, x.axis = axis.y, n = n.order)
+  # Extrahieren von breitengrad und zonalwind aus der liste
+  list.max.len <- length(list.max)
+  list.lat <- sapply(list.max, "[[", 1)
+  list.u <- sapply(list.max, "[[", 2)
+  # transformieren der liste in array
+  n.max.max <- max(sapply(list.lat, length))
+  array.lat <- sapply(list.lat, fun.fill, n = n.max.max)
+  array.u <- sapply(list.u, fun.fill, n = n.max.max)
+  # sektorielle abfrage ## liegt im bereich [] ein maximum??
+  STJ.lat <- rep(NA, 192); STJ.u <- rep(NA, 192);
+  PFJ.lat <- rep(NA, 192); PFJ.u <- rep(NA, 192);
+  for (i.lon in 1:length(axis.x)) {
+    ## Subtropischer Jetstream | abr. STJ | [20,50]
+    # mögliche positionen (können mehrere sein) innerhalb des sektors
+    STJ.pos.pos <- which(array.lat[,i.lon] > 20 & array.lat[,i.lon] < 50)
+    # position mit stärkstem zonalwind innerhalb des sektors
+    # annahme: position d jets
+    STJ.pos <- which.max(array.u[STJ.pos.pos, i.lon])
+    # array.u[STJ.pos, i.lon]
+    # abfrage, falls length() == 0
+    if (length(STJ.pos) == 1) {
+      STJ.lat[i.lon] <- array.lat[STJ.pos.pos[STJ.pos], i.lon]
+      STJ.u[i.lon] <- array.u[STJ.pos.pos[STJ.pos], i.lon]
+    }
     
-    # Position und Intensität des stärksten Jets im Sektor
-    Max.STJ.lat <- rep(NA, 192); Max.STJ.u <- rep(NA, 192)
-    for (i in 1:192) {
-      Max.STJ.ind <- which.max(array.STJ.u[,i])
-      #   print(Max.SPJ.ind)
-      if (length(Max.STJ.ind > 0)) {
-        Max.STJ.lat[i] <- array.STJ.lat[Max.STJ.ind, i]
-        Max.STJ.u[i] <- array.STJ.u[Max.STJ.ind, i]
-      } else {
-        Max.STJ.lat[i] <- NA; Max.STJ.u[i] <- NA;
-      }
+    ## polarer jetstream | abr. PFJ | [50,85]
+    # mögliche positionen
+    PFJ.pos.pos <-  which(array.lat[,i.lon] > 50 & array.lat[,i.lon] < 85)
+    # position mit stärkstem zonalwind
+    PFJ.pos <- which.max(array.u[PFJ.pos.pos, i.lon])
+    # abfrage, ob length() == 1
+    if (length(PFJ.pos) == 1) {
+      PFJ.lat[i.lon] <- array.lat[PFJ.pos.pos[PFJ.pos], i.lon]
+      PFJ.u[i.lon] <- array.u[PFJ.pos.pos[PFJ.pos], i.lon]
     }
-  } else {
-    Max.STJ.lat <- list.STJ.lat
-    Max.STJ.u <- list.STJ.u
-  }
-  
-  ## Polarfront Jetstream
-  list.max.PFJ <- apply(matrix.u, 1, cheb.find.max, x.axis = axis.y, n = n.order, max.bound.l = 45, max.bound.u = 85)
-  list.max.PFJ.len <- length(list.max.PFJ)
-  # Umformatieren der Listenelemente
-  list.PFJ.lat <- sapply(list.max.PFJ, "[[", 1)
-  list.PFJ.u <- sapply(list.max.PFJ, "[[", 2)
-  # Transformieren der Liste in Vektor
-  # Abfrage, für den FALL, dass lediglich 1! Jet gefunden wurde.
-  if (typeof(list.PFJ.lat) == "list") {
-    n.max.max <- max(sapply(list.PFJ.lat, length))
-    array.PFJ.lat <- sapply(list.PFJ.lat, fun.fill, n = n.max.max)
-    array.PFJ.u <- sapply(list.PFJ.u, fun.fill, n = n.max.max)
-    # Position und Intensität des stärksten Jets im Sektor
-    Max.PFJ.lat <- rep(NA, 192); Max.PFJ.u <- rep(NA, 192)
-    for (i in 1:192) {
-      Max.PFJ.ind <- which.max(array.PFJ.u[,i])
-      #   print(Max.SPJ.ind)
-      if (length(Max.PFJ.ind > 0)) {
-        Max.PFJ.lat[i] <- array.PFJ.lat[Max.PFJ.ind, i]
-        Max.PFJ.u[i] <- array.PFJ.u[Max.PFJ.ind, i]
-      } else {
-        Max.PFJ.lat[i] <- NA; Max.PFJ.u[i] <- NA;
-      }
-    }
-  } else {
-    Max.PFJ.lat <- list.PFJ.lat
-    Max.PFJ.u <- list.PFJ.u
   }
   
   ## Übergabe von Variablen
+  ## Positionen und Intensitäten des STJ und des PFJ
   list.model.jet <- list("PFJ.lat" = Max.PFJ.lat, "PFJ.u" = Max.PFJ.u,
                          "STJ.lat" = Max.STJ.lat, "STJ.u" = Max.STJ.u)
   return(list.model.jet)
-
 }
 
 
@@ -243,8 +220,8 @@ find.jet.dijkstra.2d <- function(u, v, lon, lat, jet, season) {
   # zur erfüllung der bedingung start = end wird der erste längengrad an den letzten kopiert
   u <- u[c(1:nlon,1),]; v <- v[c(1:nlon,1),]; len <- length(u);
   lon <- c(lon, lon[1] + 360); nlon <- length(lon);
-  mat.lat <- matrix(lat, nr = nlon, nc = nlat, byrow = TRUE)
-  mat.lon <- matrix(lon, nr = nlon, nc = nlat)
+  mat.lat <- matrix(lat, nrow = nlon, ncol = nlat, byrow = TRUE)
+  mat.lon <- matrix(lon, nrow = nlon, ncol = nlat)
   # aufbauen einer matrix zur definition der knotenpunkte und verbindenden kanten
   # erste spalte startknoten
   # zweite spalte zielknoten
