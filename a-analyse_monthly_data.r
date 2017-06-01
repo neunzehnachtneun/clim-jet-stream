@@ -395,35 +395,155 @@ for (i.stp in seq(from = 1, to = dim(data.jets.season)[1])) {
   #         data.jets.month$year <= data.jets.season[t.stp,]$Year +2 &
   #         data.jets.month$season == data.jets.season[t.stp,]$Season &
   #         data.jets.month$lon == data.jets.season[t.stp,]$Longitude)
-  data.jets.season[i.stp, 4:25] <- apply(X = data.jets.month[which(data.jets.month$year >= data.jets.season[i.stp,]$Year - 2 &
-                                                              data.jets.month$year <= data.jets.season[i.stp,]$Year + 2 &
-                                                              data.jets.month$season == data.jets.season[i.stp,]$Season &
-                                                              data.jets.month$lon == data.jets.season[i.stp,]$Longitude),6:27],
-                                  MARGIN = 2, FUN = mean, na.rm = TRUE)
+  data.jets.season[i.stp, 4:25] <- 
+    apply(X = data.jets.month[which(
+      data.jets.month$year >= data.jets.season[i.stp,]$Year - 2 &
+        data.jets.month$year <= data.jets.season[i.stp,]$Year + 2 &
+        data.jets.month$season == data.jets.season[i.stp,]$Season &
+        data.jets.month$lon == data.jets.season[i.stp,]$Longitude), 6:27],
+      MARGIN = 2, FUN = mean, na.rm = TRUE)
 }
 
-## VISUALISIERUNG DER HOVMÖLLER-DIAGRAMME ####
-## 
-
-## Konzentration auf zwei Methoden: m1c & m2
-# Positionen m1c
-ggplot(data = data.jets.season[which(data.jets.season$Season == "son"),],
+## VISUALISIERUNG DER HOVMÖLLER-DIAGRAMME ** PFJ ** DJF ####
+## POLARFRONT JETSTREAM
+## DECEMBER JANUARY FEBRUARY
+# Positionen Breitengrad Chebyshev
+ggplot(data = data.jets.season[which(data.jets.season$Season == "djf"),],
        mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m1c)) +
   geom_tile() + scale_fill_gsea()
-# Intensitäten m1c
-ggplot(data = data.jets.season[which(data.jets.season$Season == "son"),],
-       mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m1c)) +
-  geom_tile() + scale_fill_gsea()
-# Positionen m2
-ggplot(data = data.jets.season[which(data.jets.season$Season == "son"),],
+# Positionen Breitengrad Dijkstra
+ggplot(data = data.jets.season[which(data.jets.season$Season == "djf"),],
        mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2)) +
   geom_tile() + scale_fill_gsea()
-# Intesitäten m2
-ggplot(data = data.jets.season[which(data.jets.season$Season == "son"),],
+# Intensität Zonalwind Cheb
+ggplot(data = data.jets.season[which(data.jets.season$Season == "djf"),],
+       mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m1c)) +
+  geom_tile() + scale_fill_gsea()
+# Intensität Zonalwind Dijksta
+ggplot(data = data.jets.season[which(data.jets.season$Season == "djf"),],
        mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2)) +
   geom_tile() + scale_fill_gsea()
-ggplot(data = data.jets.season[which(data.jets.season$Season == "son"),],
+# Intensität Meridionalwind Dijkstra
+ggplot(data = data.jets.season[which(data.jets.season$Season == "djf"),],
        mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m2)) +
   geom_tile() + scale_fill_gsea()
+# Intensität Betrag Windstärke Dijkstra
+ggplot(data = data.jets.season[which(data.jets.season$Season == "djf"),],
+       mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2 * PFJ.v.m2)) +
+  geom_tile() + scale_fill_gsea()
+
+## HOVMÖLLER-DIAGRAMME ** PFJ ** MAM ####
+## POLARFRONT JETSTREAM
+## MARCH APRIL MAY
+
+# Positionen Breitengrad Chebyshev
+
+# Positionen Breitengrad Dijkstra
+
+# Intensität Zonalwind Cheb
+
+# Intensität Zonalwind Dijksta
+
+# Intensität Meridionalwind Dijkstra
+
+# Intensität Betrag Windstärke Dijkstra
+
+## HOVMÖLLER-DIAGRAMME ** PFJ ** JJA ####
+## POLARFRONT JETSTREAM
+## JUNE JULY AUGUST
+# Positionen Breitengrad Chebyshev
+
+# Positionen Breitengrad Dijkstra
+
+# Intensität Zonalwind Cheb
+
+# Intensität Zonalwind Dijksta
+
+# Intensität Meridionalwind Dijkstra
+
+# Intensität Betrag Windstärke Dijkstra
+
+## HOVMÖLLER-DIAGRAMME ** PFJ ** SON ####
+## POLARFRONT JETSTREAM
+## SEPTEMBER OCTOBER NOVEMBER
+# Positionen Breitengrad Chebyshev
+
+# Positionen Breitengrad Dijkstra
+
+# Intensität Zonalwind Cheb
+
+# Intensität Zonalwind Dijksta
+
+# Intensität Meridionalwind Dijkstra
+
+# Intensität Betrag Windstärke Dijkstra
+
+
+
+
+## HOVMÖLLER-DIAGRAMME ** STJ ** DJF ####
+## SUBTROPISCHER JETSTREAM
+## DECEMBER JANUARY FEBRUARY
+
+# Positionen Breitengrad Chebyshev
+
+# Positionen Breitengrad Dijkstra
+
+# Intensität Zonalwind Cheb
+
+# Intensität Zonalwind Dijksta
+
+# Intensität Meridionalwind Dijkstra
+
+# Intensität Betrag Windstärke Dijkstra
+
+## HOVMÖLLER-DIAGRAMME ** STJ ** MAM ####
+## SUBTROPISCHER JETSTREAM
+## MARCH APRIL MAY
+
+# Positionen Breitengrad Chebyshev
+
+# Positionen Breitengrad Dijkstra
+
+# Intensität Zonalwind Cheb
+
+# Intensität Zonalwind Dijksta
+
+# Intensität Meridionalwind Dijkstra
+
+# Intensität Betrag Windstärke Dijkstra
+
+## HOVMÖLLER-DIAGRAMME ** STJ ** JJA ####
+## SUBTROPISCHER JETSTREAM
+## JUNE JULY AUGUST
+# Positionen Breitengrad Chebyshev
+
+# Positionen Breitengrad Dijkstra
+
+# Intensität Zonalwind Cheb
+
+# Intensität Zonalwind Dijksta
+
+# Intensität Meridionalwind Dijkstra
+
+# Intensität Betrag Windstärke Dijkstra
+
+## HOVMÖLLER-DIAGRAMME ** STJ ** SON ####
+## SUBTROPISCHER JETSTREAM
+## SEPTEMBER OCTOBER NOVEMBER
+# Positionen Breitengrad Chebyshev
+
+# Positionen Breitengrad Dijkstra
+
+# Intensität Zonalwind Cheb
+
+# Intensität Zonalwind Dijksta
+
+# Intensität Meridionalwind Dijkstra
+
+# Intensität Betrag Windstärke Dijkstra
+
+
+
 
 ## ENDE ENDE ENDE ####
