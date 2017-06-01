@@ -170,7 +170,7 @@ find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, 
   for (i.lon in 1:length(axis.x)) {
     ## Subtropischer Jetstream | abr. STJ | [20,50]
     # mögliche positionen (können mehrere sein) innerhalb des sektors
-    STJ.pos.pos <- which(array.lat[,i.lon] > 20 & array.lat[,i.lon] < 50)
+    STJ.pos.pos <- which(array.lat[,i.lon] > 20 & array.lat[,i.lon] < 45)
     # position mit stärkstem zonalwind innerhalb des sektors
     # annahme: position d jets
     STJ.pos <- which.max(array.u[STJ.pos.pos, i.lon])
@@ -183,7 +183,7 @@ find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, 
     
     ## polarer jetstream | abr. PFJ | [50,85]
     # mögliche positionen
-    PFJ.pos.pos <-  which(array.lat[,i.lon] > 50 & array.lat[,i.lon] < 85)
+    PFJ.pos.pos <-  which(array.lat[,i.lon] > 45 & array.lat[,i.lon] < 85)
     # position mit stärkstem zonalwind
     PFJ.pos <- which.max(array.u[PFJ.pos.pos, i.lon])
     # abfrage, ob length() == 1
@@ -195,8 +195,8 @@ find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, 
   
   ## Übergabe von Variablen
   ## Positionen und Intensitäten des STJ und des PFJ
-  list.model.jet <- list("PFJ.lat" = Max.PFJ.lat, "PFJ.u" = Max.PFJ.u,
-                         "STJ.lat" = Max.STJ.lat, "STJ.u" = Max.STJ.u)
+  list.model.jet <- list("PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u,
+                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u)
   return(list.model.jet)
 }
 
