@@ -33,8 +33,38 @@ find.jet.maximum.2d <- function(matrix, axis) {
 }
 
 ## Methode 1a: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
-#library(parallel) # Paralleles Rechnen m Apply
-find.jets.chebpoly.2d <- function(matrix, axis, n.order = 8) {
+find.jets.chebpoly.all.2d <- function(matrix, axis, n.order = 8) {
+  
+  ####
+  ## VARIABLEN UND PARAMETER ####
+  ####
+  library(pckg.cheb) # Least Squares Fit u Nullstellen d Ableitung
+  
+  
+  ####
+  ## LEAST SQUARES FIT                   ####
+  ## CHEBYSHEV POLYNOME 8-TER ORDNUNG      #
+  ## AN ZONAL WIND IN MERIDIONALER RICHTUNG #
+  ####
+  ####
+  
+  list.max <- apply(matrix, 1, cheb.find.max, x.axis = lat, n = n.order)
+  list.max.len <- length(list.max)
+  
+  ## Maxima des Modells (Positionen und Werte)
+  model.max.lat <- sapply(list.max, "[[", 1)
+  model.max.u <- sapply(list.max, "[[", 2)
+  n.max.max <- max(sapply(model.max.lat, length))
+  model.max.lat <- sapply(model.max.lat, fun.fill, n = n.max.max)
+  model.max.u <- sapply(model.max.u, fun.fill, n = n.max.max)
+  
+  ## Übergabe von Variablen
+  list.model.jet <- list("all.max.lat" = model.max.lat, "all.max.u" = model.max.u)
+  return(list.model.jet)
+}
+
+## Methode 1b: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
+find.jets.chebpoly.max.2d <- function(matrix, axis, n.order = 8) {
   
   ####
   ## VARIABLEN UND PARAMETER ####
@@ -114,11 +144,11 @@ find.jets.chebpoly.2d <- function(matrix, axis, n.order = 8) {
   return(list.model.jet)
 }
 
-## Methode 1b: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
+## Methode 1c: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
 find.jets.chebpoly.fit.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 8) {
   
   ## Aufruf von find.jet.chebpoly.2d zum Auffinden der Jets
-  jets <- find.jets.chebpoly.2d(matrix = matrix.u, axis = axis.y, n.order = n.order)
+  jets <- find.jets.chebpoly.max.2d(matrix = matrix.u, axis = axis.y, n.order = n.order)
   PFJ.lat <- jets$PFJ.lat; PFJ.u   <- jets$PFJ.u
   STJ.lat <- jets$STJ.lat; STJ.u   <- jets$STJ.u
   
@@ -147,7 +177,7 @@ find.jets.chebpoly.fit.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.orde
   return(list.model.jet)
 }
 
-## Methode 1c: Zwei sektorielle Polynomfits in Meridionalrichtung, zur Unterscheidung von PFJ und STJ
+## Methode 1d: Zwei sektorielle Polynomfits in Meridionalrichtung, zur Unterscheidung von PFJ und STJ
 find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, n.order = 8) {
   ## least squares fit achter ordnung und maximalstellensuche 
   ## innerhalb unterschiedlicher breitengrad-grenzwerte für SPJ und PFJ
