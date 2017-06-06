@@ -54,7 +54,7 @@ find.jets.chebpoly.all.2d <- function(matrix, axis, n.order = 8) {
   ## Maxima des Modells (Positionen und Werte)
   model.max.lat <- sapply(list.max, "[[", 1)
   model.max.u <- sapply(list.max, "[[", 2)
-  n.max.max <- max(sapply(model.max.lat, length))
+  n.max.max <- ceiling(n.order/2) #max(sapply(model.max.lat, length))
   model.max.lat <- sapply(model.max.lat, fun.fill, n = n.max.max)
   model.max.u <- sapply(model.max.u, fun.fill, n = n.max.max)
   
