@@ -294,30 +294,98 @@ year.start <- 1960; year.end <- 2009; n.seas <- 4
 n.years <- year.end - year.start + 1
 # Definieren des Dataframes
 length.df <- n.years * n.seas * n.lon # Länge
-df.jets.season <- data.frame(rep(seq(year.start, year.end), each = n.seas * n.lon),
-                             rep(c('djf','mam','jja','son'), each = n.lon),
-                             rep(lon),
-                             NA, NA, NA, NA, NA, NA, NA, NA, 
-                             NA, NA, NA, NA, NA, NA, NA, NA, 
-                             NA, NA, NA, NA, NA, NA, NA, NA, 
-                             NA, NA, NA, NA, NA, NA, NA, NA)
+df.jets.season <- 
+  data.frame(rep(seq(year.start, year.end), each = n.seas * n.lon),
+             rep(c('djf','mam','jja','son'), each = n.lon),
+             rep(lon),
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA)
 colnames(df.jets.season) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:37])
-
 # Schleife über alle Jahre, Jahreszeiten und Längengradabschnitte
 for (i.stp in seq(from = 1, to = dim(df.jets.season)[1])) {
-  # print(i.stp)
-  # which(df.jets.month$year >= df.jets.season[t.stp,]$Year - 2 &
-  #         df.jets.month$year <= df.jets.season[t.stp,]$Year +2 &
-  #         df.jets.month$season == df.jets.season[t.stp,]$Season &
-  #         df.jets.month$lon == df.jets.season[t.stp,]$Longitude)
-  df.jets.season[i.stp, 4:25] <- 
+  df.jets.season[i.stp, 4:35] <- 
     apply(X = df.jets.month[which(
       df.jets.month$year >= df.jets.season[i.stp,]$Year - 2 &
         df.jets.month$year <= df.jets.season[i.stp,]$Year + 2 &
         df.jets.month$season == df.jets.season[i.stp,]$Season &
-        df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:27],
+        df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:37],
       MARGIN = 2, FUN = mean, na.rm = TRUE)
 }
+
+## SAISONALES MITTEL ÜBER ALLE JAHRE ####
+## 
+
+df.jets.season.mean <- 
+  data.frame(rep(c('djf','mam','jja','son'), each = n.lon),
+             rep(lon),
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season.mean) <- c('Season', 'Longitude', colnames(df.jets.month)[6:37])
+
+for (i.stp in seq(from = 1, to = dim(df.jets.season.mean)[1])) {
+  # print(i.stp)
+  df.jets.season.mean[i.stp, 3:34] <- 
+    apply(X = df.jets.month[which(
+        df.jets.month$season == df.jets.season.mean[i.stp,]$Season &
+        df.jets.month$lon == df.jets.season.mean[i.stp,]$Longitude), 6:37],
+      MARGIN = 2, FUN = mean, na.rm = TRUE)
+}
+
+## SAISONALES GLEITENDES MITTEL ABZGL DES ZEITLICHEN MITTELS ####
+## 
+
+df.jets.season.rel <-
+  data.frame(rep(seq(year.start, year.end), each = n.seas * n.lon),
+             rep(c('djf','mam','jja','son'), each = n.lon),
+             rep(lon),
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season.rel) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:37])
+for (i.stp in 1:length(unique(df.jets.season$Year))) {
+  y.stp <- unique(df.jets.season$Year)[i.stp]
+  df.jets.season.rel[which(df.jets.season.rel$Year == y.stp), 4:35] <-
+    df.jets.season[which(df.jets.season$Year == y.stp), 4:35] - df.jets.season.mean[,3:34]
+}
+
+## ZEITLICHE MITTEL DER JET-POSITIONEN ####
+##
+
+## Zeitliches Mitteln für jeden Meridionalschritt
+# Definieren des Dataframes
+length.df <- n.lon # Länge
+df.jets.tim.mean <- data.frame(rep(lon),
+                             NA, NA, NA, NA, NA, NA, NA, NA, 
+                             NA, NA, NA, NA, NA, NA, NA, NA, 
+                             NA, NA, NA, NA, NA, NA, NA, NA, 
+                             NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season) <- c('Longitude', colnames(df.jets.month)[6:37])
+# Schleife über alle Zeitschritte
+for (i.stp in seq(from = 1, to = dim(df.jets.tim.mean)[1])) {
+  # print(i.stp)
+  df.jets.tim.mean[i.stp, 2:33] <- 
+    apply(X = df.jets.month[which(
+      df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:37],
+      MARGIN = 2, FUN = mean, na.rm = TRUE)
+}
+
+
+## Zeitliches und meridionales Mitteln
+# Definieren des Dataframes
+df.jets.tim.mer.mean <- 
+  data.frame(NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA, 
+             NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.tim.mer.mean) <- colnames(df.jets.month)[6:37]
+# Mitteln der Jet-Positionen und -Geschwindigkeiten
+df.jets.tim.mer.mean <- apply(X = df.jets.month[, 6:37],
+                      MARGIN = 2, FUN = mean, na.rm = TRUE)
 
 
 ## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
@@ -331,7 +399,7 @@ ls()
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
 
-## VISUALISIEREN DER DATEN MIT GGPLOT2() ####
+## VISUALISIERUNG GGPLOT2() ####
 ##
 ## Nötige Pakete
 library(ggplot2) # Grundpaket
@@ -393,7 +461,7 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
     ggtitle("Zonales Windfeld und Position aller gefundenen Chebyshev-Maxima", 
             subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
     coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
-  
+
   
   # Plot des zonalen Windfeldes und der Position des maximalen Jets sowie des maximalen Chebyshev-Jets
   ggp.nh.m0.m1b <-
@@ -416,7 +484,7 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
             subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
     coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
   
-  # Plot des zonalen Windfeldes und der zwei stärksten Chebyshev-Maxima
+  # Plot des zonalen Windfeldes und der zwei stärksten Chebyshev-Maxima im Bereich [20,85]
   ggp.nh.m1c <-
     ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
            mapping = aes(x = lon, y = lat, fill = u)) +
@@ -437,49 +505,48 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
             subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
     coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
   
-  # Plot des zonalen Windfeldes und dem Fit durch die zwei stärksten Chebyshev-Maxima
-  ggp.nh.m1d <-
-    ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
-           mapping = aes(x = lon, y = lat, fill = u)) +
-    geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-    geom_point(mapping = aes(x = lon , y = PFJ.lat.m1d, fill = NULL),
-               data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-               shape = 24, fill = "black", size = 1) +
-    geom_point(mapping = aes(x = lon , y = STJ.lat.m1d, fill = NULL),
-               data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-               shape = 25, fill = "black", size = 1) +
-    scale_x_continuous(name = "Längengrad",
-                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-    scale_y_continuous(name = "Breitengrad",
-                       breaks = c(0, 30, 60, 90)) +
-    geom_polygon(mapping = aes(x = long, y = lat, group = group),
-                 data = map_nh, fill = "gray50", alpha = 0.35) +
-    ggtitle("Zonales Windfeld und Position des Fits an die zwei stärksten Chebyshev-Maxima", 
-            subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
-    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
+  # # Plot des zonalen Windfeldes und dem Fit durch die zwei stärksten Chebyshev-Maxima
+  # ggp.nh.m1d <-
+  #   ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
+  #          mapping = aes(x = lon, y = lat, fill = u)) +
+  #   geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
+  #   geom_point(mapping = aes(x = lon , y = PFJ.lat.m1d, fill = NULL),
+  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
+  #              shape = 24, fill = "black", size = 1) +
+  #   geom_point(mapping = aes(x = lon , y = STJ.lat.m1d, fill = NULL),
+  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
+  #              shape = 25, fill = "black", size = 1) +
+  #   scale_x_continuous(name = "Längengrad",
+  #                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+  #   scale_y_continuous(name = "Breitengrad",
+  #                      breaks = c(0, 30, 60, 90)) +
+  #   geom_polygon(mapping = aes(x = long, y = lat, group = group),
+  #                data = map_nh, fill = "gray50", alpha = 0.35) +
+  #   ggtitle("Zonales Windfeld und Position des Fits an die zwei stärksten Chebyshev-Maxima", 
+  #           subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
+  #   coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
   
-  # Plot des zonalen Windfeldes und der zwei gefundenen sektoriellen Chebyshev-Maxima
-  ggp.nh.m1e <-
-    ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
-           mapping = aes(x = lon, y = lat, fill = u)) +
-    geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-    geom_point(mapping = aes(x = lon , y = PFJ.lat.m1e, fill = NULL),
-               data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-               shape = 24, fill = "black", size = 1) +
-    geom_point(mapping = aes(x = lon , y = STJ.lat.m1e, fill = NULL),
-               data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-               shape = 25, fill = "black", size = 1) +
-    geom_hline(yintercept = c(20, 45, 85)) +
-    scale_x_continuous(name = "Längengrad",
-                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-    scale_y_continuous(name = "Breitengrad",
-                       breaks = c(0, 30, 60, 90)) +
-    geom_polygon(mapping = aes(x = long, y = lat, group = group),
-                 data = map_nh, fill = "gray50", alpha = 0.35) +
-    ggtitle("Zonales Windfeld und Position der lokalen Chebyshev-Maxima in [20,45] und [45,85]", 
-            subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
-    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
-  
+  # # Plot des zonalen Windfeldes und der zwei gefundenen sektoriellen Chebyshev-Maxima
+  # ggp.nh.m1e <-
+  #   ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
+  #          mapping = aes(x = lon, y = lat, fill = u)) +
+  #   geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
+  #   geom_point(mapping = aes(x = lon , y = PFJ.lat.m1e, fill = NULL),
+  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
+  #              shape = 24, fill = "black", size = 1) +
+  #   geom_point(mapping = aes(x = lon , y = STJ.lat.m1e, fill = NULL),
+  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
+  #              shape = 25, fill = "black", size = 1) +
+  #   geom_hline(yintercept = c(20, 45, 85)) +
+  #   scale_x_continuous(name = "Längengrad",
+  #                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+  #   scale_y_continuous(name = "Breitengrad",
+  #                      breaks = c(0, 30, 60, 90)) +
+  #   geom_polygon(mapping = aes(x = long, y = lat, group = group),
+  #                data = map_nh, fill = "gray50", alpha = 0.35) +
+  #   ggtitle("Zonales Windfeld und Position der lokalen Chebyshev-Maxima in [20,45] und [45,85]", 
+  #           subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
+  #   coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
   
   # Plot des Betrags des horizontalen Windfeldes und Dijkstra-Jets
   ggp.nh.m2 <-
@@ -512,12 +579,6 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
          dpi = 600, width = 297, height = 210, units = "mm")
   ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1c.pdf"),
          plot = ggp.nh.m1c, device = pdf, path = "05-visu-pdf/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1d.pdf"),
-         plot = ggp.nh.m1d, device = pdf, path = "05-visu-pdf/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1e.pdf"),
-         plot = ggp.nh.m1e, device = pdf, path = "05-visu-pdf/", 
          dpi = 600, width = 297, height = 210, units = "mm")
   ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2.pdf"),
          plot = ggp.nh.m2, device = pdf, path = "05-visu-pdf/", 
