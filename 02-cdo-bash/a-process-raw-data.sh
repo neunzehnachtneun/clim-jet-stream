@@ -32,29 +32,29 @@ cd ../03-raw-full/
 # cdo -daymean -remapbil,t63grid a-1957-2016-e4ei-1deg.nc b-1957-2016-e4ei-t63-daymean.nc
 
 # select parameters u,v, select grid northern hemisphere, and invert latitude  
-cdo -invertlat -sellonlatbox,0,360,90,0 -selparam,-5,-6 b-1957-2016-e4ei-t63-daymean.nc c-1957-2016-e4ei-t63-daymean-uv-nh.nc
+cdo -invertlat -sellonlatbox,0,360,90,0 -selparam,-1,-5,-6 b-1957-2016-e4ei-t63-daymean.nc c-1957-2016-e4ei-t63-daymean-zuv-nh.nc
 
 # change wd to root-directory				####
 cd ../
 
 # calculate fields of mean and sd
-cdo -timmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc a-1957-2016-e4ei-t63-uv-nh-timmean.nc
-cdo -timstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc a-1957-2016-e4ei-t63-uv-nh-timsd.nc
+# cdo -timmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc a-1957-2016-e4ei-t63-uv-nh-timmean.nc
+# cdo -timstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc a-1957-2016-e4ei-t63-uv-nh-timsd.nc
 
 # monthly means
-cdo -monmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-monmean.nc
-cdo -ymonmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-ymonmean.nc
-cdo -monstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-monsd.nc
-cdo -ymonstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-ymonsd.nc
+cdo -monmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-zuv-nh.nc b-1957-2016-e4ei-t63-zuv-nh-monmean.nc
+# cdo -ymonmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-ymonmean.nc
+# cdo -monstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-monsd.nc
+# cdo -ymonstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc b-1957-2016-e4ei-t63-uv-nh-ymonsd.nc
 
 # seasonal means
-cdo -seasmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-seasmean.nc
-cdo -yseasmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-yseasmean.nc
-cdo -seasstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-seassd.nc
-cdo -yseasstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-yseassd.nc
+# cdo -seasmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-seasmean.nc
+# cdo -yseasmean 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-yseasmean.nc
+# cdo -seasstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-seassd.nc
+# cdo -yseasstd 03-raw-full/c-1957-2016-e4ei-t63-daymean-uv-nh.nc c-1957-2016-e4ei-t63-uv-nh-yseassd.nc
 
 # seasonal running means
-cdo -b F32 -mergetime -runmean,2 -selseason,DJF c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,MAM c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,JJA c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,SON c-1957-2016-e4ei-t63-uv-nh-seasmean.nc d-1957-2016-e4ei-t63-uv-nh-seasmean-runmean.nc
+# cdo -b F32 -mergetime -runmean,2 -selseason,DJF c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,MAM c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,JJA c-1957-2016-e4ei-t63-uv-nh-seasmean.nc -runmean,2 -selseason,SON c-1957-2016-e4ei-t63-uv-nh-seasmean.nc d-1957-2016-e4ei-t63-uv-nh-seasmean-runmean.nc
 
 
 ## Orographie-Datenei-invariant.nc
