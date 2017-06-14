@@ -59,13 +59,15 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 
   # MaxJ.ind <- apply(array.u, 2, which.max)
   MaxJ.lat <- rep(NA, nrow(matrix.u)); MaxJ.u <- rep(NA, nrow(matrix.u)); 
   for (i in seq_along(axis.x)) {
-    print(i)
+    # Index des Maximum im Raum der Maxima
     MaxJ.ind <- which.max(array.u[,i])
+    # Index des Maximum im Raum der Längengrade # Nearest Neighbor Search
+    MaxJ.ind.grd <- which.min(sqrt((array.lat[MaxJ.ind, i] - axis.y)**2))
     if (length(MaxJ.ind) >= 1) {
       MaxJ.lat[i] <- array.lat[MaxJ.ind, i]
-      MaxJ.u[i] <- array.u[MaxJ.ind, i]
-    } else {
-      MaxJ.lat[i] <- NA; MaxJ.u[i] <- NA;
+    }
+    if (length(MaxJ.ind.grd) >= 1) {
+      MaxJ.u[i] <- matrix.u[i, MaxJ.ind.grd]
     }
   }
   
@@ -78,32 +80,51 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 
   
   ## Filterung der zwei stärksten Maxima
   model.maxs <- apply(array.u.sect, 2, diff.max)
-  # Positionen als Indizes
-  model.maxs.ind <- sapply(model.maxs, "[[", 1) 
-  # Umrechnung von Indizes zu Breitengraden
-  model.maxs.lat <- matrix(NA, nrow(matrix.u), ncol = 2)
+  # Positionen als Indizes im Raum der Maxima
+  model.maxs.ind <- sapply(model.maxs, "[[", 1)
+  
+  ## Umrechnung von Indizes zu Breitengraden, Zonalwind- und Meridionalwindstärke
+  model.maxs.lat <- matrix(NA, nrow = nrow(model.maxs.ind), ncol = n.axis.x)
+  model.maxs.ind.grd <- matrix(NA, nrow(model.maxs.ind), n.axis.x)
+  model.maxs.u <- matrix(NA, nrow(model.maxs.ind), n.axis.x)
+  model.maxs.v <- matrix(NA, nrow(model.maxs.ind), n.axis.x)
+  
+  # Umrechnen von Indizes in Breitengrade
   for (i in seq_along(axis.x)) {
-    #print(model.max.lat[model.max.2.ind[,i],i])
-    model.maxs.lat[i,] <- array.lat[model.maxs.ind[,i],i]
+    model.maxs.lat[,i] <- array.lat.sect[model.maxs.ind[,i],i]
   }
+  # Nächster Breitengrad-Gitterpunkt # nearest neighbor search
+  for (i in seq(from = 1, to = length(model.maxs.ind))) {
+    if (!is.na(model.maxs.ind[i])) {
+      model.maxs.ind.grd[i] <- which.min(sqrt((model.maxs.lat[i] - axis.y)**2))
+    }
+  }
+  # Abgreifen der dortigen Zonalwind- und Meridionalwind-Geschwindigkeiten
+  for (i in seq_along(axis.x)) {
+    #print(model.maxs.ind.grd[,i])
+    model.maxs.u[,i] <- matrix.u[i,model.maxs.ind.grd[,i]]
+    model.maxs.v[,i] <- matrix.v[i,model.maxs.ind.grd[,i]]
+  }
+  
   # Werte der Maxima (U-Wind)
-  model.maxs.u <- sapply(model.maxs, "[[", 2) 
+  # model.maxs.u <- sapply(model.maxs, "[[", 2) 
   
   ## Annahme: PFJ nördliches Maximum, STJ südliches Maximum
-  PFJ.lat <- rep(NA, n.axis.x); PFJ.u <- PFJ.lat;
-  STJ.lat <- rep(NA, n.axis.x); STJ.u <- STJ.lat;
-  for (i in 1:192) {
+  PFJ.lat <- rep(NA, n.axis.x); PFJ.u <- PFJ.lat; PFJ.v <- PFJ.lat;
+  STJ.lat <- rep(NA, n.axis.x); STJ.u <- STJ.lat; STJ.v <- STJ.lat;
+  for (i in seq_along(axis.x)) {
     #print(i)
-    PFJ.ind <- which.max(model.maxs.lat[i,])
-    STJ.ind <- which.min(model.maxs.lat[i,])
+    PFJ.ind <- which.max(model.maxs.lat[,i])
+    STJ.ind <- which.min(model.maxs.lat[,i])
     if (length(PFJ.ind) >= 1 | length(STJ.ind) >= 1) {
-      PFJ.lat[i] <- model.maxs.lat[i,PFJ.ind]
-      STJ.lat[i] <- model.maxs.lat[i,STJ.ind]
+      # Polarfrontjet
+      PFJ.lat[i] <- model.maxs.lat[PFJ.ind,i]
       PFJ.u[i] <- model.maxs.u[PFJ.ind,i]
+      PFJ.v[i] <- model.maxs.v[PFJ.ind,i]
+      # Subtropenjet
+      STJ.lat[i] <- model.maxs.lat[STJ.ind,i]
       STJ.u[i] <- model.maxs.u[STJ.ind,i]
-    } else {
-      PFJ.lat[i] <- NA; STJ.lat[i] <- NA;
-      PFJ.u[i] <- NA; STJ.u[i] <- NA
+      STJ.v[i] <- model.maxs.v[STJ.ind,i]
     }
     PFJ.ind <- NA; STJ.ind <- NA;
   }
@@ -111,8 +132,8 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 
   ## Übergabe der Variablen
   list.model.jet <- list("all.max.lat" = array.lat, "all.max.u" = array.u,
                          "MaxJ.lat" = MaxJ.lat, "MaxJ.u" = MaxJ.u,
-                         "PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u,
-                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u)
+                         "PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u, "PFJ.v" = PFJ.v,
+                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u, "STJ.v" = STJ.v)
   return(list.model.jet)
 }
 
