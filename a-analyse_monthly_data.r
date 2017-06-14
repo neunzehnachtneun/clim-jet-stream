@@ -8,7 +8,7 @@
 ## 
 setwd("~/01-Master-Thesis/02-code-git/")
 # getwd()
-n.cluster <- 12
+n.cluster <- 16
 
 ## EINLESEN DER DATEN ####
 ##
@@ -77,7 +77,7 @@ source("d-jetstream_detection_schemes.r")
 source("f-help-functions.r")
 
 
-## SCHLEIFE ÜBER DRUCK LEVEL ####
+## SETZEN DES ZU UNTERSUCHENDEN DRUCK LEVELS ####
 ##
 # for (p.lvl in 3:6) {
 #   print(lev[p.lvl])
@@ -89,57 +89,37 @@ t.stp <- 1; #
 print(paste(dts.month[t.stp], dts.year[t.stp]))
 
 
-## METHODE 0: find.jet.maximum.2d ####
+## METHODE 1: find.jet.maximum.2d ####
 ## 
 library(parallel)
 cl.fork.1 <- makeCluster(n.cluster, type = "FORK")
 # find.jet.maximum.2d(matrix = u[,,p.lvl, t.stp], axis = lat)
-m0 <- parApply(cl.fork.1, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jet.maximum.2d, axis = lat)
-stopCluster(cl.fork.1)
+m1 <- parApply(cl.fork.1, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jet.maximum.2d, axis = lat)
+stopCluster(cl.fork.1); rm(cl.fork.1)
 
-## METHODE 1a: find.jet.chebpoly.all.2d ####
-## 
-cl.fork.2 <- makeCluster(n.cluster, type = "FORK")
-m1a <- parApply(cl.fork.2, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jets.chebpoly.all.2d, axis = lat)
-stopCluster(cl.fork.2)
 
-## METHODE 1bc: find.jet.chebpoly.max.2d ####
-##
-cl.fork.3 <- makeCluster(n.cluster, type = "FORK")
-m1bc <- parApply(cl.fork.3, X = u[,,p.lvl,], MARGIN = 3, FUN = find.jets.chebpoly.max.2d, axis = lat)
-stopCluster(cl.fork.3)
-
-## METHODE 1d: find.jet.chebpoly.fit.2d ####
+## METHODE 2: find.jet.chebpoly.fit.2d ####
 ##
 library(foreach); library(doParallel)
-cl.fork.4 <- makeCluster(n.cluster, type = "FORK")
-registerDoParallel(cl.fork.4)
-m1d <- foreach(t.stp = 1:length(dts)) %dopar% {
-  find.jets.chebpoly.fit.2d(matrix.u = u[,,p.lvl,t.stp], 
-                            matrix.v = v[,,p.lvl,t.stp],
-                            axis.x = lon, axis.y = lat)}
-stopCluster(cl.fork.4)
+cl.fork.2 <- makeCluster(n.cluster, type = "FORK")
+registerDoParallel(cl.fork.2)
+m2 <- foreach(t.stp = 1:length(dts)) %dopar% {
+  find.jets.chebpoly.2d(matrix.u = u[,,p.lvl,t.stp], 
+                        matrix.v = v[,,p.lvl,t.stp],
+                        axis.x = lon, axis.y = lat)}
+stopCluster(cl.fork.2); rm(cl.fork.2)
 
 
-## METHODE 1e: find.jets.chebpoly.sect.2d ####
-## 
-cl.fork.5 <- makeCluster(n.cluster, type = "FORK")
-registerDoParallel(cl.fork.5)
-m1e <- foreach(t.stp = 1:length(dts)) %dopar% {
-  find.jets.chebpoly.sect.2d(matrix.u = u[,,p.lvl,t.stp],
-                             axis.x = lon, axis.y = lat)}
-stopCluster(cl.fork.5)
-
-## METHODE 2: find.jet.dijkstra.2d ####
+## METHODE 3: find.jet.dijkstra.2d ####
 ## 
 cl.psock.1 <- makeCluster(n.cluster, type = "PSOCK")
 registerDoParallel(cl.psock.1)
-m2 <- foreach(t.stp = 1:length(dts), .packages = "igraph") %dopar% {
+m3 <- foreach(t.stp = 1:length(dts), .packages = "igraph") %dopar% {
   find.jets.dijkstra.2d(u = u[,, p.lvl, t.stp], 
                         v = v[,, p.lvl, t.stp], 
                         lon = lon, lat = lat, 
                         season = dts.cld.wrm[t.stp]) }
-stopCluster(cl.psock.1)
+stopCluster(cl.psock.1); rm(cl.psock.1)
 
 
 ## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
