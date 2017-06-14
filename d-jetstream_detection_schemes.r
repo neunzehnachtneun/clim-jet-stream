@@ -12,7 +12,7 @@ library(rootSolve)
 library(igraph)
 
 
-## Methode 0: Maximum des Zonalwinds in Meridionalrichtung 
+## Methode 1: Maximum des Zonalwinds in Meridionalrichtung 
 find.jet.maximum.2d <- function(matrix, axis) {
   
   ## SUCHE DES MAXIMAS MITTELS APPLY
@@ -32,7 +32,92 @@ find.jet.maximum.2d <- function(matrix, axis) {
   
 }
 
-## Methode 1a: Polynomfit des Zonalwinds in Meridionalrichtung, alle Maxima
+## Methode 2: Polynomfit des Zonalwinds in Merdionalrichtung im Sektor [20,85]
+## Übergebene Variablen: Alle gefundenen Maxima, globales Maximum, zwei lokale Maxima in Sektor
+find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 8) {
+  # Laden nötiger Pakete
+  library(pckg.cheb)
+  
+  # Dimensionen der Matrix
+  n.axis.x <- length(axis.x)
+  n.axis.y <- length(axis.y)
+  
+  # Least-Squares-Fit mit Chebyshev-Polynomen an Zonalwind für jeden Meridian
+  # Übergabe der Maxima
+  list.max <- apply(matrix.u, 1, cheb.find.max, x.axis = axis.y, n = n.order)
+  list.max.len <- length(list.max) ###
+  
+  # Längengrad und Zonalwind der gefundenen Maxima
+  list.lat <- sapply(list.max, "[[", 1)
+  list.u <- sapply(list.max, "[[", 2)
+  ## Transformieren der Liste in Array, Auffüllen mit NAs.
+  n.max.max <- ceiling(n.order/2)
+  array.lat <- sapply(list.lat, fun.fill, n = n.max.max)
+  array.u <- sapply(list.u, fun.fill, n = n.max.max)
+  
+  # Position und Zonalwind des globalen Maximums
+  # MaxJ.ind <- apply(array.u, 2, which.max)
+  MaxJ.lat <- rep(NA, nrow(matrix.u)); MaxJ.u <- rep(NA, nrow(matrix.u)); 
+  for (i in seq_along(axis.x)) {
+    print(i)
+    MaxJ.ind <- which.max(array.u[,i])
+    if (length(MaxJ.ind) >= 1) {
+      MaxJ.lat[i] <- array.lat[MaxJ.ind, i]
+      MaxJ.u[i] <- array.u[MaxJ.ind, i]
+    } else {
+      MaxJ.lat[i] <- NA; MaxJ.u[i] <- NA;
+    }
+  }
+  
+  ## Herausfiltern der Positionen innerhalb des Sektors [20, 85]
+  sect.ind <- which(array.lat > 20 & array.lat < 85, arr.ind = TRUE)
+  array.lat.sect <- matrix(NA, nrow = n.max.max, ncol = list.max.len)
+  array.lat.sect[sect.ind] <- array.lat[sect.ind]
+  array.u.sect <- matrix(NA, nrow = n.max.max, ncol = list.max.len)
+  array.u.sect[sect.ind] <- array.u[sect.ind]
+  
+  ## Filterung der zwei stärksten Maxima
+  model.maxs <- apply(array.u.sect, 2, diff.max)
+  # Positionen als Indizes
+  model.maxs.ind <- sapply(model.maxs, "[[", 1) 
+  # Umrechnung von Indizes zu Breitengraden
+  model.maxs.lat <- matrix(NA, nrow(matrix.u), ncol = 2)
+  for (i in seq_along(axis.x)) {
+    #print(model.max.lat[model.max.2.ind[,i],i])
+    model.maxs.lat[i,] <- array.lat[model.maxs.ind[,i],i]
+  }
+  # Werte der Maxima (U-Wind)
+  model.maxs.u <- sapply(model.maxs, "[[", 2) 
+  
+  ## Annahme: PFJ nördliches Maximum, STJ südliches Maximum
+  PFJ.lat <- rep(NA, n.axis.x); PFJ.u <- PFJ.lat;
+  STJ.lat <- rep(NA, n.axis.x); STJ.u <- STJ.lat;
+  for (i in 1:192) {
+    #print(i)
+    PFJ.ind <- which.max(model.maxs.lat[i,])
+    STJ.ind <- which.min(model.maxs.lat[i,])
+    if (length(PFJ.ind) >= 1 | length(STJ.ind) >= 1) {
+      PFJ.lat[i] <- model.maxs.lat[i,PFJ.ind]
+      STJ.lat[i] <- model.maxs.lat[i,STJ.ind]
+      PFJ.u[i] <- model.maxs.u[PFJ.ind,i]
+      STJ.u[i] <- model.maxs.u[STJ.ind,i]
+    } else {
+      PFJ.lat[i] <- NA; STJ.lat[i] <- NA;
+      PFJ.u[i] <- NA; STJ.u[i] <- NA
+    }
+    PFJ.ind <- NA; STJ.ind <- NA;
+  }
+  
+  ## Übergabe der Variablen
+  list.model.jet <- list("all.max.lat" = array.lat, "all.max.u" = array.u,
+                         "MaxJ.lat" = MaxJ.lat, "MaxJ.u" = MaxJ.u,
+                         "PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u,
+                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u)
+  return(list.model.jet)
+}
+
+
+## Methode 2a: Polynomfit des Zonalwinds in Meridionalrichtung, alle Maxima
 find.jets.chebpoly.all.2d <- function(matrix, axis, n.order = 8) {
   
   ####
@@ -63,7 +148,7 @@ find.jets.chebpoly.all.2d <- function(matrix, axis, n.order = 8) {
   return(list.model.jet)
 }
 
-## Methode 1b: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
+## Methode 2b: Polynomfit des Zonalwinds in Meridionalrichtung, zwei stärkste Maxima als PFJ und STJ
 find.jets.chebpoly.max.2d <- function(matrix.u, axis.y, n.order = 8) {
   
   ####
@@ -141,7 +226,7 @@ find.jets.chebpoly.max.2d <- function(matrix.u, axis.y, n.order = 8) {
   return(list.model.jet)
 }
 
-## Methode 1c: Polynomfit des Zonalwinds in Meridionalrichtung, Fit durch zwei stärkste Maxima als PFJ und STJ
+## Methode 2c: Polynomfit des Zonalwinds in Meridionalrichtung, Fit durch zwei stärkste Maxima als PFJ und STJ
 find.jets.chebpoly.fit.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 8) {
   
   ## Aufruf von find.jet.chebpoly.2d zum Auffinden der Jets
@@ -174,7 +259,7 @@ find.jets.chebpoly.fit.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.orde
   return(list.model.jet)
 }
 
-## Methode 1d: Zwei sektorielle Polynomfits in Meridionalrichtung, zur Unterscheidung von PFJ und STJ
+## Methode 2d: Zwei sektorielle Polynomfits in Meridionalrichtung, zur Unterscheidung von PFJ und STJ
 find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, n.order = 8) {
   ## least squares fit achter ordnung und maximalstellensuche 
   ## innerhalb unterschiedlicher breitengrad-grenzwerte für SPJ und PFJ
@@ -228,7 +313,7 @@ find.jets.chebpoly.sect.2d <- function(matrix.u, matrix.v = NA, axis.x, axis.y, 
 }
 
 
-## Methode2: Kürzester Pfad mittels Dijkstra-Algorithmus. Nach Molnos/PIK.
+## Methode 3: Kürzester Pfad mittels Dijkstra-Algorithmus. Nach Molnos/PIK.
 find.jet.dijkstra.2d <- function(u, v, lon, lat, jet, season) {
   # Anpassen der Wichtungen
   if (jet == "STJ" & season == "cold") {
