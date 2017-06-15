@@ -153,13 +153,13 @@ m2c.PFJ.z   <- sapply(m2, "[[", "PFJ.z")
 
 ## Dijkstra-Methodik M3
 # m3.STJ.lon  <- sapply(m2, "[[", "STJ.lon")    # Subtropenjet
-m3.STJ.lat  <- sapply(m2, "[[", "STJ.lat")
-m3.STJ.u    <- sapply(m2, "[[", "STJ.u")
-m3.STJ.v    <- sapply(m2, "[[", "STJ.v")
+m3.STJ.lat  <- sapply(m3, "[[", "STJ.lat")
+m3.STJ.u    <- sapply(m3, "[[", "STJ.u")
+m3.STJ.v    <- sapply(m3, "[[", "STJ.v")
 # m3.PFJ.lon  <- sapply(m2, "[[", "PFJ.lon")    # Polarfrontjet
-m3.PFJ.lat  <- sapply(m2, "[[", "PFJ.lat")
-m3.PFJ.u    <- sapply(m2, "[[", "PFJ.u")
-m3.PFJ.v    <- sapply(m2, "[[", "PFJ.v")
+m3.PFJ.lat  <- sapply(m3, "[[", "PFJ.lat")
+m3.PFJ.u    <- sapply(m3, "[[", "PFJ.u")
+m3.PFJ.v    <- sapply(m3, "[[", "PFJ.v")
 
 
 ## MELTEN DES DATENSATZES (RESHAPE2::MELT) FÜR GGPLOT2 ####
@@ -218,20 +218,6 @@ df.uv <- melt(u[,,p.lvl,], varnames = c("lon", "lat", "t.stp"), value.name = "u"
 df.uv$v <- melt(data = v[,,p.lvl,])$value
 df.uv$uv <- sqrt( df.uv$u ** 2 + df.uv$v ** 2 )
 df.uv$z <- melt(data = z[,,p.lvl,])$value
-
-
-## Löschen überflüssiger Variablen
-rm(u, v, m0, m1a, m1bc, m1d, m1e, m2, 
-   m0.J.lat, m0.J.u, 
-   m1a.J.lat, m1a.J.u, 
-   m1b.J.lat, m1b.J.u,
-   m1c.STJ.lat, m1c.STJ.u, m1c.PFJ.lat, m1c.PFJ.u,
-   m1d.STJ.lat, m1d.STJ.u, m1d.STJ.v,
-   m1d.PFJ.lat, m1d.PFJ.u, m1d.PFJ.v,
-   m1e.STJ.lat, m1e.STJ.u, m1e.PFJ.lat, m1e.PFJ.u,
-   m2.STJ.lon, m2.STJ.lat, m2.STJ.u, m2.STJ.v, 
-   m2.PFJ.lon, m2.PFJ.lat, m2.PFJ.u, m2.PFJ.v,
-   cl.fork.1, cl.fork.2, cl.fork.3, cl.fork.4, cl.fork.5, cl.psock.1)
 
 
 ## SAISONALES GLEITENDES MITTEL ÜBER FÜNF JAHRE ####
@@ -333,7 +319,7 @@ df.jets.tim.mer.mean <- apply(X = df.jets.month[, 6:25],
 ## 
 
 # ls()
-rm(date.help, diff.max, dts, dts.cld.wrm, dts.month, dts.season, dts.year, find.jet.dijkstra.2d, find.jet.maximum.2d, find.jets.chebpoly.2d, find.jets.dijkstra.2d, fun.fill, len.na, length.df, lon.hlp,  m1, m1.J.lat, m1.J.u, m2, m2a.J.lat, m2a.J.u, m2b.J.lat, m2b.J.u, m2c.PFJ.lat, m2c.PFJ.u, m2c.PFJ.v, m2c.PFJ.z, m2c.STJ.lat, m2c.STJ.u, m2c.STJ.v, m2c.STJ.z, m3, m3.PFJ.lat, m3.PFJ.u , m3.PFJ.v, m3.STJ.lat, m3.STJ.u, m3.STJ.v,n.cluster,norm.vec, u, v, y.stp, t.stp, year.end, year.start, z)
+rm(date.help, diff.max, find.jet.dijkstra.2d, find.jet.maximum.2d, find.jets.chebpoly.2d, find.jets.dijkstra.2d, fun.fill, len.na, length.df, lon.hlp,  m1, m1.J.lat, m1.J.u, m2, m2a.J.lat, m2a.J.u, m2b.J.lat, m2b.J.u, m2c.PFJ.lat, m2c.PFJ.u, m2c.PFJ.v, m2c.PFJ.z, m2c.STJ.lat, m2c.STJ.u, m2c.STJ.v, m2c.STJ.z, m3, m3.PFJ.lat, m3.PFJ.u , m3.PFJ.v, m3.STJ.lat, m3.STJ.u, m3.STJ.v,n.cluster,norm.vec, u, v, y.stp, t.stp, year.end, year.start, z)
 # ls()
 
 ## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
@@ -385,20 +371,20 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
   print(t.stp)
   
   # Plot des zonalen Windfeldes und der Position aller gefundenen Chebyshev-Jets
-  ggp.nh.m1a <-
+  ggp.nh.m2a <-
     ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
            mapping = aes(x = lon, y = lat, fill = u)) +
     geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-    geom_point(mapping = aes(x = lon , y = J.lat.m1a.a, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = J.lat.m2a.a, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 20, fill = "black", size = 1) +
-    geom_point(mapping = aes(x = lon , y = J.lat.m1a.b, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = J.lat.m2a.b, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 20, fill = "black", size = 1) +
-    geom_point(mapping = aes(x = lon , y = J.lat.m1a.c, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = J.lat.m2a.c, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 20, fill = "black", size = 1) +
-    geom_point(mapping = aes(x = lon , y = J.lat.m1a.d, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = J.lat.m2a.d, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 20, fill = "black", size = 1) +
     scale_x_continuous(name = "Längengrad",
@@ -413,14 +399,14 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
 
   
   # Plot des zonalen Windfeldes und der Position des maximalen Jets sowie des maximalen Chebyshev-Jets
-  ggp.nh.m0.m1b <-
+  ggp.nh.m1.m2b <-
     ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
            mapping = aes(x = lon, y = lat, fill = u)) +
     geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-    geom_point(mapping = aes(x = lon , y = J.lat.m0, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = J.lat.m1, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 16, fill = "black", size = 1, show.legend = TRUE) +
-    geom_point(mapping = aes(x = lon , y = J.lat.m1b, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = J.lat.m2b, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 18, fill = "black", size = 1.5, show.legend = TRUE) +
     scale_x_continuous(name = "Längengrad",
@@ -434,14 +420,14 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
     coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
   
   # Plot des zonalen Windfeldes und der zwei stärksten Chebyshev-Maxima im Bereich [20,85]
-  ggp.nh.m1c <-
+  ggp.nh.m2c <-
     ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
            mapping = aes(x = lon, y = lat, fill = u)) +
     geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-    geom_point(mapping = aes(x = lon , y = PFJ.lat.m1c, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = PFJ.lat.m2c, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 24, fill = "black", size = 1) +
-    geom_point(mapping = aes(x = lon , y = STJ.lat.m1c, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = STJ.lat.m2c, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 25, fill = "black", size = 1) +
     scale_x_continuous(name = "Längengrad",
@@ -454,58 +440,15 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
             subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
     coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
   
-  # # Plot des zonalen Windfeldes und dem Fit durch die zwei stärksten Chebyshev-Maxima
-  # ggp.nh.m1d <-
-  #   ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
-  #          mapping = aes(x = lon, y = lat, fill = u)) +
-  #   geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-  #   geom_point(mapping = aes(x = lon , y = PFJ.lat.m1d, fill = NULL),
-  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-  #              shape = 24, fill = "black", size = 1) +
-  #   geom_point(mapping = aes(x = lon , y = STJ.lat.m1d, fill = NULL),
-  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-  #              shape = 25, fill = "black", size = 1) +
-  #   scale_x_continuous(name = "Längengrad",
-  #                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-  #   scale_y_continuous(name = "Breitengrad",
-  #                      breaks = c(0, 30, 60, 90)) +
-  #   geom_polygon(mapping = aes(x = long, y = lat, group = group),
-  #                data = map_nh, fill = "gray50", alpha = 0.35) +
-  #   ggtitle("Zonales Windfeld und Position des Fits an die zwei stärksten Chebyshev-Maxima", 
-  #           subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
-  #   coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
-  
-  # # Plot des zonalen Windfeldes und der zwei gefundenen sektoriellen Chebyshev-Maxima
-  # ggp.nh.m1e <-
-  #   ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
-  #          mapping = aes(x = lon, y = lat, fill = u)) +
-  #   geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-  #   geom_point(mapping = aes(x = lon , y = PFJ.lat.m1e, fill = NULL),
-  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-  #              shape = 24, fill = "black", size = 1) +
-  #   geom_point(mapping = aes(x = lon , y = STJ.lat.m1e, fill = NULL),
-  #              data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
-  #              shape = 25, fill = "black", size = 1) +
-  #   geom_hline(yintercept = c(20, 45, 85)) +
-  #   scale_x_continuous(name = "Längengrad",
-  #                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-  #   scale_y_continuous(name = "Breitengrad",
-  #                      breaks = c(0, 30, 60, 90)) +
-  #   geom_polygon(mapping = aes(x = long, y = lat, group = group),
-  #                data = map_nh, fill = "gray50", alpha = 0.35) +
-  #   ggtitle("Zonales Windfeld und Position der lokalen Chebyshev-Maxima in [20,45] und [45,85]", 
-  #           subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
-  #   coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
-  
   # Plot des Betrags des horizontalen Windfeldes und Dijkstra-Jets
-  ggp.nh.m2 <-
+  ggp.nh.m3 <-
     ggplot(data = df.uv[which(df.uv$t.stp == dts[t.stp]),],
            mapping = aes(x = lon, y = lat, fill = uv)) +
     geom_tile() + scale_fill_gsea() + #scale_fill_distiller(palette = 'RdYlBu') +
-    geom_point(mapping = aes(x = lon , y = PFJ.lat.m2, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = PFJ.lat.m3, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 24, fill = "black", size = 1) +
-    geom_point(mapping = aes(x = lon , y = STJ.lat.m2, fill = NULL),
+    geom_point(mapping = aes(x = lon , y = STJ.lat.m3, fill = NULL),
                data = df.jets.month[which(df.jets.month$dts == dts[t.stp]),],
                shape = 25, fill = "black", size = 1) +
     scale_x_continuous(name = "Längengrad",
@@ -543,54 +486,54 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
   print(i.ssn)
   
   # Positionen Breitengrad Chebyshev
-  hovm.pfj.lat.m1.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m1c)) +
+  hovm.pfj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2c)) +
     geom_tile() + scale_fill_gsea()
   # Positionen Breitengrad Dijkstra
-  hovm.pfj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season = i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2)) +
+  hovm.pfj.lat.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m3)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Zonalwind Chebyshev
-  hovm.pfj.u.m1.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m1c)) +
+  hovm.pfj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2c)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Zonalwind Dijkstra
-  hovm.pfj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2)) +
+  hovm.pfj.u.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Meridionalwind Dijkstra
-  hovm.pfj.v.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m2)) +
+  hovm.pfj.v.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m3)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Betrag Windstärke Dijkstra
-  hovm.pfj.uv.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2 * PFJ.v.m2)) +
+  hovm.pfj.uv.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3 * PFJ.v.m3)) +
     geom_tile() + scale_fill_gsea()
   
   ## RELATIV ZU ZONALEM MITTEL
   # Positionen Breitengrad Chebyshev
   hovm.pfj.lat.m1.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m1c)) +
+                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2c)) +
     geom_tile() + scale_fill_gsea()
   # Positionen Breitengrad Dijkstra
   hovm.pfj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2)) +
+                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m3)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Zonalwind Chebyshev
   hovm.pfj.u.m1.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m1c)) +
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2c)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Zonalwind Dijkstra
   hovm.pfj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2)) +
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Meridionalwind Dijkstra
   hovm.pfj.v.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m2)) +
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m3)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Betrag Windstärke Dijkstra
   hovm.pfj.uv.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2 * PFJ.v.m2)) +
+                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3 * PFJ.v.m3)) +
     geom_tile() + scale_fill_gsea()
 }
 ## HOVMÖLLER-DIAGRAMME ** STJ ####
@@ -601,55 +544,55 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
   print(i.ssn)
 
 # Positionen Breitengrad Chebyshev
-hovm.stj.lat.m1.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m1c)) +
+hovm.stj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
   geom_tile() + scale_fill_gsea()
 # Positionen Breitengrad Dijkstra
-hovm.stj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2)) +
+hovm.stj.lat.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Zonalwind Chebyshev
-hovm.stj.u.m1.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m1c)) +
+hovm.stj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Zonalwind Dijkstra
-hovm.stj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2)) +
+hovm.stj.u.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Meridionalwind Dijkstra
-hovm.stj.v.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.v.m2)) +
+hovm.stj.v.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Betrag Windstärke Dijkstra
-hovm.stj.uv.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                 mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2 * PFJ.v.m2)) +
+hovm.stj.uv.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                 mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3 * PFJ.v.m3)) +
   geom_tile() + scale_fill_gsea()
 
 
 ## RELATIV ZU ZONALEM MITTEL
 # Positionen Breitengrad Chebyshev
-hovm.stj.lat.m1.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m1c)) +
+hovm.stj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
   geom_tile() + scale_fill_gsea()
 # Positionen Breitengrad Dijkstra
-hovm.stj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2)) +
+hovm.stj.lat.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Zonalwind Chebyshev
-hovm.stj.u.m1.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m1c)) +
+hovm.stj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Zonalwind Dijkstra
-hovm.stj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2)) +
+hovm.stj.u.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Meridionalwind Dijkstra
-hovm.stj.v.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.v.m2)) +
+hovm.stj.v.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
   geom_tile() + scale_fill_gsea()
 # Intensität Betrag Windstärke Dijkstra
-hovm.stj.uv.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                 mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2 * PFJ.v.m2)) +
+hovm.stj.uv.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                 mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3 * PFJ.v.m3)) +
   geom_tile() + scale_fill_gsea()
 }
 
