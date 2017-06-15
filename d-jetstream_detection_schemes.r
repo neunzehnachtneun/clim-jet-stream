@@ -35,10 +35,8 @@ find.jet.maximum.2d <- function(matrix, axis) {
 
 ## Methode 2: Polynomfit des Zonalwinds in Merdionalrichtung im Sektor [20,85]
 ## Übergebene Variablen: Alle gefundenen Maxima, globales Maximum, zwei lokale Maxima in Sektor
-find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 8) {
-  # Laden nötiger Pakete
-  # library(pckg.cheb)
-  
+find.jets.chebpoly.2d <- function(matrix.u, matrix.v, matrix.z, axis.x, axis.y, n.order = 8) {
+
   # Dimensionen der Matrix
   n.axis.x <- length(axis.x)
   n.axis.y <- length(axis.y)
@@ -89,6 +87,7 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 
   model.maxs.ind.grd <- matrix(NA, nrow(model.maxs.ind), n.axis.x)
   model.maxs.u <- matrix(NA, nrow(model.maxs.ind), n.axis.x)
   model.maxs.v <- matrix(NA, nrow(model.maxs.ind), n.axis.x)
+  model.maxs.z <- matrix(NA, nrow(model.maxs.ind), n.axis.x)
   
   # Umrechnen von Indizes in Breitengrade
   for (i in seq_along(axis.x)) {
@@ -105,14 +104,17 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 
     #print(model.maxs.ind.grd[,i])
     model.maxs.u[,i] <- matrix.u[i,model.maxs.ind.grd[,i]]
     model.maxs.v[,i] <- matrix.v[i,model.maxs.ind.grd[,i]]
+    model.maxs.z[,i] <- matrix.z[i,model.maxs.ind.grd[,i]]
   }
   
   # Werte der Maxima (U-Wind)
   # model.maxs.u <- sapply(model.maxs, "[[", 2) 
   
   ## Annahme: PFJ nördliches Maximum, STJ südliches Maximum
-  PFJ.lat <- rep(NA, n.axis.x); PFJ.u <- PFJ.lat; PFJ.v <- PFJ.lat;
-  STJ.lat <- rep(NA, n.axis.x); STJ.u <- STJ.lat; STJ.v <- STJ.lat;
+  PFJ.lat <- rep(NA, n.axis.x); 
+  PFJ.u <- PFJ.lat; PFJ.v <- PFJ.lat; PFJ.z <- PFJ.lat
+  STJ.lat <- rep(NA, n.axis.x); 
+  STJ.u <- STJ.lat; STJ.v <- STJ.lat; STJ.z <- STJ.lat
   for (i in seq_along(axis.x)) {
     #print(i)
     PFJ.ind <- which.max(model.maxs.lat[,i])
@@ -122,19 +124,21 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, axis.x, axis.y, n.order = 
       PFJ.lat[i] <- model.maxs.lat[PFJ.ind,i]
       PFJ.u[i] <- model.maxs.u[PFJ.ind,i]
       PFJ.v[i] <- model.maxs.v[PFJ.ind,i]
+      PFJ.z[i] <- model.maxs.z[PFJ.ind,i]
       # Subtropenjet
       STJ.lat[i] <- model.maxs.lat[STJ.ind,i]
       STJ.u[i] <- model.maxs.u[STJ.ind,i]
       STJ.v[i] <- model.maxs.v[STJ.ind,i]
+      STJ.z[i] <- model.maxs.z[STJ.ind,i]
     }
     PFJ.ind <- NA; STJ.ind <- NA;
   }
   
   ## Übergabe der Variablen
-  list.model.jet <- list("all.max.lat" = array.lat, "all.max.u" = array.u,
-                         "MaxJ.lat" = MaxJ.lat, "MaxJ.u" = MaxJ.u,
-                         "PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u, "PFJ.v" = PFJ.v,
-                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u, "STJ.v" = STJ.v)
+  list.model.jet <- list("all.max.lat" = array.lat, # "all.max.u" = array.u,
+                         "MaxJ.lat" = MaxJ.lat, # "MaxJ.u" = MaxJ.u,
+                         "PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u, "PFJ.v" = PFJ.v, "PFJ.z" = PFJ.z,
+                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u, "STJ.v" = STJ.v, "STJ.z" = STJ.z)
   return(list.model.jet)
 }
 
