@@ -13,9 +13,10 @@ n.cluster <- 16
 ## EINLESEN DER DATEN ####
 ##
 library(ncdf4)
-nc <- nc_open("04-data-nc/b-1957-2016-e4ei-t63-uv-nh-monmean.nc")
+nc <- nc_open("04-data-nc/b-1957-2016-e4ei-t63-zuv-nh-monmean.nc")
 u <- ncvar_get(nc, "u") # U-Wind-Komponente
 v <- ncvar_get(nc, "v") # V-Wind-Komponente
+z <- ncvar_get(nc, "z") # Geopotenzielle Höhe
 lon <- ncvar_get(nc, "lon") # Längengrad
 lat <- ncvar_get(nc, "lat") # Breitengrad
 lev <- ncvar_get(nc, "level") # Drucklevel
@@ -35,6 +36,7 @@ dts.month <- months(dts, abbreviate = TRUE); dts.year <- years(dts);
 ## Beschreibung der Matrizen
 dimnames(u) <- list(lon, lat, lev, dts)
 dimnames(v) <- list(lon, lat, lev, dts)
+dimnames(z) <- list(lon, lat, lev, dts)
 
 # Unterscheidung von warmen & kalten Monaten
 dts.cld.wrm <- rep(NA, length.out = length(dts))
@@ -56,19 +58,8 @@ lon[1]; lon.hlp[97];
 # cut.lon <- which(lon.hlp == lon[1])
 u <- u[c(97:192,1:96),,,]; dimnames(u) <- list(lon.hlp, lat, lev, dts)
 v <- v[c(97:192,1:96),,,]; dimnames(v) <- list(lon.hlp, lat, lev, dts)
+z <- z[c(97:192,1:96),,,]; dimnames(z) <- list(lon.hlp, lat, lev, dts)
 lon <- lon.hlp
-# m1.STJ.lat  <- m1.STJ.lat[c(97:192,1:96),]; rownames(m1.STJ.lat) <- lon.hlp
-# m1.STJ.u    <- m1.STJ.u[c(97:192,1:96),]
-# m2.STJ.lon  <- m2.STJ.lon[c(97:192,1:96),]
-# m2.STJ.lat  <- m2.STJ.lat[c(97:192,1:96),]
-# m2.STJ.u    <- m2.STJ.u[c(97:192,1:96),]
-# m2.STJ.v    <- m2.STJ.v[c(97:192,1:96),]
-# m1.PFJ.lat  <- m1.PFJ.lat[c(97:192,1:96),]
-# m1.PFJ.u    <- m1.PFJ.u[c(97:192,1:96),]
-# m2.PFJ.lon  <- m2.PFJ.lon[c(97:192,1:96),]
-# m2.PFJ.lat  <- m2.PFJ.lat[c(97:192,1:96),]
-# m2.PFJ.u    <- m2.PFJ.u[c(97:192,1:96),]
-# m2.PFJ.v    <- m2.PFJ.v[c(97:192,1:96),]
 
 
 ## LADEN NÖTIGER HILFSFUNKTIONEN ####
@@ -106,6 +97,7 @@ registerDoParallel(cl.fork.2)
 m2 <- foreach(t.stp = 1:length(dts)) %dopar% {
   find.jets.chebpoly.2d(matrix.u = u[,,p.lvl,t.stp], 
                         matrix.v = v[,,p.lvl,t.stp],
+                        matrix.z = z[,,p.lvl,t.stp],
                         axis.x = lon, axis.y = lat)}
 stopCluster(cl.fork.2); rm(cl.fork.2)
 
@@ -133,114 +125,88 @@ ls()
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
 
-## FORMATIEREN DER DATENSATZE UND LÖSCHEN ÜBERFLÜSSIGER VARIABLEN ####
+## FORMATIEREN DER DATENSATZE ####
 ## 
 library(plyr); library(dplyr); library(reshape2)
 
-## Lokales Maximum M0
+## Globales Maximum M1
 # Maximaljet
-m0.J.lat    <- sapply(m0, "[[", "MaxJ.lat"); colnames(m0.J.lat) <- dts; rownames(m0.J.lat) <- lon
-m0.J.u      <- sapply(m0, "[[", "MaxJ.u")
+m1.J.lat    <- sapply(m1, "[[", "MaxJ.lat"); colnames(m1.J.lat) <- dts; rownames(m1.J.lat) <- lon
+m1.J.u      <- sapply(m1, "[[", "MaxJ.u")
 
-## Chebyshev-Methodik M1
+## Chebyshev-Methodik M2
 # alle gefundenen Maxima/Jets
-m1a.J.lat <- sapply(m1a, "[[", "all.max.lat")
-m1a.J.u <- sapply(m1a, "[[", "all.max.u")
+m2a.J.lat <- sapply(m2, "[[", "all.max.lat")
+#m2a.J.u <- sapply(m2, "[[", "all.max.u")
 # maximaler Chebyshev-Jet
-m1b.J.lat <- sapply(m1bc, "[[", "MaxJ.lat")
-m1b.J.u   <- sapply(m1bc, "[[", "MaxJ.u")
-# Maximum und zweitstärkstes Maximum
-m1c.STJ.lat <- sapply(m1bc, "[[", "STJ.lat")  # Suptropenjet
-m1c.STJ.u   <- sapply(m1bc, "[[", "STJ.u")
-m1c.PFJ.lat <- sapply(m1bc, "[[", "PFJ.lat")  # Polarfrontjet
-m1c.PFJ.u   <- sapply(m1bc, "[[", "PFJ.u")
-# Fit durch m1c
-m1d.STJ.lat <- sapply(m1d, "[[", "STJ.lat")   # Subtropenjet
-m1d.STJ.u   <- sapply(m1d, "[[", "STJ.u")
-m1d.STJ.v   <- sapply(m1d, "[[", "STJ.v")
-m1d.PFJ.lat <- sapply(m1d, "[[", "PFJ.lat")   # Polarfrontjet
-m1d.PFJ.u   <- sapply(m1d, "[[", "PFJ.u")
-m1d.PFJ.v   <- sapply(m1d, "[[", "PFJ.v")
-# Sektorielle Suche nach stärkstem Maximum
-m1e.STJ.lat <- sapply(m1e, "[[", "STJ.lat")   # Subtropenjet
-m1e.STJ.u   <- sapply(m1e, "[[", "STJ.u")
-m1e.PFJ.lat <- sapply(m1e, "[[", "PFJ.lat")   # Subtropenjet
-m1e.PFJ.u   <- sapply(m1e, "[[", "PFJ.u")
+m2b.J.lat <- sapply(m2, "[[", "MaxJ.lat")
+#m2b.J.u   <- sapply(m2, "[[", "MaxJ.u")
+# Maximum und zweitstärkstes Maximum in Sektor
+m2c.STJ.lat <- sapply(m2, "[[", "STJ.lat")  # Suptropenjet
+m2c.STJ.u   <- sapply(m2, "[[", "STJ.u")
+m2c.STJ.v   <- sapply(m2, "[[", "STJ.v")
+m2c.STJ.z   <- sapply(m2, "[[", "STJ.z")
+m2c.PFJ.lat <- sapply(m2, "[[", "PFJ.lat")  # Polarfrontjet
+m2c.PFJ.u   <- sapply(m2, "[[", "PFJ.u")
+m2c.PFJ.v   <- sapply(m2, "[[", "PFJ.v")
+m2c.PFJ.z   <- sapply(m2, "[[", "PFJ.z")
 
-## Dijkstra-Methodik M2
-m2.STJ.lon  <- sapply(m2, "[[", "STJ.lon")    # Subtropenjet
-m2.STJ.lat  <- sapply(m2, "[[", "STJ.lat")
-m2.STJ.u    <- sapply(m2, "[[", "STJ.u")
-m2.STJ.v    <- sapply(m2, "[[", "STJ.v")
-m2.PFJ.lon  <- sapply(m2, "[[", "PFJ.lon")    # Polarfrontjet
-m2.PFJ.lat  <- sapply(m2, "[[", "PFJ.lat")
-m2.PFJ.u    <- sapply(m2, "[[", "PFJ.u")
-m2.PFJ.v    <- sapply(m2, "[[", "PFJ.v")
+## Dijkstra-Methodik M3
+# m3.STJ.lon  <- sapply(m2, "[[", "STJ.lon")    # Subtropenjet
+m3.STJ.lat  <- sapply(m2, "[[", "STJ.lat")
+m3.STJ.u    <- sapply(m2, "[[", "STJ.u")
+m3.STJ.v    <- sapply(m2, "[[", "STJ.v")
+# m3.PFJ.lon  <- sapply(m2, "[[", "PFJ.lon")    # Polarfrontjet
+m3.PFJ.lat  <- sapply(m2, "[[", "PFJ.lat")
+m3.PFJ.u    <- sapply(m2, "[[", "PFJ.u")
+m3.PFJ.v    <- sapply(m2, "[[", "PFJ.v")
+
 
 ## MELTEN DES DATENSATZES (RESHAPE2::MELT) FÜR GGPLOT2 ####
 ## 
 # Maximaljet
-df.jets.month              <- melt(m0.J.lat,varnames = c("lon", "dts"),value.name = "J.lat.m0")
+df.jets.month              <- melt(m1.J.lat,varnames = c("lon", "dts"),value.name = "J.lat.m1")
 # Einfügen der Jahreszahlen, Monate, Jahreszeiten
 df.jets.month$dts          <- rep(dts, each = n.lon)          # Datum
 df.jets.month$year         <- rep(dts.year, each = n.lon)     # Jahr
 df.jets.month$month        <- rep(dts.month, each = n.lon)    # Monat
 df.jets.month$season       <- rep(dts.season, each = n.lon)   # Jahreszeit/Saison
-df.jets.month$J.u.m0       <- melt(m0.J.u)$value
-
-# alle auffindbaren Chebyshev-Jets
-df.jets.month$J.lat.m1a.a  <- melt(m1a.J.lat[seq(from = 1, by = 4, length.out = n.lon)])$value
-df.jets.month$J.lat.m1a.b  <- melt(m1a.J.lat[seq(from = 2, by = 4, length.out = n.lon)])$value
-df.jets.month$J.lat.m1a.c  <- melt(m1a.J.lat[seq(from = 3, by = 4, length.out = n.lon)])$value
-df.jets.month$J.lat.m1a.d  <- melt(m1a.J.lat[seq(from = 4, by = 4, length.out = n.lon)])$value
-df.jets.month$J.u.m1a.a    <- melt(m1a.J.u[seq(from = 1, by = 4, length.out = n.lon)])$value
-df.jets.month$J.u.m1a.b    <- melt(m1a.J.u[seq(from = 2, by = 4, length.out = n.lon)])$value
-df.jets.month$J.u.m1a.c    <- melt(m1a.J.u[seq(from = 3, by = 4, length.out = n.lon)])$value
-df.jets.month$J.u.m1a.d    <- melt(m1a.J.u[seq(from = 4, by = 4, length.out = n.lon)])$value
-
-# Maximaljet Chebyshev
-df.jets.month$J.lat.m1b    <- melt(m1b.J.lat)$value
-df.jets.month$J.u.m1b      <- melt(m1b.J.u)$value
-
-# Maximum und zweitstärkstes Maximum
-df.jets.month$STJ.lat.m1c  <- melt(m1c.STJ.lat)$value # Subtropenjet
-df.jets.month$STJ.u.m1c    <- melt(m1c.STJ.u)$value
-df.jets.month$PFJ.lat.m1c  <- melt(m1c.PFJ.lat)$value # Polarfrontjet
-df.jets.month$PFJ.u.m1c    <- melt(m1c.PFJ.u)$value
-# Fit durch zwei stärkste Maxima
-df.jets.month$STJ.lat.m1d  <- melt(m1d.STJ.lat)$value # Subtropenjet
-df.jets.month$STJ.u.m1d    <- melt(m1d.STJ.u)$value
-df.jets.month$STJ.v.m1d    <- melt(m1d.STJ.v)$value
-df.jets.month$PFJ.lat.m1d  <- melt(m1d.PFJ.lat)$value # Polarfrontjet
-df.jets.month$PFJ.u.m1d    <- melt(m1d.PFJ.u)$value
-df.jets.month$PFJ.v.m1d    <- melt(m1d.PFJ.v)$value
-# Sektorielle Suche nach Maxima
-df.jets.month$STJ.lat.m1e  <- melt(m1e.STJ.lat)$value # Subtropenjet
-df.jets.month$STJ.u.m1e    <- melt(m1e.STJ.u)$value
-df.jets.month$PFJ.lat.m1e  <- melt(m1e.PFJ.lat)$value # Polarfrontjet
-df.jets.month$PFJ.u.m1e    <- melt(m1e.PFJ.u)$value
-# Dijkstra-Methodik
-df.jets.month$STJ.lat.m2   <- melt(m2.STJ.lat)$value  # Subtropenjet
-df.jets.month$STJ.u.m2     <- melt(m2.STJ.u)$value
-df.jets.month$STJ.v.m2     <- melt(m2.STJ.v)$value
-df.jets.month$PFJ.lat.m2   <- melt(m2.PFJ.lat)$value  # Polarfrontjet
-df.jets.month$PFJ.u.m2     <- melt(m2.PFJ.u)$value
-df.jets.month$PFJ.v.m2     <- melt(m2.PFJ.v)$value
+# df.jets.month$J.u.m1       <- melt(m1.J.u)$value
 
 # Umsortieren der Spalten des Datensatzes
-df.jets.month <- df.jets.month[,c("dts", "year", "month", "season", "lon", 
-                                  "J.lat.m0", "J.u.m0", "J.lat.m1b", "J.u.m1b",
-                                  "J.lat.m1a.a", "J.lat.m1a.b", "J.lat.m1a.c", "J.lat.m1a.d",
-                                  "J.u.m1a.a", "J.u.m1a.b", "J.u.m1a.c", "J.u.m1a.d",
-                                  "STJ.lat.m1c", "STJ.u.m1c",   
-                                  "STJ.lat.m1d", "STJ.u.m1d", "STJ.v.m1d",
-                                  "STJ.lat.m1e", "STJ.u.m1e",
-                                  "STJ.lat.m2",  "STJ.u.m2",  "STJ.v.m2",
-                                  "PFJ.lat.m1c", "PFJ.u.m1c",   
-                                  "PFJ.lat.m1d", "PFJ.u.m1d", "PFJ.v.m1d",
-                                  "PFJ.lat.m1e", "PFJ.u.m1e",
-                                  "PFJ.lat.m2",  "PFJ.u.m2",  "PFJ.v.m2"
-                                  )]
+df.jets.month <- df.jets.month[,c("dts", "year", "month", "season", "lon", "J.lat.m1")]
+
+# Maximaljet Chebyshev
+df.jets.month$J.lat.m2b    <- melt(m2b.J.lat)$value
+# df.jets.month$J.u.m2b      <- melt(m2b.J.u)$value
+
+# alle auffindbaren Chebyshev-Jets
+df.jets.month$J.lat.m2a.a  <- melt(m2a.J.lat[seq(from = 1, by = 4, length.out = n.lon)])$value
+df.jets.month$J.lat.m2a.b  <- melt(m2a.J.lat[seq(from = 2, by = 4, length.out = n.lon)])$value
+df.jets.month$J.lat.m2a.c  <- melt(m2a.J.lat[seq(from = 3, by = 4, length.out = n.lon)])$value
+df.jets.month$J.lat.m2a.d  <- melt(m2a.J.lat[seq(from = 4, by = 4, length.out = n.lon)])$value
+# df.jets.month$J.u.m2a.a    <- melt(m2a.J.u[seq(from = 1, by = 4, length.out = n.lon)])$value
+# df.jets.month$J.u.m2a.b    <- melt(m2a.J.u[seq(from = 2, by = 4, length.out = n.lon)])$value
+# df.jets.month$J.u.m2a.c    <- melt(m2a.J.u[seq(from = 3, by = 4, length.out = n.lon)])$value
+# df.jets.month$J.u.m2a.d    <- melt(m2a.J.u[seq(from = 4, by = 4, length.out = n.lon)])$value
+
+# Maximum und zweitstärkstes Maximum
+df.jets.month$STJ.lat.m2c  <- melt(m2c.STJ.lat)$value # Subtropenjet
+df.jets.month$STJ.u.m2c    <- melt(m2c.STJ.u)$value
+df.jets.month$STJ.v.m2c    <- melt(m2c.STJ.v)$value
+df.jets.month$STJ.z.m2c    <- melt(m2c.STJ.v)$value
+df.jets.month$PFJ.lat.m2c  <- melt(m2c.PFJ.lat)$value # Polarfrontjet
+df.jets.month$PFJ.u.m2c    <- melt(m2c.PFJ.u)$value
+df.jets.month$PFJ.v.m2c    <- melt(m2c.PFJ.v)$value
+df.jets.month$PFJ.z.m2c    <- melt(m2c.PFJ.v)$value
+
+# Dijkstra-Methodik
+df.jets.month$STJ.lat.m3   <- melt(m3.STJ.lat)$value  # Subtropenjet
+df.jets.month$STJ.u.m3     <- melt(m3.STJ.u)$value
+df.jets.month$STJ.v.m3     <- melt(m3.STJ.v)$value
+df.jets.month$PFJ.lat.m3   <- melt(m3.PFJ.lat)$value  # Polarfrontjet
+df.jets.month$PFJ.u.m3     <- melt(m3.PFJ.u)$value
+df.jets.month$PFJ.v.m3     <- melt(m3.PFJ.v)$value
 
 
 # colnames(df.jets.month)
@@ -251,6 +217,8 @@ df.jets.month <- df.jets.month[,c("dts", "year", "month", "season", "lon",
 df.uv <- melt(u[,,p.lvl,], varnames = c("lon", "lat", "t.stp"), value.name = "u")
 df.uv$v <- melt(data = v[,,p.lvl,])$value
 df.uv$uv <- sqrt( df.uv$u ** 2 + df.uv$v ** 2 )
+df.uv$z <- melt(data = z[,,p.lvl,])$value
+
 
 ## Löschen überflüssiger Variablen
 rm(u, v, m0, m1a, m1bc, m1d, m1e, m2, 
@@ -278,19 +246,17 @@ df.jets.season <-
   data.frame(rep(seq(year.start, year.end), each = n.seas * n.lon),
              rep(c('djf','mam','jja','son'), each = n.lon),
              rep(lon),
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA)
-colnames(df.jets.season) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:37])
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:25])
 # Schleife über alle Jahre, Jahreszeiten und Längengradabschnitte
 for (i.stp in seq(from = 1, to = dim(df.jets.season)[1])) {
-  df.jets.season[i.stp, 4:35] <- 
+  df.jets.season[i.stp, 4:23] <- 
     apply(X = df.jets.month[which(
       df.jets.month$year >= df.jets.season[i.stp,]$Year - 2 &
         df.jets.month$year <= df.jets.season[i.stp,]$Year + 2 &
         df.jets.month$season == df.jets.season[i.stp,]$Season &
-        df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:37],
+        df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:25],
       MARGIN = 2, FUN = mean, na.rm = TRUE)
 }
 
@@ -300,18 +266,16 @@ for (i.stp in seq(from = 1, to = dim(df.jets.season)[1])) {
 df.jets.season.mean <- 
   data.frame(rep(c('djf','mam','jja','son'), each = n.lon),
              rep(lon),
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA)
-colnames(df.jets.season.mean) <- c('Season', 'Longitude', colnames(df.jets.month)[6:37])
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season.mean) <- c('Season', 'Longitude', colnames(df.jets.month)[6:25])
 
 for (i.stp in seq(from = 1, to = dim(df.jets.season.mean)[1])) {
   # print(i.stp)
-  df.jets.season.mean[i.stp, 3:34] <- 
+  df.jets.season.mean[i.stp, 3:22] <- 
     apply(X = df.jets.month[which(
         df.jets.month$season == df.jets.season.mean[i.stp,]$Season &
-        df.jets.month$lon == df.jets.season.mean[i.stp,]$Longitude), 6:37],
+        df.jets.month$lon == df.jets.season.mean[i.stp,]$Longitude), 6:25],
       MARGIN = 2, FUN = mean, na.rm = TRUE)
 }
 
@@ -322,15 +286,14 @@ df.jets.season.rel <-
   data.frame(rep(seq(year.start, year.end), each = n.seas * n.lon),
              rep(c('djf','mam','jja','son'), each = n.lon),
              rep(lon),
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA)
-colnames(df.jets.season.rel) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:37])
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season.rel) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:25])
+
 for (i.stp in 1:length(unique(df.jets.season$Year))) {
   y.stp <- unique(df.jets.season$Year)[i.stp]
-  df.jets.season.rel[which(df.jets.season.rel$Year == y.stp), 4:35] <-
-    df.jets.season[which(df.jets.season$Year == y.stp), 4:35] - df.jets.season.mean[,3:34]
+  df.jets.season.rel[which(df.jets.season.rel$Year == y.stp), 4:23] <-
+    df.jets.season[which(df.jets.season$Year == y.stp), 4:23] - df.jets.season.mean[,3:22]
 }
 
 ## ZEITLICHE MITTEL DER JET-POSITIONEN ####
@@ -340,17 +303,16 @@ for (i.stp in 1:length(unique(df.jets.season$Year))) {
 # Definieren des Dataframes
 length.df <- n.lon # Länge
 df.jets.tim.mean <- data.frame(rep(lon),
-                             NA, NA, NA, NA, NA, NA, NA, NA, 
-                             NA, NA, NA, NA, NA, NA, NA, NA, 
-                             NA, NA, NA, NA, NA, NA, NA, NA, 
-                             NA, NA, NA, NA, NA, NA, NA, NA)
-colnames(df.jets.tim.mean) <- c('Longitude', colnames(df.jets.month)[6:37])
+                             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+                             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.tim.mean) <- c('Longitude', colnames(df.jets.month)[6:25])
+
 # Schleife über alle Zeitschritte
 for (i.stp in seq(from = 1, to = dim(df.jets.tim.mean)[1])) {
   # print(i.stp)
-  df.jets.tim.mean[i.stp, 2:33] <- 
+  df.jets.tim.mean[i.stp, 2:21] <- 
     apply(X = df.jets.month[which(
-      df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:37],
+      df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:25],
       MARGIN = 2, FUN = mean, na.rm = TRUE)
 }
 
@@ -358,15 +320,21 @@ for (i.stp in seq(from = 1, to = dim(df.jets.tim.mean)[1])) {
 ## Zeitliches und meridionales Mitteln
 # Definieren des Dataframes
 df.jets.tim.mer.mean <- 
-  data.frame(NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA, 
-             NA, NA, NA, NA, NA, NA, NA, NA)
-colnames(df.jets.tim.mer.mean) <- colnames(df.jets.month)[6:37]
+  data.frame(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.tim.mer.mean) <- colnames(df.jets.month)[6:25]
+
 # Mitteln der Jet-Positionen und -Geschwindigkeiten
-df.jets.tim.mer.mean <- apply(X = df.jets.month[, 6:37],
+df.jets.tim.mer.mean <- apply(X = df.jets.month[, 6:25],
                       MARGIN = 2, FUN = mean, na.rm = TRUE)
 
+
+## LÖSCHEN UNNÖTIGER VARIABLEN ####
+## 
+
+# ls()
+rm(date.help, diff.max, dts, dts.cld.wrm, dts.month, dts.season, dts.year, find.jet.dijkstra.2d, find.jet.maximum.2d, find.jets.chebpoly.2d, find.jets.dijkstra.2d, fun.fill, len.na, length.df, lon.hlp,  m1, m1.J.lat, m1.J.u, m2, m2a.J.lat, m2a.J.u, m2b.J.lat, m2b.J.u, m2c.PFJ.lat, m2c.PFJ.u, m2c.PFJ.v, m2c.PFJ.z, m2c.STJ.lat, m2c.STJ.u, m2c.STJ.v, m2c.STJ.z, m3, m3.PFJ.lat, m3.PFJ.u , m3.PFJ.v, m3.STJ.lat, m3.STJ.u, m3.STJ.v,n.cluster,norm.vec, u, v, y.stp, t.stp, year.end, year.start, z)
+# ls()
 
 ## ZWISCHENSPEICHERN DER WERTE UND ERNEUTES LADEN DES DATENSATZES ####
 # Speichern
@@ -376,6 +344,7 @@ rm(list = ls())
 # Laden
 load("stp-b.RData")
 ls()
+
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
 
