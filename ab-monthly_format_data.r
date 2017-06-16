@@ -205,17 +205,18 @@ df.jets.tim.mer.mean <-
 colnames(df.jets.tim.mer.mean) <- colnames(df.jets.month)[6:25]
 
 # Mitteln der Jet-Positionen und -Geschwindigkeiten
-df.jets.tim.mer.mean <- apply(X = df.jets.month[, 6:25],
+df.jets.tim.mer.mean[1,] <- apply(X = df.jets.month[, 6:25],
                       MARGIN = 2, FUN = mean, na.rm = TRUE)
 
+## Orographie ####
+source("e-get-orography.r")
+df.zh <- get.orography.e4ei()
 
 ## LÖSCHEN UNNÖTIGER VARIABLEN ####
 ## 
-
 # ls()
-rm(date.help, diff.max, find.jet.dijkstra.2d, find.jet.maximum.2d, find.jets.chebpoly.2d, find.jets.dijkstra.2d, fun.fill, len.na, length.df, lon.hlp,  m1, m1.J.lat, m1.J.u, m2, m2a.J.lat, m2a.J.u, m2b.J.lat, m2b.J.u, m2c.PFJ.lat, m2c.PFJ.u, m2c.PFJ.v, m2c.PFJ.z, m2c.STJ.lat, m2c.STJ.u, m2c.STJ.v, m2c.STJ.z, m3, m3.PFJ.lat, m3.PFJ.u , m3.PFJ.v, m3.STJ.lat, m3.STJ.u, m3.STJ.v,n.cluster,norm.vec, u, v, y.stp, t.stp, year.end, year.start, z)
+rm(date.help, diff.max, find.jet.dijkstra.2d, find.jet.maximum.2d, find.jets.chebpoly.2d, find.jets.dijkstra.2d, fun.fill, len.na, length.df, lon.hlp,  m1, m1.J.lat, m1.J.u, m2, m2a.J.lat, m2a.J.u, m2b.J.lat, m2b.J.u, m2c.PFJ.lat, m2c.PFJ.u, m2c.PFJ.v, m2c.PFJ.z, m2c.STJ.lat, m2c.STJ.u, m2c.STJ.v, m2c.STJ.z, m3, m3.PFJ.lat, m3.PFJ.u , m3.PFJ.v, m3.STJ.lat, m3.STJ.u, m3.STJ.v,n.cluster,norm.vec, u, v, y.stp, t.stp, year.end, year.start, z, get.orography.e4ei)
 # ls()
-
 
 
 ## ZWISCHENSPEICHERN DER WERTE DES DATENSATZES ####
