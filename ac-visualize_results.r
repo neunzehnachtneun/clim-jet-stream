@@ -148,17 +148,17 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
   
   ## Speichern der Plots als pdfs
   # ggp.jets <- grid.arrange(ggp.u.m0, ggp.u.m1a, ggp.u.m1b, ggp.u.m1c, ggp.uv.m2, ncol = 1)
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m0-m1b.pdf"),
-         plot = ggp.nh.m0.m1b, device = pdf, path = "05-visu-pdf/",
+  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b.pdf"),
+         plot = ggp.nh.m1.m2b, device = pdf, path = "05-visu-pdf/",
          dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1a.pdf"),
-         plot = ggp.nh.m1a, device = pdf, path = "05-visu-pdf/", 
+  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2a.pdf"),
+         plot = ggp.nh.m2a, device = pdf, path = "05-visu-pdf/", 
          dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1c.pdf"),
-         plot = ggp.nh.m1c, device = pdf, path = "05-visu-pdf/", 
+  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2c.pdf"),
+         plot = ggp.nh.m2c, device = pdf, path = "05-visu-pdf/", 
          dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2.pdf"),
-         plot = ggp.nh.m2, device = pdf, path = "05-visu-pdf/", 
+  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m3.pdf"),
+         plot = ggp.nh.m3, device = pdf, path = "05-visu-pdf/", 
          dpi = 600, width = 297, height = 210, units = "mm")
 }
 
@@ -280,5 +280,45 @@ hovm.stj.uv.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Seas
                                  mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3 * PFJ.v.m3)) +
   geom_tile() + scale_fill_gsea()
 }
+
+
+## VERGLEICH CHEBYSHEV VS DIJKSTRA ####
+## 
+
+ggplot(data = df.jets.season, mapping = aes(x = PFJ.lat.m2c, y = PFJ.lat.m3)) + 
+  stat_ellipse(type = "norm", level = 0.90) + 
+  stat_ellipse(type = "norm", level = 0.95) + 
+  stat_ellipse(type = "norm", level = 0.99) #+ geom_point()
+
+ggplot(data = df.jets.season, mapping = aes(x = STJ.lat.m2c, y = STJ.lat.m3)) + 
+  stat_ellipse(type = "norm", level = 0.90) + 
+  stat_ellipse(type = "norm", level = 0.95) + 
+  stat_ellipse(type = "norm", level = 0.99) #+ geom_point()
+
+ggplot(data = df.jets.season, mapping = aes(x = PFJ.u.m2c, y = PFJ.u.m3)) + 
+  stat_ellipse(type = "norm", level = 0.90) + 
+  stat_ellipse(type = "norm", level = 0.95) + 
+  stat_ellipse(type = "norm", level = 0.99) #+ geom_point()
+
+ggplot(data = df.jets.season, mapping = aes(x = STJ.u.m2c, y = STJ.u.m3)) + 
+  stat_ellipse(type = "norm", level = 0.90) + 
+  stat_ellipse(type = "norm", level = 0.95) + 
+  stat_ellipse(type = "norm", level = 0.99) #+ geom_point()
+
+ggplot(data = df.jets.season, mapping = aes(x = PFJ.v.m2c, y = PFJ.v.m3)) + 
+  stat_ellipse(type = "norm", level = 0.90) + 
+  stat_ellipse(type = "norm", level = 0.95) + 
+  stat_ellipse(type = "norm", level = 0.99) #+ geom_point()
+
+ggplot(data = df.jets.season, mapping = aes(x = STJ.v.m2c, y = STJ.v.m3)) + 
+  stat_ellipse(type = "norm", level = 0.90) + 
+  stat_ellipse(type = "norm", level = 0.95) + 
+  stat_ellipse(type = "norm", level = 0.99) +
+  geom_abline(slope = 1, intercept = 0) +
+  geom_vline(xintercept = mean(df.jets.season$STJ.v.m2c)) +
+  geom_hline(yintercept = mean(df.jets.season$STJ.v.m3)) +
+  geom_point(data = df.jets.season, mapping = aes(x = mean(STJ.v.m2c), y = mean(STJ.v.m3))) 
+  
+#+ geom_point()
 
 ## ENDE ENDE ENDE ####
