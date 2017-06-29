@@ -75,10 +75,10 @@ df.jets.month$J.lat.m2b    <- melt(m2b.J.lat)$value
 # df.jets.month$J.u.m2b      <- melt(m2b.J.u)$value
 
 # alle auffindbaren Chebyshev-Jets
-df.jets.month$J.lat.m2a.a  <- melt(m2a.J.lat[seq(from = 1, by = 4, length.out = n.lon)])$value
-df.jets.month$J.lat.m2a.b  <- melt(m2a.J.lat[seq(from = 2, by = 4, length.out = n.lon)])$value
-df.jets.month$J.lat.m2a.c  <- melt(m2a.J.lat[seq(from = 3, by = 4, length.out = n.lon)])$value
-df.jets.month$J.lat.m2a.d  <- melt(m2a.J.lat[seq(from = 4, by = 4, length.out = n.lon)])$value
+df.jets.month$J.lat.m2a.a  <- melt(m2a.J.lat[seq(from = 1, by = 4, length.out = n.lon*length(dts))])$value
+df.jets.month$J.lat.m2a.b  <- melt(m2a.J.lat[seq(from = 2, by = 4, length.out = n.lon*length(dts))])$value
+df.jets.month$J.lat.m2a.c  <- melt(m2a.J.lat[seq(from = 3, by = 4, length.out = n.lon*length(dts))])$value
+df.jets.month$J.lat.m2a.d  <- melt(m2a.J.lat[seq(from = 4, by = 4, length.out = n.lon*length(dts))])$value
 # df.jets.month$J.u.m2a.a    <- melt(m2a.J.u[seq(from = 1, by = 4, length.out = n.lon)])$value
 # df.jets.month$J.u.m2a.b    <- melt(m2a.J.u[seq(from = 2, by = 4, length.out = n.lon)])$value
 # df.jets.month$J.u.m2a.c    <- melt(m2a.J.u[seq(from = 3, by = 4, length.out = n.lon)])$value
