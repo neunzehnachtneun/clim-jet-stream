@@ -148,16 +148,16 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
   
   ## Speichern der Plots als pdfs
   # ggp.jets <- grid.arrange(ggp.u.m0, ggp.u.m1a, ggp.u.m1b, ggp.u.m1c, ggp.uv.m2, ncol = 1)
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b.pdf"),
+  ggsave(filename = paste0('case-', dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b.pdf"),
          plot = ggp.nh.m1.m2b, device = pdf, path = "05-visu-pdf/",
          dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2a.pdf"),
+  ggsave(filename = paste0('case-',dts.year[t.stp], "-", dts.month[t.stp], "-m2a.pdf"),
          plot = ggp.nh.m2a, device = pdf, path = "05-visu-pdf/", 
          dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2c.pdf"),
+  ggsave(filename = paste0('case-',dts.year[t.stp], "-", dts.month[t.stp], "-m2c.pdf"),
          plot = ggp.nh.m2c, device = pdf, path = "05-visu-pdf/", 
          dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m3.pdf"),
+  ggsave(filename = paste0('case-',dts.year[t.stp], "-", dts.month[t.stp], "-m3.pdf"),
          plot = ggp.nh.m3, device = pdf, path = "05-visu-pdf/", 
          dpi = 600, width = 297, height = 210, units = "mm")
 }
@@ -186,40 +186,83 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
   hovm.pfj.u.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3)) +
     geom_tile() + scale_fill_gsea()
+  # Intensität Meridionalwind Chebyshev
+  hovm.pfj.v.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m2c)) +
+    geom_tile() + scale_fill_gsea()
   # Intensität Meridionalwind Dijkstra
   hovm.pfj.v.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
                               mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m3)) +
     geom_tile() + scale_fill_gsea()
-  # Intensität Betrag Windstärke Dijkstra
-  hovm.pfj.uv.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3 * PFJ.v.m3)) +
-    geom_tile() + scale_fill_gsea()
+
   
   ## RELATIV ZU ZONALEM MITTEL
   # Positionen Breitengrad Chebyshev
-  hovm.pfj.lat.m1.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+  hovm.pfj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
                                 mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2c)) +
     geom_tile() + scale_fill_gsea()
   # Positionen Breitengrad Dijkstra
-  hovm.pfj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+  hovm.pfj.lat.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
                                 mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m3)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Zonalwind Chebyshev
-  hovm.pfj.u.m1.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+  hovm.pfj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2c)) +
     geom_tile() + scale_fill_gsea()
   # Intensität Zonalwind Dijkstra
-  hovm.pfj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+  hovm.pfj.u.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3)) +
     geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Dijkstra
+  # Intensität Meridionalwind Chebyshev
   hovm.pfj.v.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m2c)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Meridionalwind Dijkstra
+  hovm.pfj.v.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
                               mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m3)) +
     geom_tile() + scale_fill_gsea()
-  # Intensität Betrag Windstärke Dijkstra
-  hovm.pfj.uv.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                               mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3 * PFJ.v.m3)) +
-    geom_tile() + scale_fill_gsea()
+
+  
+  ## Speichern der Plots
+  # Breitengrade
+  ggsave(filename = paste0("hovm.pfj.lat.m2.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m2.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.lat.m3.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m3.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.lat.m2.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m2.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.lat.m3.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m3.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  # Zonalwind
+  ggsave(filename = paste0("hovm.pfj.u.m2.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m2.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.u.m3.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m3.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.u.m2.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m2.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.u.m3.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m3.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  # Meridionalwind
+  ggsave(filename = paste0("hovm.pfj.v.m2.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m2.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.v.m3.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m3.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.v.m2.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m2.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.v.m3.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m3.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
 }
 ## HOVMÖLLER-DIAGRAMME ** STJ ####
 ## SUBTROPISCHER JETSTREAM
@@ -227,58 +270,100 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
 # Schleife über Jahreszeiten
 for (i.ssn in c("djf", "mam", "jja", "son")) {
   print(i.ssn)
-
-# Positionen Breitengrad Chebyshev
-hovm.stj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
-  geom_tile() + scale_fill_gsea()
-# Positionen Breitengrad Dijkstra
-hovm.stj.lat.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Zonalwind Chebyshev
-hovm.stj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Zonalwind Dijkstra
-hovm.stj.u.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Meridionalwind Dijkstra
-hovm.stj.v.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Betrag Windstärke Dijkstra
-hovm.stj.uv.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                 mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3 * PFJ.v.m3)) +
-  geom_tile() + scale_fill_gsea()
-
-
-## RELATIV ZU ZONALEM MITTEL
-# Positionen Breitengrad Chebyshev
-hovm.stj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
-  geom_tile() + scale_fill_gsea()
-# Positionen Breitengrad Dijkstra
-hovm.stj.lat.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                  mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Zonalwind Chebyshev
-hovm.stj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Zonalwind Dijkstra
-hovm.stj.u.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Meridionalwind Dijkstra
-hovm.stj.v.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
-  geom_tile() + scale_fill_gsea()
-# Intensität Betrag Windstärke Dijkstra
-hovm.stj.uv.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                 mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3 * PFJ.v.m3)) +
-  geom_tile() + scale_fill_gsea()
+  
+  # Positionen Breitengrad Chebyshev
+  hovm.stj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
+    geom_tile() + scale_fill_gsea()
+  # Positionen Breitengrad Dijkstra
+  hovm.stj.lat.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Zonalwind Chebyshev
+  hovm.stj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Zonalwind Dijkstra
+  hovm.stj.u.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Meridionalwind Chebyshev
+  hovm.stj.v.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m2c)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Meridionalwind Dijkstra
+  hovm.stj.v.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
+    geom_tile() + scale_fill_gsea()
+  
+  
+  ## RELATIV ZU ZONALEM MITTEL
+  # Positionen Breitengrad Chebyshev
+  hovm.stj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
+    geom_tile() + scale_fill_gsea()
+  # Positionen Breitengrad Dijkstra
+  hovm.stj.lat.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Zonalwind Chebyshev
+  hovm.stj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Zonalwind Dijkstra
+  hovm.stj.u.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Meridionalwind Chebyshev
+  hovm.stj.v.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m2c)) +
+    geom_tile() + scale_fill_gsea()
+  # Intensität Meridionalwind Dijkstra
+  hovm.stj.v.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
+                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
+    geom_tile() + scale_fill_gsea()
+  
+  
+  ## Speichern der Plots
+  # Breitengrade
+  ggsave(filename = paste0("hovm.pfj.lat.m2.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m2.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.lat.m3.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m3.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.lat.m2.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m2.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.lat.m3.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.lat.m3.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  # Zonalwind
+  ggsave(filename = paste0("hovm.pfj.u.m2.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m2.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.u.m3.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m3.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.u.m2.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m2.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.u.m3.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.u.m3.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  # Meridionalwind
+  ggsave(filename = paste0("hovm.pfj.v.m2.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m2.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.v.m3.abs", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m3.abs, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.v.m2.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m2.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
+  ggsave(filename = paste0("hovm.pfj.v.m3.rel", i.ssn, ".pdf"),
+         plot = hovm.pfj.v.m3.rel, device = pdf, path = "05-visu-pdf/", 
+         dpi = 600, width = 297, height = 210, units = "mm")
 }
 
 
