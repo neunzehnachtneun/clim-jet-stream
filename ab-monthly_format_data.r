@@ -114,11 +114,55 @@ df.uv$uv <- sqrt( df.uv$u ** 2 + df.uv$v ** 2 )
 df.uv$z <- melt(data = z[,,p.lvl,])$value
 
 
-## SAISONALES GLEITENDES MITTEL ÜBER FÜNF JAHRE ####
+
+## EINFLUSS DER OROGRAPHIE AUF ZONALWIND ####
+
+## Orographie
+source("e-get-orography.r")
+df.zh <- get.orography.df()
+
+
+# 
+# ## Coriolis-Parameter
+# # f <- 2 * 0.7272 * 10 ** -4 * lat 
+# 
+# u.max <- 2 * 0.7272 * 10 ** -4 * df.jets.month$STJ.lat.m2c / 
+#   (df.jets.month$STJ.z.m2c) - get.orography.ll(df.zh = df.zh, lon = df.jets.month$lon, lat = df.jets.month$STJ.lat.m2c))
+# 
+# get.orography.ll(df.zh = df.zh, lon = df.jets.month$lon, lat = df.jets.month$STJ.lat.m2c)
+# 
+# get.orography.ll(df.zh = df.zh, lon = lon[1], lat = lat[1])
+# #df.jets.month$u.max <- 
+#  
+
+
+
+
+## SAISONALES MITTEL ÜBER ALLE JAHRE ####
+## 
+
+df.jets.season.mean <-
+  data.frame(rep(c('djf','mam','jja','son'), each = n.lon),
+             rep(lon),
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season.mean) <- c('Season', 'Longitude', colnames(df.jets.month)[6:25])
+
+for (i.stp in seq(from = 1, to = dim(df.jets.season.mean)[1])) {
+  # print(i.stp)
+  df.jets.season.mean[i.stp, 3:22] <-
+    apply(X = df.jets.month[which(
+      df.jets.month$season == df.jets.season.mean[i.stp,]$Season &
+        df.jets.month$lon == df.jets.season.mean[i.stp,]$Longitude), 6:25],
+      MARGIN = 2, FUN = mean, na.rm = TRUE)
+}
+
+
+## SAISONALES  MITTEL ####
 ##
 
 # Festlegen des Untersuchungszeitraums
-year.start <- 1960; year.end <- 2009; n.seas <- 4
+year.start <- 1958; year.end <- 2015; n.seas <- 4
 n.years <- year.end - year.start + 1
 # Definieren des Dataframes
 length.df <- n.years * n.seas * n.lon # Länge
@@ -140,26 +184,8 @@ for (i.stp in seq(from = 1, to = dim(df.jets.season)[1])) {
       MARGIN = 2, FUN = mean, na.rm = TRUE)
 }
 
-## SAISONALES MITTEL ÜBER ALLE JAHRE ####
-## 
 
-df.jets.season.mean <- 
-  data.frame(rep(c('djf','mam','jja','son'), each = n.lon),
-             rep(lon),
-             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
-             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
-colnames(df.jets.season.mean) <- c('Season', 'Longitude', colnames(df.jets.month)[6:25])
-
-for (i.stp in seq(from = 1, to = dim(df.jets.season.mean)[1])) {
-  # print(i.stp)
-  df.jets.season.mean[i.stp, 3:22] <- 
-    apply(X = df.jets.month[which(
-        df.jets.month$season == df.jets.season.mean[i.stp,]$Season &
-        df.jets.month$lon == df.jets.season.mean[i.stp,]$Longitude), 6:25],
-      MARGIN = 2, FUN = mean, na.rm = TRUE)
-}
-
-## SAISONALES GLEITENDES MITTEL ABZGL DES ZEITLICHEN MITTELS ####
+## SAISONALES MITTEL ABZGL DES ZEITLICHEN MITTELS ####
 ## 
 
 df.jets.season.rel <-
@@ -175,6 +201,51 @@ for (i.stp in 1:length(unique(df.jets.season$Year))) {
   df.jets.season.rel[which(df.jets.season.rel$Year == y.stp), 4:23] <-
     df.jets.season[which(df.jets.season$Year == y.stp), 4:23] - df.jets.season.mean[,3:22]
 }
+
+
+
+## SAISONALES GLEITENDES MITTEL ÜBER FÜNF JAHRE ####
+##
+
+# Festlegen des Untersuchungszeitraums
+year.start <- 1960; year.end <- 2009; n.seas <- 4
+n.years <- year.end - year.start + 1
+# Definieren des Dataframes
+length.df <- n.years * n.seas * n.lon # Länge
+df.jets.season.rn <- 
+  data.frame(rep(seq(year.start, year.end), each = n.seas * n.lon),
+             rep(c('djf','mam','jja','son'), each = n.lon),
+             rep(lon),
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season.rn) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:25])
+# Schleife über alle Jahre, Jahreszeiten und Längengradabschnitte
+for (i.stp in seq(from = 1, to = dim(df.jets.season)[1])) {
+  df.jets.season.rn[i.stp, 4:23] <- 
+    apply(X = df.jets.month[which(
+      df.jets.month$year == df.jets.season[i.stp,]$Year &
+        df.jets.month$season == df.jets.season[i.stp,]$Season &
+        df.jets.month$lon == df.jets.season[i.stp,]$Longitude), 6:25],
+      MARGIN = 2, FUN = mean, na.rm = TRUE)
+}
+
+## SAISONALES GLEITENDES MITTEL ABZGL DES ZEITLICHEN MITTELS ####
+## 
+
+df.jets.season.rn.rel <-
+  data.frame(rep(seq(year.start, year.end), each = n.seas * n.lon),
+             rep(c('djf','mam','jja','son'), each = n.lon),
+             rep(lon),
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+             NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+colnames(df.jets.season.rn.rel) <- c('Year', 'Season', 'Longitude', colnames(df.jets.month)[6:25])
+
+for (i.stp in 1:length(unique(df.jets.season$Year))) {
+  y.stp <- unique(df.jets.season.rn.rel$Year)[i.stp]
+  df.jets.season.rn.rel[which(df.jets.season.rel$Year == y.stp), 4:23] <-
+    df.jets.season.rn[which(df.jets.season$Year == y.stp), 4:23] - df.jets.season.mean[,3:22]
+}
+
 
 ## ZEITLICHE MITTEL DER JET-POSITIONEN ####
 ##
@@ -208,9 +279,6 @@ colnames(df.jets.tim.mer.mean) <- colnames(df.jets.month)[6:25]
 df.jets.tim.mer.mean[1,] <- apply(X = df.jets.month[, 6:25],
                       MARGIN = 2, FUN = mean, na.rm = TRUE)
 
-## Orographie ####
-source("e-get-orography.r")
-df.zh <- get.orography.e4ei()
 
 ## LÖSCHEN UNNÖTIGER VARIABLEN ####
 ## 
