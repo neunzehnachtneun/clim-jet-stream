@@ -1,0 +1,99 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+%\usepackage[isolatin]{inputenc} 
+
+%% ## Schriftarten
+\usepackage{palatino} %% Serifen %times
+\usepackage[scaled]{helvet} %% Serifenlos
+\usepackage{courier} %% Schreibmaschinenschrift
+%\usepackage{mathptmx} %% Matheschrift
+
+%% Allgemeines Layout
+\setbinding{.5cm} % bindekorrektur
+\semiisopage % \semiisopage[12] \isopage
+\OnehalfSpacing % zeilenabstand
+%\usepackage[a4paper, top=40mm, inner=30mm, outer=25mm, bottom=30mm]{geometry}
+
+%% Layout Kopf- und Fußzeile
+% plain
+\makeevenhead{plain}{}{}{}
+\makeevenfoot{plain}{}{\thepage}{}
+\makeoddhead{plain}{}{}{}
+\makeoddfoot{plain}{}{\thepage}{}
+% headings
+\makeevenhead{headings}{\leftmark}{}{}
+\makeevenfoot{headings}{}{\thepage}{}
+\makeoddhead{headings}{}{}{\rightmark}
+\makeoddfoot{headings}{}{\thepage}{}
+% sep line
+%\makeheadrule{plain}{\textwidth}{.5pt}
+\makefootrule{plain}{\textwidth}{.5pt}{0ex}
+\makeheadrule{headings}{\textwidth}{.5pt}
+\makefootrule{headings}{\textwidth}{.5pt}{0ex}
+
+%% Inhaltsverzeichnis
+%\usepackage[nottoc,numbib]{tocbibind}
+\setcounter{tocdepth}{1}
+
+%% Abbildungen
+\usepackage{graphicx}
+\usepackage{float} % für Fließumgebungen; Platzierung H verschiebt nicht
+\restylefloat{figure}
+
+%% Anführungszeichen
+\usepackage[babel,german=quotes]{csquotes}
+%% Farbe
+\usepackage{color}
+%% Querverweise
+%\usepackage{hyperref}
+%\usepackage{memhfixc}
+
+%% Blindtexte
+\usepackage{blindtext, lipsum}
+
+%\usepackage{graphics, graphicx, caption, array, longtable}
+%\usepackage{marginnote, lmodern, enumitem}
+%\usepackage{tabularx, color, url, pdflscape, subfigure}
+%\usepackage{siunitx, amsfonts, amsmath, amsthm, amsbsy, amssymb}
+%\usepackage[e]{esvect} % bessere Vektorpfeile
+
+% %\usepackage{chicago}
+% \usepackage[fixlanguage]{babelbib}
+% \selectbiblanguage{ngerman}
+% 
+%
+% \usepackage{lipsum}
+% \usepackage{array}
+% %
+
+
+%\numberwithin{equation}{section} 
+%\usepackage[a4paper, top=40mm, inner=30mm, outer=25mm, bottom=30mm]{geometry}
+
+%\setlength{\parindent}{1em}
+
+
+
+
+%% ## Bildunterschriften
+%\addto\captionsngerman{}
+%\renewcommand{\figurename}{\small{\textbf{Abb.}}}
+%\captionsetup{figurewithin = section}
+%\captionsetup{font=small, labelfont=bfseries}
+
+%
+% %% ## Layout Kopf- und Fußzeile
+% \usepackage[automark]{scrpage2}
+% \pagestyle{scrheadings}
+% \clearscrheadings
+% \clearscrheadfoot
+% \clearscrplain
+% \rehead{\bf{\leftmark}}
+% %\ohead{\pagemark}
+% \cfoot{\pagemark}
+% \setheadsepline{.5pt} % Linie unter dem Head
+% \setfootsepline{.5pt} % Linie über dem foot
+%
+%
+%% ## Ende der Präambel

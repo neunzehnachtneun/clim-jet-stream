@@ -1,0 +1,78 @@
+%%## MASTER THESIS
+
+%% DOCUMENTCLASS %%
+%%\documentclass[11pt, DIV=calc, BCOR=10mm, twoside]{scrbook} 
+\documentclass[a4paper,11pt,twoside,onecolumn,openright,final]{memoir} %scrartcl scrreprt scrbook %memoir
+
+\include{b-praeambel}
+
+
+\begin{document}
+\frontmatter
+
+\include{c-titel}
+\include{d-eigenstaendigkeit}
+
+\newpage
+\thispagestyle{empty}
+\quad
+\newpage
+\thispagestyle{empty}
+\tableofcontents  % Inhaltsverzeichnis
+\listoffigures    % Abbildungsverzeichnis
+%\listoftables    % Tabellenverzeichnis
+\newpage
+
+\mainmatter %% ## 
+
+\include{e-abstract}
+
+\part{Einleitung}
+\include{f-motivation}
+
+\part{Hintergründe und Methodik}
+\include{g-hintergrund}
+\include{h-methodik}
+
+\part{Auswertung und Ergebnisse}
+\include{i-ergebnisse}
+
+
+\part{Diskussion}
+\include{j-diskussion}
+\include{k-danksagung}
+
+
+\bibliographystyle{plain} %chicago??
+\bibliography{ls-literatur}
+
+\end{document}
+
+
+% \mainmatter %% ## 
+% \part{Einleitung}
+% \chapter{balaf}
+% \lipsum
+% \section{asfhsdg}
+% \subsection{ahsfgbsdg}
+% \lipsum
+% \part{Theorie und Hintergründe}
+%
+% \part{Auswertung}
+% \chapter{Test Literatur}
+% 1 \cite{Garfinkel-2013}
+% \\
+% 2 \cite{Hovmoeller-1949a}
+% \\
+% 2 \cite{Hovmoeller-1949b}
+% \\
+% 3 \cite{Wallace-2014}
+% \\
+% 4 \cite{Petoukhov-2013}
+% \\
+% 5 \cite{Francis-2012}
+% \\
+% 6 \cite{Barnes-2013}
+% \\
+% 7 \cite{Francis-2015}
+%
