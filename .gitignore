@@ -9,6 +9,7 @@ nohup.out
 
 # excluded folders
 .idea/
+00-archiv/
 
 # excluded data types
 *.RData
@@ -19,4 +20,4 @@ nohup.out
 *.iml
 *.xml
 *.json
-
+*.Rout
