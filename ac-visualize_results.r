@@ -274,7 +274,7 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
   # Positionen Breitengrad Chebyshev
   hovm.stj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
                                 mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
-    geom_tile() + scale_fill_gsea()
+    geom_tile() + scale_fill_gsea() 
   # Positionen Breitengrad Dijkstra
   hovm.stj.lat.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
                                 mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
@@ -373,12 +373,16 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
 ggplot(data = df.jets.season, mapping = aes(x = PFJ.lat.m2c, y = PFJ.lat.m3)) + 
   stat_ellipse(type = "norm", level = 0.90) + 
   stat_ellipse(type = "norm", level = 0.95) + 
-  stat_ellipse(type = "norm", level = 0.99) #+ geom_point()
+  stat_ellipse(type = "norm", level = 0.99) +
+  scale_x_continuous(name = "Positionen Chebyshev") + #+ geom_point()
+  scale_y_continuous(name = "Positionen Dijkstra")
 
 ggplot(data = df.jets.season, mapping = aes(x = STJ.lat.m2c, y = STJ.lat.m3)) + 
   stat_ellipse(type = "norm", level = 0.90) + 
   stat_ellipse(type = "norm", level = 0.95) + 
-  stat_ellipse(type = "norm", level = 0.99) #+ geom_point()
+  stat_ellipse(type = "norm", level = 0.99) +
+  scale_x_continuous(name = "Positionen Chebyshev") + #+ geom_point()
+  scale_y_continuous(name = "Positionen Dijkstra")
 
 
 ggplot(data = df.jets.season, mapping = aes(x = PFJ.u.m2c, y = PFJ.u.m3)) + 
