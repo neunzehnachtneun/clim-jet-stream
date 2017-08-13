@@ -19,6 +19,11 @@ ls()
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
 
+## Laden des Sea Ice Index Datensatzes ####
+##
+sea.ice.index <- read.csv("04-data-nc/d-sea-ice-index-arctic-noaa.csv")
+
+
 ## FORMATIEREN DER DATENSATZE ####
 ## 
 library(plyr); library(dplyr); library(reshape2)
