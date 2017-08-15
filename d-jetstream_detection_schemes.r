@@ -50,7 +50,7 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, matrix.z, axis.x, axis.y, 
   list.lat <- sapply(list.max, "[[", 1)
   list.u <- sapply(list.max, "[[", 2)
   ## Transformieren der Liste in Array, Auffüllen mit NAs.
-  n.max.max <- ceiling(n.order/2)
+  n.max.max <- ceiling(n.order/2 + 1)
   array.lat <- sapply(list.lat, fun.fill, n = n.max.max)
   array.u <- sapply(list.u, fun.fill, n = n.max.max)
   
@@ -134,11 +134,31 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, matrix.z, axis.x, axis.y, 
     PFJ.ind <- NA; STJ.ind <- NA;
   }
   
+  ## Überprüfen, ob Jets weiter als 10 Grad auseinanderliegen.
+  ## Falls nicht, Annahme für Single-Jetstream
+  SJS.ind <- which(sqrt((PFJ.lat - STJ.lat)**2) < 10)
+  
+  SJS.lat <- rep(NA, n.axis.x); 
+  SJS.u <- SJS.lat; SJS.v <- SJS.lat; SJS.z <- SJS.lat
+  
+  ## Nehme Mittelwert der beiden Werte
+  SJS.lat[SJS.ind]  <- apply(cbind(PFJ.lat[SJS.ind], STJ.lat[SJS.ind]), 1, mean)
+  SJS.u[SJS.ind]    <- apply(cbind(PFJ.u[SJS.ind], STJ.u[SJS.ind]), 1, mean)
+  SJS.v[SJS.ind]    <- apply(cbind(PFJ.v[SJS.ind], STJ.v[SJS.ind]), 1, mean)
+  SJS.z[SJS.ind]    <- apply(cbind(PFJ.z[SJS.ind], STJ.z[SJS.ind]), 1, mean)
+  
+  ## Setze korrespondierende PFJ.* und STJ.* gleich NA
+  PFJ.lat[SJS.ind] <- NA;  PFJ.u[SJS.ind]   <- NA
+  PFJ.v[SJS.ind]   <- NA;  PFJ.v[SJS.ind]   <- NA
+  STJ.lat[SJS.ind] <- NA;  STJ.u[SJS.ind]   <- NA
+  STJ.v[SJS.ind]   <- NA;  STJ.z[SJS.ind]   <- NA
+  
   ## Übergabe der Variablen
   list.model.jet <- list("all.max.lat" = array.lat, # "all.max.u" = array.u,
                          "MaxJ.lat" = MaxJ.lat, # "MaxJ.u" = MaxJ.u,
                          "PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u, "PFJ.v" = PFJ.v, "PFJ.z" = PFJ.z,
-                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u, "STJ.v" = STJ.v, "STJ.z" = STJ.z)
+                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u, "STJ.v" = STJ.v, "STJ.z" = STJ.z,
+                         "SJS.lat" = SJS.lat, "SJS.u" = SJS.u, "SJS.v" = SJS.u, "SJS.z" = SJS.z)
   return(list.model.jet)
 }
 
@@ -243,11 +263,33 @@ find.jets.dijkstra.2d <- function(u, v, lon, lat, season) {
   STJ <- find.jet.dijkstra.2d(u, v, lon, lat, jet = "STJ", season)
   PFJ <- find.jet.dijkstra.2d(u, v, lon, lat, jet = "PFJ", season)
   
+  PFJ.lat <- PFJ$SP.J.lon; PFJ.u <- PFJ$SP.J.u; PFJ.v <- PFJ$SP.J.v; PFJ.z <- PFJ$SP.J.z;
+  STJ.lat <- STJ$SP.J.lon; STJ.u <- STJ$SP.J.u; STJ.v <- STJ$SP.J.v; STJ.z <- STJ$SP.J.z;
+  
+  ## Überprüfen, ob Jets weiter als 10 Grad auseinanderliegen.
+  ## Falls nicht, Annahme für Single-Jetstream
+  SJS.ind <- which(sqrt((PFJ.lat - STJ.lat)**2) < 10)
+  
+  SJS.lat <- rep(NA, n.axis.x); 
+  SJS.u <- SJS.lat; SJS.v <- SJS.lat; SJS.z <- SJS.lat
+  
+  ## Nehme Mittelwert der beiden Werte
+  SJS.lat[SJS.ind]  <- apply(cbind(PFJ.lat[SJS.ind], STJ.lat[SJS.ind]), 1, mean)
+  SJS.u[SJS.ind]    <- apply(cbind(PFJ.u[SJS.ind], STJ.u[SJS.ind]), 1, mean)
+  SJS.v[SJS.ind]    <- apply(cbind(PFJ.v[SJS.ind], STJ.v[SJS.ind]), 1, mean)
+  SJS.z[SJS.ind]    <- apply(cbind(PFJ.z[SJS.ind], STJ.z[SJS.ind]), 1, mean)
+  
+  ## Setze korrespondierende PFJ.* und STJ.* gleich NA
+  PFJ.lat[SJS.ind] <- NA;  PFJ.u[SJS.ind]   <- NA
+  PFJ.v[SJS.ind]   <- NA;  PFJ.v[SJS.ind]   <- NA
+  STJ.lat[SJS.ind] <- NA;  STJ.u[SJS.ind]   <- NA
+  STJ.v[SJS.ind]   <- NA;  STJ.z[SJS.ind]   <- NA
+  
+  
   # Übergabe der Variablen
-  list.model.jet <- list("STJ.lon" = STJ$SP.J.lon, "STJ.lat" = STJ$SP.J.lat, 
-                         "STJ.u"   = STJ$SP.J.u,   "STJ.v"   = STJ$SP.J.v,
-                         "PFJ.lon" = PFJ$SP.J.lon, "PFJ.lat" = PFJ$SP.J.lat,
-                         "PFJ.u"   = PFJ$SP.J.u,   "PFJ.v"   = PFJ$SP.J.v)
+  list.model.jet <- list("PFJ.lat" = PFJ.lat, "PFJ.u" = PFJ.u, "PFJ.v" = PFJ.v, "PFJ.z" = PFJ.z,
+                         "STJ.lat" = STJ.lat, "STJ.u" = STJ.u, "STJ.v" = STJ.v, "STJ.z" = STJ.z,
+                         "SJS.lat" = SJS.lat, "SJS.u" = SJS.u, "SJS.v" = SJS.u, "SJS.z" = SJS.z)
   return(list.model.jet)
 }
 
