@@ -9,7 +9,8 @@ nohup.out
 
 # excluded folders
 .idea/
-00-archiv/
+00-archive/
+04-data-nc-csv/
 
 # excluded data types
 *.RData
