@@ -13,7 +13,7 @@ n.cluster <- 16
 ## EINLESEN DER DATEN ####
 ##
 library(ncdf4)
-nc <- nc_open("04-data-nc/b-1957-2016-e4ei-t63-zuv-nh-monmean.nc")
+nc <- nc_open("04-data-nc-csv/b-1957-2016-e4ei-t63-zuv-nh-monmean.nc")
 u <- ncvar_get(nc, "u") # U-Wind-Komponente
 v <- ncvar_get(nc, "v") # V-Wind-Komponente
 z <- ncvar_get(nc, "z") # Geopotenzielle Höhe
@@ -29,9 +29,11 @@ n.lon <- length(lon) ; n.lat = length(lat)
 
 ## ZEITLICHE AUFLÖSUNG
 ## 
-library(chron)
+#library(chron)
+library(lubridate)
 dts = as.POSIXct(date.help*3600, origin = '1900-01-01 00:00', tz = 'UTC')
-dts.month <- months(dts, abbreviate = TRUE); dts.year <- years(dts); 
+dts.month <- as.character(month(dts, label = TRUE)); 
+dts.year <- year(dts); 
 
 ## Beschreibung der Matrizen
 dimnames(u) <- list(lon, lat, lev, dts)
