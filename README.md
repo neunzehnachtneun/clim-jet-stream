@@ -1,5 +1,6 @@
 #  clim-jet-stream
-Eine M.Sc.-Thesis über die Klimatologie des Jetstreams auf der Nordhemisphäre
+Eine M.Sc.-Thesis über die Klimatologie des Jetstreams auf der Nordhemisphäre. Zeitraum Sep 1957 bis Jun 2017.
+Dies ist das Code-Repository. Es ist geplant, das Text-Repository später in dieses zu überführen.
 
 
 ## Gründsätzliches
@@ -22,15 +23,27 @@ In diesem Ordner befindet sich das für R geschriebene Paket pckg.cheb. Zweck de
 
 ### 04-data-nc
 Dieser Ordner enthält die mit cdo vorverarbeiteten Datensätzte bestehend aus jeweils dem Mittelwert und der Standardabweichung über unterschiedliche Zeitskalen berechnet aus den täglichen Mittelwerten des kombinierten ERA-40- und ERA-Interim-Datensatz. Diese umfassen:
-1. den mittleren Zustand
-2. monatliche Mittelwerte
-3. saisonale Mittelwerte
-4. gleitende saisonale Mittelwerte über fünf Jahre
+1. monatliche Mittelwerte
+
 
 ## Datei-/Skriptstruktur
 ### a-analyse_monthly_data.r
 Skript zur Untersuchung von saisonalen Änderungen auf der Basis von Monatsmitteln
-> Hauptskript
+
+### aa-monthly_jet_detection.r
+Einlesen des kombinierten ERA-40-Interim-Datensatzes und Anwendung der Jetstream-Detektions-Methoden auf diesen.
+
+### ab-monthly_format_data.r
+Formatierung der Datensätze als dataframe/tibble mit allen zentralen Größen.
+
+### ac-visualize_results-case.r
+Visualisierung von stichprobenartigen Einzelfällen für die Plausibilitätsanalyse.
+
+### ad-visualize_results-comp-dijkcheb.r
+Vergleich der beiden Methoden in Streudiagramen und Ellipsen differenziert nach Jettypen.
+
+### ae-visualize_results-hovmoller.r
+Visualisierung von Hovmöllerdiagramen für Positionen und Geschwindigkeiten der mittels Chebyshev- und Dijkstra-Methoden gefundenen polaren und subtropischen Jetstreams.
 
 ### d-jetstream_detection_schemes.r
 Verschiedene Routinen zum Auffinden des Jets:
@@ -45,10 +58,19 @@ Berechnung der Orographie und Einfluss auf zonales Maximum des zonalen Vorticity
 ### f-help-functions.r
 Kleine Hilfsfunktionen
 
+### g-citations-bibtex.r
+Ausgabe der bibtex-Zitationen zur Referenzierung dieser im Text der MA.
+
+### h-prepare-seaicedata.r
+Der Seeeis-Datensatz liegt monatsweise (Ein File für Jan, eines für Feb etc.), dieser Datensatz wird hier eingelesen und als csv in einem konsitenten Datensatz übergeben.
+
 ## To-Do-Liste
 - [x] Skripte vervollständigen und überprüfen
 - [x] Code PIK implementieren
-- [ ] Finalisierung der Methodik
+- [x] Finalisierung der Methodik
 - [x] Visualisierung erster Ergebnisse
-- [ ] Berechnung und Visualisierung von Hovmöller-Diagrammen 
+- [x] Berechnung und Visualisierung von Hovmöller-Diagrammen 
+- [ ] Zusammenhang Jetposition und arktisches Seeeis
+- [ ] Finalisierung der Plots
+- [ ] Konsistenzcheck und Kommentierung des Codes
 - [ ] ~~Bezier-Curves ausprobieren~~
