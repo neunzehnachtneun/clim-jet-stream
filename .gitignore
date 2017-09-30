@@ -4,6 +4,8 @@
 # exclude build files
 *.aux
 *.log
+*.lof
+*.lot
 *.out
 *.toc
 *.bbl
@@ -12,3 +14,4 @@
 
 # exlude built pdf
 *.pdf
+
