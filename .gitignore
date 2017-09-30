@@ -1,2 +1,14 @@
 # exclude temporary datatypes
 *~
+
+# exclude build files
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+
+# exlude built pdf
+*.pdf
