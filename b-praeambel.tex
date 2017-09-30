@@ -1,6 +1,6 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[ngerman]{babel}
+\usepackage[ngerman, british]{babel}
 %\usepackage[isolatin]{inputenc} 
 
 %% ## Schriftarten
@@ -14,6 +14,9 @@
 \semiisopage % \semiisopage[12] \isopage
 \OnehalfSpacing % zeilenabstand
 %\usepackage[a4paper, top=40mm, inner=30mm, outer=25mm, bottom=30mm]{geometry}
+\usepackage[document]{ragged2e} % linksbündig 
+\usepackage[babel,german=quotes]{csquotes} % Anführungszeichen
+\usepackage{color}                    % farbe 
 
 %% Layout Kopf- und Fußzeile
 % plain
@@ -36,21 +39,45 @@
 %\usepackage[nottoc,numbib]{tocbibind}
 \setcounter{tocdepth}{1}
 
+%% Sonstige Pakete
+%% Matheumgebungen
+\usepackage[fleqn]{mathtools}
+
 %% Abbildungen
+\usepackage{tikz}
 \usepackage{graphicx}
 \usepackage{float} % für Fließumgebungen; Platzierung H verschiebt nicht
 \restylefloat{figure}
 
-%% Anführungszeichen
-\usepackage[babel,german=quotes]{csquotes}
-%% Farbe
-\usepackage{color}
+%% Captions von Tabellen und Abbildungen
+\makeatletter
+\renewcommand{\fnum@table}[1]{\textbf{\tablename~\thetable:} }
+\renewcommand{\fnum@figure}[1]{\textbf{\figurename~\thefigure:} }
+\makeatother
+
 %% Querverweise
 %\usepackage{hyperref}
 %\usepackage{memhfixc}
 
+%% Tabellen
+\usepackage{tabularx}
+\usepackage{multirow}
+
+%% Zitation und Literaturverzeichnis
+\usepackage[square, semicolon]{natbib}
+\bibliographystyle{abbrvnat} % plainnat abbrvnat unsrtnat
+\usepackage{url}
+
+
 %% Blindtexte
 \usepackage{blindtext, lipsum}
+
+
+
+
+
+
+
 
 %\usepackage{graphics, graphicx, caption, array, longtable}
 %\usepackage{marginnote, lmodern, enumitem}
@@ -68,32 +95,5 @@
 % %
 
 
-%\numberwithin{equation}{section} 
-%\usepackage[a4paper, top=40mm, inner=30mm, outer=25mm, bottom=30mm]{geometry}
-
-%\setlength{\parindent}{1em}
-
-
-
-
-%% ## Bildunterschriften
-%\addto\captionsngerman{}
-%\renewcommand{\figurename}{\small{\textbf{Abb.}}}
-%\captionsetup{figurewithin = section}
-%\captionsetup{font=small, labelfont=bfseries}
-
-%
-% %% ## Layout Kopf- und Fußzeile
-% \usepackage[automark]{scrpage2}
-% \pagestyle{scrheadings}
-% \clearscrheadings
-% \clearscrheadfoot
-% \clearscrplain
-% \rehead{\bf{\leftmark}}
-% %\ohead{\pagemark}
-% \cfoot{\pagemark}
-% \setheadsepline{.5pt} % Linie unter dem Head
-% \setfootsepline{.5pt} % Linie über dem foot
-%
 %
 %% ## Ende der Präambel
