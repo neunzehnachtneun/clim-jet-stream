@@ -1,4 +1,4 @@
-## source("ac-visualize_results.r")
+## source("ac-visualize_results-case.r")
 ## 
 ## ANALYSE VON MONATLICHEN MITTELWERTEN ####
 ## 1957 - 2016
@@ -28,6 +28,8 @@ library(ggplot2) # Visualisierung
 library(ggsci) # Farbskala
 library(tikzDevice) # Plot für Weiterverarbeitung in Latex
 
+## Nötige Hilfsfunktionen
+source("f-help-functions.r")
 
 ## VISUALISIEREN DER BESTIMMTEN JETPOSITIONEN ####
 ##
@@ -47,10 +49,9 @@ ggp.nh.merc <-
   coord_map(xlim = c(-180,180), ylim = c(0,90))
 
 
-for (t.stp in round(seq(1,length(dts), length.out = 6))) {
+for (t.stp in round(seq(1,length(dts), length.out = 12))) {
   print(t.stp)
-  
-  
+
   ## Plot des zonalen Windfeldes und der Position des maximalen Jets sowie des maximalen Chebyshev-Jets
   # Datenaufbereitung
   tb.subset <-
@@ -77,7 +78,7 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
                  data = map_nh, fill = "gray50", alpha = 0.35) +
     ggtitle("Zonales Windfeld und Position der meridionalen Zonalwindmaxima und des absoluten Chebyshev-Maximums", 
             subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
-    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif") 
+    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic() 
 
   # Plot des zonalen Windfeldes und der zwei stärksten Chebyshev-Maxima im Bereich [20,85]
   # Datenaufbereitung
@@ -105,7 +106,7 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
                  data = map_nh, fill = "gray50", alpha = 0.35) +
     ggtitle("Zonales Windfeld und Position der zwei stärksten Chebyshev-Maxima", 
             subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
-    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
+    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic()
   
   # Plot des Betrags des horizontalen Windfeldes und Dijkstra-Jets
   # Datenaufbereitung
@@ -133,41 +134,24 @@ for (t.stp in round(seq(1,length(dts), length.out = 6))) {
                  data = map_nh, fill = "gray50", alpha = 0.35) +
     ggtitle("Betrag des horizontalen Windfeldes und Position des Dijkstra-Jets", 
             subtitle = paste0(dts.year[t.stp], "-", dts.month[t.stp])) +
-    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic(base_family = "Droid Serif")
+    coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + theme_classic()
   
+  ## Speichern der Plots als pdfs und tex-files
   
-  ## Speichern der Plots als pdfs
-  # ggp.jets <- grid.arrange(ggp.u.m0, ggp.u.m1a, ggp.u.m1b, ggp.u.m1c, ggp.uv.m2, ncol = 1)
-  ggsave(filename = paste0("case-", dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b.pdf"),
-         plot = ggp.nh.m1.m2b, device = pdf, path = "05-visu-pdf/01-case/",
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("case-",dts.year[t.stp], "-", dts.month[t.stp], "-m2c.pdf"),
-         plot = ggp.nh.m2c, device = pdf, path = "05-visu-pdf/01-case/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("case-",dts.year[t.stp], "-", dts.month[t.stp], "-m3.pdf"),
-         plot = ggp.nh.m3, device = pdf, path = "05-visu-pdf/01-case/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  
-  ## Speichern der Plots als latex-Output
-  #
-  filepath <- paste0("05-visu-pdf/01-case/case-", dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b.tex")
-  tikz(file = filepath)
-  print(ggp.nh.m1.m2b)
-  dev.off()
-  #
-  filepath <- paste0("05-visu-pdf/01-case/case-", dts.year[t.stp], "-", dts.month[t.stp], "-m2c.tex")
-  tikz(file = filepath)
-  print(ggp.nh.m2c)
-  dev.off()
-  #
-  filepath <- paste0("05-visu-pdf/01-case/case-", dts.year[t.stp], "-", dts.month[t.stp], "-m3.tex")
-  tikz(file = filepath)
-  print(ggp.nh.m3)
-  dev.off()
-  
+  plt.save(plt = ggp.nh.m1.m2b, 
+           width = 150, height = 75, pointsize = 11,
+           filepath = "05-visu-pdf/01-case/", 
+           filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b"))
+  plt.save(plt = ggp.nh.m2c, 
+           width = 150, height = 75, pointsize = 11,
+           filepath = "05-visu-pdf/01-case/", 
+           filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2c"))
+  plt.save(plt = ggp.nh.m3, 
+           width = 150, height = 75, pointsize = 11,
+           filepath = "05-visu-pdf/01-case/", 
+           filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m3"))
   
 }
-
 
 
 ## ENDE ENDE ENDE ####
