@@ -42,3 +42,34 @@ norm.vec <- function(vec) {
   return(normalized.vec)
 }
 
+
+####
+## FUNKTION ZUM SPEICHERN VON PLOTS IM PDF- UND TIKZ-FORMAT ####
+####
+plt.save <- function(plt, 
+                     width, height, pointsize = 11, 
+                     filepath, filename, 
+                     format.pdf = TRUE, format.tikz = TRUE) {
+  library(ggplot2)
+  library(tikzDevice)
+  
+  # save as pdf
+  if (format.pdf) {
+    ggsave(plot = plt, device = pdf, 
+           path = paste0(filepath, "01-pdf"),
+           filename = paste0(filename, ".pdf"),
+           dpi = 600, width = width, height = height, units = "mm")
+  }
+  
+  # save as tex
+  if (format.tikz) {
+    ggsave(plot = plt, device = tikz, 
+           path = paste0(filepath, "02-tikz"),
+           filename = paste0(filename, ".tex"),
+           dpi = 600, width = width, height = height, units = "mm")
+  }
+}
+
+
+
+
