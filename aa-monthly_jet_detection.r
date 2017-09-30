@@ -13,7 +13,7 @@ n.cluster <- 16
 ## EINLESEN DER DATEN ####
 ##
 library(ncdf4)
-nc <- nc_open("04-data-nc-csv/b-1957-2016-e4ei-t63-zuv-nh-monmean.nc")
+nc <- nc_open("04-data-nc-csv/1957-2016-e4ei-t63-monmean-zuv-nh.nc")
 u <- ncvar_get(nc, "u") # U-Wind-Komponente
 v <- ncvar_get(nc, "v") # V-Wind-Komponente
 z <- ncvar_get(nc, "z") # Geopotenzielle Höhe
