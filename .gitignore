@@ -4,6 +4,7 @@
 # exclude build files
 *.aux
 *.log
+*.dvi
 *.lof
 *.lot
 *.out
