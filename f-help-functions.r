@@ -56,15 +56,19 @@ plt.save <- function(plt,
   # save as pdf
   if (format.pdf) {
     ggsave(plot = plt, device = pdf, 
-           path = paste0(filepath, "01-pdf"),
+           path = filepath, 
            filename = paste0(filename, ".pdf"),
            dpi = 600, width = width, height = height, units = "mm")
   }
   
   # save as tex
   if (format.tikz) {
-    ggsave(plot = plt, device = tikz, 
-           path = paste0(filepath, "02-tikz"),
+    # tikz(file = paste0(filepath, filename, ".tex"), 
+    #      width = width/2.51, height = height/2.51)
+    # print(plt)
+    # dev.off()
+    ggsave(plot = plt, device = tikz,
+           path = filepath,
            filename = paste0(filename, ".tex"),
            dpi = 600, width = width, height = height, units = "mm")
   }
