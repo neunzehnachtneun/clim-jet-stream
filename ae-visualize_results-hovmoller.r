@@ -29,227 +29,305 @@ library(zoo) # Zeitreihenanalyse
 library(ggplot2) # Visualisierung
 library(ggsci) # Farbskala
 library(tikzDevice) # Plot für Weiterverarbeitung in Latex
+source("f-help-functions.r")
 
 ## mean
-tb.subset <-
+tb.subset.mean <-
   tb.jets.month %>%
-  filter(method == "Chebyshev" & class != "MJ") %>%
+  filter(class != "MJ") %>%
   select(year, season, method, class, lon, lat, u, v) %>%
   group_by(method, class, year, season, lon) %>%
-  summarise_all(funs(mean, "mean", mean(., na.rm = TRUE)))
+  summarise_all(funs("mean", mean, mean(., na.rm = TRUE)))
 
 
-## running mean
-tb.subset <-
-  tb.jets.month %>%
-  filter(method == "Chebyshev" & class != "MJ" & season == "son") %>%
-  select(year, lon, lat, u, v) %>%
-  group_by(year, lon) %>%
-  mutate(RUNMEAN = rollmean(lat, k = 5, fill = NA))
+## running mean über fünf Jahre
+rollmean5 <- function(data) rollapply(data, 5, mean, na.rm = TRUE, fill = NA, partial = TRUE)
+tb.subset.rollmean <-
+  tb.subset.mean %>%
+  group_by(method, class, season, lon) %>%
+  mutate_at(.vars = vars(lat_mean, u_mean, v_mean), .funs = funs("rollmean5", rollmean5, rollmean5(.)))
 
+## Plot des meridionalen Mittels ####
+## 
+ggp.clim.pfj <- 
+ggplot(data = tb.subset.mean %>%
+         group_by(method, class, year) %>%
+         select(method, class, year, lat_mean, u_mean, v_mean) %>%
+         summarise_all(funs("mean", mean, mean(., na.rm = TRUE))) %>%
+         filter(class == "PFJ"),
+       mapping = aes(x = year, y = lat_mean_mean, 
+                     shape = method))  + geom_point() + 
+  geom_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x) +
+  labs(shape = "Methode", color = "LM") +
+  guides(shape = guide_legend(order = 1),
+         colour = guide_legend(order = 2)) +    
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Breitengrad in $^{\\circ}$",
+                     breaks = c(50, 55, 60, 65, 70)) +
+  theme_bw() + theme(legend.position = "bottom")
 
-## VISUALISIERUNG DER HOVMÖLLER-DIAGRAMME ** PFJ ####
-## POLARFRONT JETSTREAM
+ggp.clim.stj <- 
+ggplot(data = tb.subset.mean %>%
+         group_by(method, class, year) %>%
+         select(method, class, year, lat_mean, u_mean, v_mean) %>%
+         summarise_all(funs("mean", mean, mean(., na.rm = TRUE))) %>%
+         filter(class == "STJ"),
+       mapping = aes(x = year, y = lat_mean_mean, 
+                     shape = method)) + geom_point() + 
+  geom_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x) +
+  labs(shape = "Methode", color = "LM") +
+  guides(shape = guide_legend(order = 1),
+         colour = guide_legend(order = 2)) +    
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Breitengrad in $^{\\circ}$",
+                     breaks = c(32,34,36)) +
+  theme_bw() + theme(legend.position = "bottom")
 
+plt.save(plt = ggp.clim.pfj, width = 140, height = 70, pointsize = 11, 
+         filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/04-clim/", 
+         filename = "mean_clim_pfj")
+plt.save(plt = ggp.clim.stj, width = 140, height = 70, pointsize = 11, 
+         filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/04-clim/", 
+         filename = "mean_clim_stj")
+
+## VISUALISIERUNG DER HOVMÖLLER-DIAGRAMME  ####
 # Schleife über Jahreszeiten
 for (i.ssn in c("djf", "mam", "jja", "son")) {
   print(i.ssn)
   
-  # Positionen Breitengrad Chebyshev
-  hovm.pfj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Positionen Breitengrad Dijkstra
-  hovm.pfj.lat.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Chebyshev
-  hovm.pfj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Dijkstra
-  hovm.pfj.u.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Chebyshev
-  hovm.pfj.v.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Dijkstra
-  hovm.pfj.v.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m3)) +
-    geom_tile() + scale_fill_gsea()
-
+  ## Chebyshev Polarfrontjet ####
+  ## Breitengrad
+  ggp.hovm.m2.pfj.lat <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Chebyshev", class == "PFJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = lat_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Breitengrad in $^{\\circ}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Zonalwind
+  ggp.hovm.m2.pfj.u <- 
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Chebyshev", class == "PFJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = u_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Zonalwind in $\\frac{m}{s}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Meridionalwind
+  ggp.hovm.m2.pfj.v <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Chebyshev", class == "PFJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = v_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Meridionalwind in $\\frac{m}{s}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
   
-  ## RELATIV ZU ZONALEM MITTEL
-  # Positionen Breitengrad Chebyshev
-  hovm.pfj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Positionen Breitengrad Dijkstra
-  hovm.pfj.lat.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = PFJ.lat.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Chebyshev
-  hovm.pfj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Dijkstra
-  hovm.pfj.u.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.u.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Chebyshev
-  hovm.pfj.v.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Dijkstra
-  hovm.pfj.v.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = PFJ.v.m3)) +
-    geom_tile() + scale_fill_gsea()
-
+  ## Chebyshev Subtropenjet ####
+  ## Breitengrad
+  ggp.hovm.m2.stj.lat <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Chebyshev", class == "STJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = lat_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Breitengrad in $^{\\circ}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Zonalwind
+  ggp.hovm.m2.stj.u <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Chebyshev", class == "STJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = u_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Zonalwind in $\\frac{m}{s}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Meridionalwind
+  ggp.hovm.m2.stj.v <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Chebyshev", class == "STJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = v_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Meridionalwind in $\\frac{m}{s}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
   
-  ## Speichern der Plots
+  ## Dijkstra Polarfrontjet ####
+  ## Breitengrad
+  ggp.hovm.m3.pfj.lat <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Dijkstra", class == "PFJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = lat_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Breitengrad in $^{\\circ}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Zonalwind
+  ggp.hovm.m3.pfj.u <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Dijkstra", class == "PFJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = u_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Breitengrad in $^{\\circ}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Meridionalwind
+  ggp.hovm.m3.pfj.v <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Dijkstra", class == "PFJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = v_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Breitengrad in $^{\\circ}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  
+  ## Dijkstra Subtropenjet ####
+  ## Breitengrad
+  ggp.hovm.m3.stj.lat <- 
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Dijkstra", class == "STJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = lat_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Breitengrad in $^{\\circ}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Zonalwind
+  ggp.hovm.m3.stj.u <- 
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Dijkstra", class == "STJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = u_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Zonalwind in $\\frac{m}{s}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  ## Meridionalwind
+  ggp.hovm.m3.stj.v <-
+    ggplot(data = tb.subset.rollmean %>%
+             filter(method == "Dijkstra", class == "STJ", season == i.ssn),
+           mapping = aes(x = lon, y = year, fill = v_mean_rollmean5)) +
+    geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
+    labs(fill = "Meridionalwind in $\\frac{m}{s}$") +
+    guides(fill = guide_colourbar(title.position = "left",
+                                  direction = "horizontal",
+                                  label.position = "bottom")) +
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+                       breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+    scale_y_continuous(name = "Jahr",
+                       breaks = c(1960, 1970, 1980, 1990, 2000, 2010, 2020)) +
+    theme_bw() + theme(legend.position = "bottom")
+  
+  
+  ## Speichern der Plots ####
   # Breitengrade
-  ggsave(filename = paste0("pfj-", i.ssn, "-m2-abs.pdf"),
-         plot = hovm.pfj.lat.m2.abs, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m3-abs.pdf"),
-         plot = hovm.pfj.lat.m3.abs, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m2-rel.pdf"),
-         plot = hovm.pfj.lat.m2.rel, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m3-rel.pdf"),
-         plot = hovm.pfj.lat.m3.rel, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
+  plt.save(plt = ggp.hovm.m2.pfj.lat, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/05-hovm-lat/", 
+           filename = paste0("hovm_chebyshev_pfj_", i.ssn))
+  plt.save(plt = ggp.hovm.m2.stj.lat, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/05-hovm-lat/", 
+           filename = paste0("hovm_chebyshev_stj_", i.ssn))
+  plt.save(plt = ggp.hovm.m3.pfj.lat, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/05-hovm-lat/", 
+           filename = paste0("hovm_dijkstra_pfj_", i.ssn))
+  plt.save(plt = ggp.hovm.m3.stj.lat, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/05-hovm-lat/", 
+           filename = paste0("hovm_dijkstra_stj_", i.ssn))
   # Zonalwind
-  ggsave(filename = paste0("pfj-", i.ssn, "-m2-abs.pdf"),
-         plot = hovm.pfj.u.m2.abs, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m3-abs.pdf"),
-         plot = hovm.pfj.u.m3.abs, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m2-rel.pdf"),
-         plot = hovm.pfj.u.m2.rel, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m3-rel.pdf"),
-         plot = hovm.pfj.u.m3.rel, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
+  plt.save(plt = ggp.hovm.m2.pfj.u, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/06-hovm-u/", 
+           filename = paste0("hovm_chebyshev_pfj_", i.ssn))
+  plt.save(plt = ggp.hovm.m2.stj.u, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/06-hovm-u/", 
+           filename = paste0("hovm_chebyshev_stj_", i.ssn))
+  plt.save(plt = ggp.hovm.m3.pfj.u, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/06-hovm-u/", 
+           filename = paste0("hovm_dijkstra_pfj_", i.ssn))
+  plt.save(plt = ggp.hovm.m3.stj.u, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/06-hovm-u/", 
+           filename = paste0("hovm_dijkstra_stj_", i.ssn))
   # Meridionalwind
-  ggsave(filename = paste0("pfj-", i.ssn, "-m2-abs.pdf"),
-         plot = hovm.pfj.v.m2.abs, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m3-abs.pdf"),
-         plot = hovm.pfj.v.m3.abs, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m2-rel.pdf"),
-         plot = hovm.pfj.v.m2.rel, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("pfj-", i.ssn, "-m3-rel.pdf"),
-         plot = hovm.pfj.v.m3.rel, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
+  plt.save(plt = ggp.hovm.m2.pfj.v, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/07-hovm-v/", 
+           filename = paste0("hovm_chebyshev_pfj_", i.ssn))
+  plt.save(plt = ggp.hovm.m2.stj.v, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/07-hovm-v/", 
+           filename = paste0("hovm_chebyshev_stj_", i.ssn))
+  plt.save(plt = ggp.hovm.m3.pfj.v, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/07-hovm-v/", 
+           filename = paste0("hovm_dijkstra_pfj_", i.ssn))
+  plt.save(plt = ggp.hovm.m3.stj.v, width = 140, height = 100, pointsize = 11, 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/04-hovm-v/", 
+           filename = paste0("hovm_dijkstra_stj_", i.ssn))
 }
-## HOVMÖLLER-DIAGRAMME ** STJ ####
-## SUBTROPISCHER JETSTREAM
-
-# Schleife über Jahreszeiten
-for (i.ssn in c("djf", "mam", "jja", "son")) {
-  print(i.ssn)
-  
-  # Positionen Breitengrad Chebyshev
-  hovm.stj.lat.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
-    geom_tile() + scale_fill_gsea() 
-  # Positionen Breitengrad Dijkstra
-  hovm.stj.lat.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Chebyshev
-  hovm.stj.u.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Dijkstra
-  hovm.stj.u.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Chebyshev
-  hovm.stj.v.m2.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Dijkstra
-  hovm.stj.v.m3.abs <- ggplot(data = df.jets.season[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
-    geom_tile() + scale_fill_gsea()
-  
-  
-  ## RELATIV ZU ZONALEM MITTEL
-  # Positionen Breitengrad Chebyshev
-  hovm.stj.lat.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Positionen Breitengrad Dijkstra
-  hovm.stj.lat.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                                mapping = aes(x = Longitude, y = Year, fill = STJ.lat.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Chebyshev
-  hovm.stj.u.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Zonalwind Dijkstra
-  hovm.stj.u.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.u.m3)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Chebyshev
-  hovm.stj.v.m2.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m2c)) +
-    geom_tile() + scale_fill_gsea()
-  # Intensität Meridionalwind Dijkstra
-  hovm.stj.v.m3.rel <- ggplot(data = df.jets.season.rel[which(df.jets.season$Season == i.ssn),],
-                              mapping = aes(x = Longitude, y = Year, fill = STJ.v.m3)) +
-    geom_tile() + scale_fill_gsea()
-  
-  
-  ## Speichern der Plots
-  # Breitengrade
-  ggsave(filename = paste0("stj-", i.ssn, "-m2-abs.pdf"),
-         plot = hovm.pfj.lat.m2.abs, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m3-abs.pdf"),
-         plot = hovm.pfj.lat.m3.abs, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m2-rel.pdf"),
-         plot = hovm.pfj.lat.m2.rel, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m3-rel.pdf"),
-         plot = hovm.pfj.lat.m3.rel, device = pdf, path = "05-visu-pdf/02-hovm-lat/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  # Zonalwind
-  ggsave(filename = paste0("stj-", i.ssn, "-m2-abs.pdf"),
-         plot = hovm.pfj.u.m2.abs, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m3-abs.pdf"),
-         plot = hovm.pfj.u.m3.abs, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m2-rel.pdf"),
-         plot = hovm.pfj.u.m2.rel, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m3-rel.pdf"),
-         plot = hovm.pfj.u.m3.rel, device = pdf, path = "05-visu-pdf/03-hovm-u/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  # Meridionalwind
-  ggsave(filename = paste0("stj-", i.ssn, "-m2-abs.pdf"),
-         plot = hovm.pfj.v.m2.abs, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m3-abs.pdf"),
-         plot = hovm.pfj.v.m3.abs, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m2-rel.pdf"),
-         plot = hovm.pfj.v.m2.rel, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-  ggsave(filename = paste0("stj-", i.ssn, "-m3-rel.pdf"),
-         plot = hovm.pfj.v.m3.rel, device = pdf, path = "05-visu-pdf/04-hovm-v/", 
-         dpi = 600, width = 297, height = 210, units = "mm")
-}
-
 
 ## ENDE ENDE ENDE ####
