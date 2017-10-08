@@ -7,7 +7,7 @@
 ## 
 setwd("~/01-Master-Thesis/02-code-git/")
 # getwd()
-n.cluster <- 16
+n.cluster <- 8
 
 ## EINLESEN DER DATEN ####
 ##
@@ -125,9 +125,10 @@ for (ii in seq_along(i.order)) {
   tb.order$rmse[ii] <- rmse
   tb.order$dist[ii] <- dist
   print(tb.order)
+  write.table(tb.order, file = "b-set_order_fit.csv")
 }
 
 
 ## ZWISCHENSPEICHERN DER WERTE DES DATENSATZES ####
 # Speichern
-save.image("fit-order.RData")
+# save.image("fit-order.RData")
