@@ -100,7 +100,7 @@ m2 <- foreach(t.stp = 1:length(dts)) %dopar% {
   find.jets.chebpoly.2d(matrix.u = u[,,p.lvl,t.stp], 
                         matrix.v = v[,,p.lvl,t.stp],
                         matrix.z = z[,,p.lvl,t.stp],
-                        axis.x = lon, axis.y = lat, n.order = 12)}
+                        axis.x = lon, axis.y = lat, n.order = 24)}
 stopCluster(cl.fork.2); rm(cl.fork.2)
 
 
