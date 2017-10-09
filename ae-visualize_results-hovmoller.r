@@ -326,7 +326,7 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
            filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/07-hovm-v/", 
            filename = paste0("hovm_dijkstra_pfj_", i.ssn))
   plt.save(plt = ggp.hovm.m3.stj.v, width = 140, height = 100, pointsize = 11, 
-           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/04-hovm-v/", 
+           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/07-hovm-v/", 
            filename = paste0("hovm_dijkstra_stj_", i.ssn))
 }
 
