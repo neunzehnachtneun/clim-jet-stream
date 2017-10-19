@@ -1,17 +1,19 @@
-%%## MASTER THESIS
+%% MASTER THESIS
 
-%% DOCUMENTCLASS %%
-%%\documentclass[11pt, DIV=calc, BCOR=10mm, twoside]{scrbook} 
-\documentclass[a4paper,11pt,twoside,onecolumn,openright,final]{memoir} %scrartcl scrreprt scrbook %memoir
-
+% Präambel
 \include{b-praeambel}
-
+\usepackage{printlen}
+\uselengthunit{cm}
 
 \begin{document}
 \selectlanguage{ngerman}
-\frontmatter
+\pagenumbering{alph}    % a, b, c, ...
+% \printlength{\textwidth}
+% \printlength{\textheight}
 
 \include{c-titel}
+\frontmatter
+\pagenumbering{roman}   % i, ii, iii, iv, ...
 \include{d-eigenstaendigkeit}
 
 \newpage
@@ -22,29 +24,36 @@
 \tableofcontents  % Inhaltsverzeichnis
 \listoffigures    % Abbildungsverzeichnis
 \listoftables     % Tabellenverzeichnis
-\newpage
-
+% \newpage
+%
 \mainmatter %% ## 
-
+\pagenumbering{arabic}  % 1, 2, 3, 4, ...
 \include{e-abstract}
 
-\part{Einleitung}
+%\part{Einleitung}
 \include{f-motivation}
 
-\part{Hintergründe und Methodik}
+%\part{Hintergründe und Methodik}
 \include{g-hintergrund}
 \include{h-methodik}
 
-\part{Auswertung}
-\include{i-plausibilitaet}
-\include{j-klimatologie}
-\include{k-seeeis}
+% %\part{Auswertung}
+% \include{i-plausibilitaet}
+% \include{j-klimatologie}
+% \include{k-seeeis}
+%
+% %\part{Diskussion}
+% \include{l-diskussion}
+% \include{m-danksagung}
 
-\part{Diskussion}
-\include{l-diskussion}
-\include{m-danksagung}
 
+
+
+%\part{Anhang}
+\appendix
+\chapter{Einzelfallbeispiele}
+\chapter{Hovmöller-Diagramme der Dijkstra-Methode}
+\chapter{Saisonale Veränderungen}
 
 \bibliography{n-literatur}
-
 \end{document}

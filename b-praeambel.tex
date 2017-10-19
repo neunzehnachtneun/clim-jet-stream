@@ -1,13 +1,34 @@
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage[ngerman, british]{babel}
-%\usepackage[isolatin]{inputenc} 
+%% Präambel für Master Thesis
+%  Dokumentenklasse
+\documentclass[a4paper,11pt,twoside,onecolumn,openright,final]{memoir} %scrartcl scrreprt scrbook %memoir
 
-%% ## Schriftarten
-\usepackage{palatino} %% Serifen %times
-\usepackage[scaled]{helvet} %% Serifenlos
-\usepackage{courier} %% Schreibmaschinenschrift
-%\usepackage{mathptmx} %% Matheschrift
+%% Pakete
+% Unterscheidung zwischen compiler LuaLaTeX vs pdfLaTeX
+\usepackage{ifluatex}
+\ifluatex 
+    % lualatex
+    %\usepackage{polyglossia}   
+    \usepackage{fontspec}
+    %\defaultfontfeatures{Ligatures=TeX}
+    %\usepackage[]{unicode-math} 
+    %\unimathsetup{math-style=TeX}
+    \setmainfont[Ligatures=TeX]{DejaVuSerif} 
+    \setsansfont{DejaVuSans}
+    \setmonofont{DejaVuSansMono}
+\else 
+    % pdflatex
+    \usepackage[T1]{fontenc}
+    \usepackage[utf8]{inputenc}
+    % Schriftarten
+    \usepackage{palatino}       % Serifen %times
+    \usepackage[scaled]{helvet} % Serifenlos
+    \usepackage{courier}        % Schreibmaschinenschrift
+    %\usepackage{mathptmx}      % Matheschrift
+\fi
+
+%% Sprache
+\usepackage[ngerman, british]{babel}
+
 
 %% Allgemeines Layout
 \setbinding{.5cm} % bindekorrektur
@@ -35,6 +56,10 @@
 \makeheadrule{headings}{\textwidth}{.5pt}
 \makefootrule{headings}{\textwidth}{.5pt}{0ex}
 
+%% Querverweise
+\usepackage[linktoc=all, hypertexnames=false, plainpages=false, pdfpagelabels]{hyperref}
+\usepackage{memhfixc}
+
 %% Inhaltsverzeichnis
 %\usepackage[nottoc,numbib]{tocbibind}
 \setcounter{tocdepth}{1}
@@ -48,16 +73,17 @@
 \usepackage{graphicx}
 \usepackage{float} % für Fließumgebungen; Platzierung H verschiebt nicht
 \restylefloat{figure}
+\ifluatex
+    \newcommand{\includegraphicstikz}{\input}
+\else
+    \newcommand{\includegraphicstikz}{\includegraphics}
+\fi
 
 %% Captions von Tabellen und Abbildungen
 \makeatletter
 \renewcommand{\fnum@table}[1]{\textbf{\tablename~\thetable:} }
 \renewcommand{\fnum@figure}[1]{\textbf{\figurename~\thefigure:} }
 \makeatother
-
-%% Querverweise
-%\usepackage{hyperref}
-%\usepackage{memhfixc}
 
 %% Tabellen
 \usepackage{tabularx}
