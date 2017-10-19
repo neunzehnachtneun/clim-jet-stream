@@ -1,21 +1,23 @@
-
-\chapter{Methodik}
-Während der Arbeit an dieser Abschlussarbeit wurden zwei Verfahren zur Detektion von Jetstreams im Allgemeinen und zur Unterscheidung zwischen polarem und subtropischem Jetstream im Speziellen umgesetzt. Die erste Methode wurde eigens entwickelt und basiert auf einem Least-Squares-Fit mit Chebyshev-Polynomen. Im Folgenden wird diese Methode daher als \enquote{Chebyshev-Methode} bezeichnet. Die zweite Methode ist \citet{molnos-2017} entnommen und baut auf dem Dijkstra-Algorithmus auf, der kürzeste Pfade zwischen einem Start- und Zielknoten in Graphen ermittelt. Diese Methode wird im Folgenden \enquote{Dijkstra-Methode} genannt. 
+\chapter{Methodik} \label{ch:methodik}
+Während der Arbeit an dieser Abschlussarbeit wurden zwei Verfahren zur Detektion von Jetstreams im Allgemeinen und zur Unterscheidung zwischen polarem und subtropischem Jetstream im Speziellen umgesetzt. Die erste Methode wurde eigens entwickelt und basiert auf einer Maximalstellensuche über einen Least-Squares-Fit mit Chebyshev-Polynomen. Im Folgenden wird diese Methode daher als \enquote{Chebyshev-Methode} bezeichnet. Die zweite Methode ist \citet{molnos-2017} entnommen und baut auf dem Dijkstra-Algorithmus auf, der kürzeste Pfade zwischen einem Start- und Zielknoten in Graphen ermittelt. Diese Methode wird im Folgenden \enquote{Dijkstra-Methode} genannt. 
 
 \section{Untersuchte Datensätze}
-In dieser Arbeit werden die ERA-Interim- \citep{dee-2011} mit den ERA-40-Daten \citep{uppala-2005} kombiniert, um einen konsistenten Datensatz von 1957 bis 2017 zu erhalten. Der ERA-Interim-Datensatz, der in 1979 beginnt, wird also mit dem ERA-40-Datensatz verlängert. Dieser Datensatz wird zunächst monatlich gemittelt und von der südlichen Hemisphäre bereinigt. Um im Anschluss an die Analyse der Reanalysedaten die Option zu haben, die Ergebnisse mit Klimaprojektionen zu vergleichen, werden die Daten vom vorliegenden $1,00^{\circ} \ast 1,00^{\circ}$-Gitter auf ein T63-Gitter extrapoliert.
+In dieser Arbeit werden die ERA-Interim- \citep{dee-2011} mit den ERA-40-Daten \citep{uppala-2005} kombiniert, um einen konsistenten Datensatz von 1957 bis 2017 zu erhalten. Der ERA-Interim-Datensatz, der in 1979 beginnt, wird so mit dem ERA-40-Datensatz verlängert. Dieser Datensatz wird zunächst monatlich gemittelt und von der südlichen Hemisphäre bereinigt. Um im Anschluss an die Analyse der Reanalysedaten die Option zu haben, die Ergebnisse mit Klimaprojektionen zu vergleichen, werden die Daten vom vorliegenden $1,00^{\circ} \ast 1,00^{\circ}$-Gitter auf ein T63-Gitter extrapoliert. %oder interpoliert??
 \\
 Betrachtet werden die Parameter Zonalwind $u$, Meridionalwind $v$ und geopotenzielle Höhe $z$ auf den Druckniveau $250\,$hPa, da \citet{rikus-2015} etwa in dieser Höhe den subtropischen und Polarfrontjetstream detektiert hat.
 \\
-Darüber hinaus wird der Sea-Ice-Index-Datensatz der NOAA \citep{sii-2016} genutzt, um Korrelationen zwischen der Position des Jets und der arktischen Eisfläche zu untersuchen.
+Darüber hinaus wird der Sea-Ice-Index-Datensatz der NOAA \citep{sii-2016} genutzt, um Korrelationen zwischen der Position des Jets sowie deren Variabilität und der arktischen Eisfläche zu untersuchen.
 
+\begin{figure}[hbt]
+  \centering
+  \includegraphicstikz{05-visu-pdf-tikz/01-area/north-hem-merc}
+  \caption{Geographische Ausdehnung des Untersuchungsgebiets} \label{fig:area}
+\end{figure}
 
-\begin{table}
+\begin{table}[hbt]
 \caption[Eckdaten der genutzten Datensätze]{Genutzte Datensätze und deren Eckdaten wie zeitliche und räumliche Auflösungen und genutzte Parameter}
 \centering
 \begin{tabularx}{\textwidth}{|p{0.16\textwidth}|X|X|X|}
-%{|>{\hsize=\hsize}X|>{\hsize=\hsize}X|>{\hsize=\hsize}X|>{\hsize=\hsize}X|}
-%{|l|X|X|X|}
   \hline
   Datensatz & ERA-40 & ERA-Interim & NOAA-Sea-Ice \\
   \hline
@@ -51,19 +53,54 @@ Darüber hinaus wird der Sea-Ice-Index-Datensatz der NOAA \citep{sii-2016} genut
 \end{table}
 
 \subsection{ERA-40}
+\citep{uppala-2005}
 \subsection{ERA-Interim}
+\citep{dee-2011}
 \subsection{Sea-Ice-Daten}
+\citep{sii-2016}
 
 \section{Chebyshev-Methode}
 Der Chebyshev-Methode liegen folgende Annahme zugrunde:
 \begin{enumerate}
   \item Die Positionen des Jetstreams bestimmen sich durch die Positionen lokaler meridionaler Maxima des Zonalwinds $u$.
   \item Falls mehrere lokale Maxima auffindbar sind, ist das nördlichere der beiden Maxima der Polarfront-Jetstream und das Südliche der Subtropen-Jetstream.
-  \item Falls sich aufgefundene lokale Maxima nicht eineindeutig einem der beiden Jets zuordnen lassen oder die Distanz kleiner als $10^\circ$ ist, werden diese als Single-Jets klassifiziert.
+  \item Falls sich aufgefundene lokale Maxima nicht eineindeutig einem der beiden Jets zuordnen lassen oder die Distanz kleiner als $10^\circ$ geographischer Breite ist, werden diese als Single-Jets klassifiziert.
 \end{enumerate}
+Die Maxima werden lokalisiert, indem ein Polynom mittels Least-Squares-Verfahren für jeden Meridian an den Zonalwind gefittet wird. Hierzu werden Chebyshev-Polynome erster Art genutzt. Diese haben den Vorteil, dass sich über die Koeffizienten nicht bloß der (geschätzte) Wert sondern auch die Werte der ersten und zweiten Ableitung zurückgegeben lässt. Über eine Nullstellensuche der ersten Ableitung und eine Überprüfung der zweiten Ableitung lassen sich so die Positionen und Werte der Maxima bestimmen.
 
-\subsection{Aufbau der Polynome und Least-Squares-Verfahren}
-Die Maxima werden lokalisiert, indem ein Polynom mittels Least-Squares-Verfahren für jeden Meridian an den Zonalwind gefittet wird. Hierzu werden Chebyshev-Polynome erster Art genutzt. Diese haben den Vorteil, dass sich über die Koeffizienten nicht bloß der (geschätzte) Wert sondern auch die Werte der ersten und zweiten Ableitung zurückgegeben lässt. Über eine Nullstellensuche der ersten Ableitung und eine Überprüfung der zweiten Ableitung lassen sich so die Positionen und Werte der Maxima bestimmen. \\
+\subsection{Least-Squares-Fit}
+Zunächst wird also ein Polynom an den Zonalwinds für jeden Meridian gefittet. Das Least-Squares-Verfahren oder die Methode kleinster Fehlerquadrate ist ein gängiges Verfahren der Regressionsanalyse, mit dem sich \enquote{die Form von Abhängigkeiten zwischen zwei  oder mehreren Merkmalen einer Grundgesamtheit untersuchen}~\citep{bronstein-2006} lässt. Im allgemeinen Fall wird so ein Zusammenhang zwischen einer unabhängigen Variable~$\underline{\boldsymbol{x}}$ und einer abhängigen Variable~$\underline{\boldsymbol{f}}$ gesucht. In diesem Fall sind dies der Breitengrad $\phi$ und die Intensität des Zonalwinds $u$. Über die vektoriellen Datenpunkte $\underline{\boldsymbol{f}}$ und die Schätzmatrix $\boldsymbol{G}$ lassen sich die Koeffizienten eines Polynoms $s$-ter Ordnung bestimmen.  
+\begin{align}
+\begin{split}
+\underline{\boldsymbol{\tilde{a}}} = 
+\begin{pmatrix}
+  \tilde{a}_0 \\
+  \tilde{a}_1 \\
+  \vdots \\
+  \tilde{a}_s
+\end{pmatrix},
+\underline{\boldsymbol{f}} = 
+\begin{pmatrix}
+  f_0 \\
+  f_1 \\
+  \vdots \\
+  f_N
+\end{pmatrix},
+\boldsymbol{G} = 
+ \begin{pmatrix}
+  g_{0} \left( \underline{\boldsymbol{x}}^{\left( 1 \right)} \right) & g_{1} \left( \underline{\boldsymbol{x}}^{\left( 1 \right)} \right) & \cdots & g_{s} \left( \underline{\boldsymbol{x}}^{\left( 1 \right)} \right) \\
+  g_{0} \left( \underline{\boldsymbol{x}}^{\left( 2 \right)} \right) & g_{1} \left( \underline{\boldsymbol{x}}^{\left( 2 \right)} \right) & \cdots & g_{s} \left( \underline{\boldsymbol{x}}^{\left( 2 \right)} \right) \\
+  \vdots  & \vdots  & \ddots & \vdots  \\
+  g_{0} \left( \underline{\boldsymbol{x}}^{\left( N \right)} \right) & g_{1} \left( \underline{\boldsymbol{x}}^{\left( N \right)} \right) & \cdots & g_{s} \left( \underline{\boldsymbol{x}}^{\left( N \right)} \right) \\
+ \end{pmatrix}
+\end{split}
+\end{align}
+
+\begin{align}
+& \underline{\boldsymbol{\tilde{a}}} = \boldsymbol{G^TG^{-1}G^T}\underline{\boldsymbol{f}} 
+\end{align}
+
+\subsection{Aufbau der Chebyshev-Polynome}
 Über die allgemeine Rekursionsformel für orthogonale Polynome \citep{Abramowitz-1972} lassen sie sich die Chebyshev-Polynome erster Art $T(x)$ und zweiter Art $U(x)$, die im Bereich $-1 < x < 1$ definiert sind, folgendermaßen berechnen:
 \begin{align}
 \begin{split}
@@ -94,45 +131,28 @@ Die Ableitungen lassen sich aus der trigenometrischen Definition der Polynome be
 %\end{split}
 \end{align} 
 
-
-\subsection{Least-Squares-Fit}
-Das Least-Squares-Verfahren oder die Methode kleinster Fehlerquadrate ist ein Verfahren der Regressionsanalyse, mit dem sich \enquote{die Form von Abhängigkeiten zwischen zwei  oder mehreren Merkmalen einer Grundgesamtheit untersuchen}~\citep{bronstein-2006} lässt. Im allgemeinen Fall wird so ein Zusammenhang zwischen einer unabhängigen Variable~$\underline{\boldsymbol{x}}$ und einer abhängigen Variable~$\underline{\boldsymbol{f}}$ gesucht. In diesem Fall sind dies der Breitengrad $\phi$ und die Intensität des Zonalwinds $u$. Über die vektoriellen Datenpunkte $\underline{\boldsymbol{f}}$ und die Schätzmatrix $\boldsymbol{G}$ lassen sich die Koeffizienten eines Polynoms $s$-ter Ordnung bestimmen.  
-\begin{align}
-\begin{split}
-\underline{\boldsymbol{\tilde{a}}} = 
-\begin{pmatrix}
-  \tilde{a}_0 \\
-  \tilde{a}_1 \\
-  \vdots \\
-  \tilde{a}_s
-\end{pmatrix},
-\underline{\boldsymbol{f}} = 
-\begin{pmatrix}
-  f_0 \\
-  f_1 \\
-  \vdots \\
-  f_N
-\end{pmatrix},
-\boldsymbol{G} = 
- \begin{pmatrix}
-  g_{0} \left( \underline{\boldsymbol{x}}^{\left( 1 \right)} \right) & g_{1} \left( \underline{\boldsymbol{x}}^{\left( 1 \right)} \right) & \cdots & g_{s} \left( \underline{\boldsymbol{x}}^{\left( 1 \right)} \right) \\
-  g_{0} \left( \underline{\boldsymbol{x}}^{\left( 2 \right)} \right) & g_{1} \left( \underline{\boldsymbol{x}}^{\left( 2 \right)} \right) & \cdots & g_{s} \left( \underline{\boldsymbol{x}}^{\left( 2 \right)} \right) \\
-  \vdots  & \vdots  & \ddots & \vdots  \\
-  g_{0} \left( \underline{\boldsymbol{x}}^{\left( N \right)} \right) & g_{1} \left( \underline{\boldsymbol{x}}^{\left( N \right)} \right) & \cdots & g_{s} \left( \underline{\boldsymbol{x}}^{\left( N \right)} \right) \\
- \end{pmatrix}
-\end{split}
-\end{align}
-
-\begin{align}
-& \underline{\boldsymbol{\tilde{a}}} = \boldsymbol{G^TG^{-1}G^T}\underline{\boldsymbol{f}} 
-\end{align}
+\subsection{Lokalisierung der Maxima}
 Über die Koeffienten $\underline{\boldsymbol{\tilde{a}}}$ lassen sich einerseits die geschätzten Werte für den angenommenen Zusammenhang andererseits auch die Werte der ersten und zweiten Ableitung bestimmen. Die Schätzmatrizen $\boldsymbol{G}'$ und $\boldsymbol{G}''$ für die Ableitungen ergeben sich aus den Ableitungen der Chebyshev-Polynome erster Art.
 \begin{align}
 & \underline{\boldsymbol{\tilde{f}}} = \boldsymbol{G}\underline{\boldsymbol{\tilde{a}}}, \hspace{1em} \dfrac{d}{dx}\underline{\boldsymbol{\tilde{f}}} = \boldsymbol{G}'\underline{\boldsymbol{\tilde{a}}}, \hspace{1em} \dfrac{d^2}{dx^2}\underline{\boldsymbol{\tilde{f}}} = \boldsymbol{G}''\underline{\boldsymbol{\tilde{a}}}
 \end{align}
-Um die Maxima des Datensatzes zu finden, wird nun mithilfe des Newton-Raphson-Verfahrens nach Nullstellen der ersten Ableitung gesucht und überprüft, ob der Wert der zweiten Ableitung $<0$ ist. 
+Um die Maxima des Datensatzes zu finden, wird nun mithilfe des Newton-Raphson-Verfahrens nach Nullstellen der ersten Ableitung gesucht und überprüft, ob der Wert der zweiten Ableitung $<0$ ist.
+
+
 \subsection{Anwendung auf den Datensatz}
-Auf den in dieser Arbeit genutzten Datensatz bezogen werden die Tropen ebenso wie der Pol vom Suchalgorithmus ausgeschlossen, um Fehler durch Randoszillationen und Ostwindmaxima in den Tropen auszuschließen. Konzentriert wird sich auf die Nordhemisphäre im Bereich $20^{\circ} < \phi < 85^{\circ}$.
+Auf den in dieser Arbeit genutzten Datensatz bezogen werden die Tropen ebenso wie der Pol vom Suchalgorithmus ausgeschlossen, um Fehler durch Randoszillationen und Ostwindmaxima in den Tropen auszuschließen. Konzentriert wird sich auf die Nordhemisphäre im Bereich $20^{\circ} < \phi < 85^{\circ}$. Zunächst wird überprüft, welcher Ordnung der Polynomfit sein muss, um die Maxima am besten abzubilden. Hierfür wird die Wurzel der mittleren quadratischen Differenz zwischen der Breitendgrad-Position des Maximalwerts des Zonalwinds und der mittels Least-Squares-Verfahren gefundenen Jetposition errechnet. Abbildung \ref{fig:order_rmse} zeigt ein zu erwartendes Ergebnis. Bei einer meridionalen Auflösung von $48$ Gitterpunkten schneidet das Least Squares Verfahren mit Polynomen der 24. Ordnung am besten ab, da allgemein $n$ Polynome $2 \cdot n$ Gitterpunkte am besten abbilden. Für die folgenden Analysen wird daher ein Fit 24. Ordnung angewandt. 
+
+\begin{figure}
+  \centering
+  \includegraphicstikz{05-visu-pdf-tikz/00-fit-order/order_rmse}
+  \caption{Zusammenhang zwischen der Ordnung des Polynoms und der Wurzel der mittleren quadratischen Differenz zwischen den Positionen des Maximalwerts des Zonalwinds und des modellierten Maximaljets.} \label{fig:order_rmse}
+\end{figure}
+
+% \begin{figure}
+%   \centering
+%   \includegraphicstikz{05-visu-pdf-tikz/00-fit-order/order_dist}
+%   \caption{Test} \label{fig:test}
+% \end{figure}
 
 \section{Dijkstra-Methode}
 Die Dijkstra-Methode basiert auf der Methodik von \citet{molnos-2017}, der folgende Annahmen zugrundeliegen:
@@ -168,7 +188,6 @@ Die größte Herausforderung in der Anwendung des Dijkstra-Algorithmus auf ein P
 Um einen vollständigen Umlauf des Jets zu berechnen, wird für jeden Zeitschritt die Datenreihe des ersten Längengrad-Schritts hinter die letzte Datenreihe gesetzt, sodass die erste Datenreihe gleich der letzten Datenreihe ist.
 \\
 Die Kanten führen von jedem Knoten lediglich zu seinen drei bis acht direkten Nachbarknoten, während sich die Gewichte $C_j$ aus den drei Komponenten Betrag der Windstärke $X_j$, Windrichtung $Y_j$ sowie der Abweichung vom klimatologischen Mittel $Z_j$ zusammensetzen (siehe Gleichung \ref{eq:dijkstra1}). Die Gewichtungen $w_1$, $w_2$ und $w_3$ der drei Beiträge sind positiv-semidifinit, summieren sich auf 1 und sind für jeden Beitrag spezifisch (siehe Gleichung \ref{eq:dijkstra2}).
-
 \begin{align}
   & C_j = w_1 \cdot X_j + w_2 \cdot Y_j + w_3 \cdot Z_j   
   \label{eq:dijkstra1}\\
@@ -217,7 +236,7 @@ Die Tabelle \ref{tab:dijkstra} zeigt die genutzten Parameter $w_1$, $w_2$, $w_3$
 \label{tab:dijkstra}
 \end{table}
 
-Obwohl sich der in dieser Arbeit genutzte Datensatz (2D, $250\,\text{hPa}$, Monatsmittel) von dem in \citet{molnos-2017} verwendeten Datensatz (2D, vertikal gemittelt über $500-150\,\text{hPa}$, 15-tägiges gleitendes Mittel) unterscheidet, wird keine erneute Optimierung der Parameter vorgenommen, insbesondere um die Dijkstra-Methode mit der Chebyshev-Methode anhand des selben Input-Datensatzes zu vergleichen. 
+Obwohl sich der in dieser Arbeit genutzte Datensatz (2D, $250\,\text{hPa}$, Monatsmittel) von dem in \citet{molnos-2017} verwendeten Datensatz (2D, vertikal gemittelt über $500-150\,\text{hPa}$, 15-tägiges gleitendes Mittel) unterscheidet, wird keine erneute Optimierung der Parameter vorgenommen, insbesondere um die Dijkstra-Methode mit der Chebyshev-Methode anhand desselben Input-Datensatzes zu vergleichen. 
 
 \section{Technische Umsetzung}
 Für die programmiertechnische Umsetzung werden \texttt{R} und \texttt{python} und die Kommando\-zeilen\-werkzeuge \texttt{cdo} und \texttt{git} verwendet. Sie ist folgendermaßen erfolgt: 
