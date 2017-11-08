@@ -47,7 +47,7 @@ norm.vec <- function(vec) {
 ## FUNKTION ZUM SPEICHERN VON PLOTS IM PDF- UND TIKZ-FORMAT ####
 ####
 plt.save <- function(plt, 
-                     width, height, pointsize = 11, 
+                     width = 135, height, pointsize = 11, 
                      filepath, filename, 
                      format.pdf = TRUE, format.tikz = TRUE) {
   library(ggplot2)
