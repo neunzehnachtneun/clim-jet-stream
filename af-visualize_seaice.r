@@ -45,55 +45,94 @@ tb.subset <-
   filter(method == "Chebyshev" & class == "PFJ")
 
 
+## Mittel -> method, class, year ####
+## Für Klimatrends!
+## 1. Mittelwert
+tb.subset.yr.mean <-
+  tb.jets.month %>%
+  filter(class != "MJ") %>%
+  filter(lon >= -90 & lon <= -0) %>%
+  select(year, season, month, dts, method, class, lon, lat, u, v, extent) %>%
+  group_by(method, class, year, month, dts) %>%
+  summarise_at(.vars = vars(lat, u, v), .funs = funs("mean", mean, mean(., na.rm = TRUE)))
+tb.subset.yr.mean <- left_join(tb.subset.yr.mean, tb.sea.ice, by = c("year", "month"))
 
 
-## VERGLEICH CHEBYSHEV VS DIJKSTRA ####
-## 
+## 2. Standardabweichung
+tb.subset.yr.sdev <-
+  tb.jets.month %>%
+  filter(class != "MJ") %>%
+  filter(lon >= -90 & lon <= -0) %>%
+  select(year, month, dts, method, class, lon, lat, u, v, extent) %>%
+  group_by(method, class, year, month, dts) %>%
+  summarise_at(.vars = vars(lat, u, v), .funs = funs("sd", sd, sd(., na.rm = TRUE)))
+tb.subset.yr.sdev <- left_join(tb.subset.yr.sdev, tb.sea.ice, by = c("year", "month"))
+
+
+## Seeeisentwicklung allgemein
+ggp.seaice <- 
+  ggplot(data = tb.subset.yr.mean %>%
+           filter(year >= 1978),
+         mapping = aes(x = dts, y = extent)) + 
+  geom_line(size = 0.2) +
+  geom_smooth(method = "lm", formula = y ~ x) +
+  scale_y_continuous(name = "Ausdehnung des arktischen Seeeises in km2",
+                     breaks = c(4,8,12,16)) +
+  theme_bw() + theme(legend.position = "bottom")
+print(ggp.seaice)
+
 
 ## Chebyshev
-## 
-ggp.seaice.chebyshev <-
-  ggplot(data =   tb.jets.month %>%
-           filter(lon >= -90 & lon <= -0) %>%
+## Mean
+ggp.seaice.chebyshev.mean <-
+  ggplot(data =   tb.subset.yr.mean %>%
            filter(method == "Chebyshev" & class == "PFJ"), 
-         mapping = aes(x = extent, y = lat, col = season)) + 
-  geom_jitter(size = 0.2) + scale_colour_brewer(palette = "RdYlBu", direction = -1) +
+         mapping = aes(x = extent, y = lat_mean)) + 
+  geom_point(size = 0.2) + scale_colour_brewer(palette = "RdYlBu", direction = -1) +
+  geom_smooth(method = "lm", formula = y ~ x) +
   scale_x_reverse(name = "Seeeis-Ausdehnung") +
   scale_y_continuous(name = "Positionen Chebyshev") +
-  theme_classic() +
+  theme_bw() +
   theme(legend.position = "bottom")
-print(ggp.seaice.chebyshev)
-##
-
+print(ggp.seaice.chebyshev.mean)
+## Sdev
+ggp.seaice.chebyshev.sdev <-
+  ggplot(data =   tb.subset.yr.sdev %>%
+           filter(method == "Chebyshev" & class == "PFJ"), 
+         mapping = aes(x = extent, y = lat_sd)) + 
+  geom_point(size = 0.2) + scale_colour_brewer(palette = "RdYlBu", direction = -1) +
+  geom_smooth(method = "lm", formula = y ~ x) +
+  scale_x_reverse(name = "Seeeis-Ausdehnung") +
+  scale_y_continuous(name = "Positionen Chebyshev") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+print(ggp.seaice.chebyshev.sdev)
 
 ## Dijkstra
-## 
-ggp.seaice.dijkstra <- 
-  ggplot(data =   tb.jets.month %>%
-           filter(lon >= -90 & lon <= -0) %>%
+## Mean
+ggp.seaice.dijkstra.mean <-
+  ggplot(data =   tb.subset.yr.mean %>%
            filter(method == "Dijkstra" & class == "PFJ"), 
-         mapping = aes(x = extent, y = lat, col = season)) + 
-  geom_jitter(size = 0.2) + scale_colour_brewer(palette = "RdYlBu", direction = -1) +
-  scale_x_reverse(name = "Seeeis-Ausdehnung in km$^{2}$") +
+         mapping = aes(x = extent, y = lat_mean)) + 
+  geom_point(size = 0.2) + scale_colour_brewer(palette = "RdYlBu", direction = -1) +
+  geom_smooth(method = "lm", formula = y ~ x) +
+  scale_x_reverse(name = "Seeeis-Ausdehnung") +
   scale_y_continuous(name = "Positionen Dijkstra") +
-  theme_classic() +
+  theme_bw() +
   theme(legend.position = "bottom")
-print(ggp.seaice.chebyshev)
-##
-ggp.seaice.dijkstra <- 
-  ggplot(data =   tb.jets.month %>%
-           filter(lon >= -90 & lon <= -0) %>%
-           filter(method == "Dijkstra", class == "PFJ", season == "DJF") %>%
-           select(year, month, lat, extent) %>%
-           group_by(year, month) %>%
-           summarise_all(funs("mean", mean, mean(., na.rm = TRUE))), 
-         mapping = aes(x = extent, y = lat, col = season)) + 
-  geom_jitter(size = 0.2) + scale_colour_brewer(palette = "RdYlBu", direction = -1) +
-  scale_x_reverse(name = "Seeeis-Ausdehnung in km$^{2}$") +
+print(ggp.seaice.dijkstra.mean)
+## Sdev
+ggp.seaice.dijkstra.sdev <-
+  ggplot(data =   tb.subset.yr.sdev %>%
+           filter(method == "Dijkstra" & class == "PFJ"), 
+         mapping = aes(x = extent, y = lat_sd)) + 
+  geom_point(size = 0.2) + scale_colour_brewer(palette = "RdYlBu", direction = -1) +
+  geom_smooth(method = "lm", formula = y ~ x) +
+  scale_x_reverse(name = "Seeeis-Ausdehnung") +
   scale_y_continuous(name = "Positionen Dijkstra") +
-  theme_classic() +
+  theme_bw() +
   theme(legend.position = "bottom")
-print(ggp.seaice.chebyshev)
+print(ggp.seaice.dijkstra.sdev)
 
 
 
