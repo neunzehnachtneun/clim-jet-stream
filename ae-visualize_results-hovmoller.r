@@ -554,6 +554,7 @@ for (i.ssn in c("djf", "mam", "jja", "son")) {
   plt.save(plt = ggp.hovm.m3.stj.v, width = 140, height = 100, pointsize = 11, 
            filepath = paste0(save.dir, "07-hovm-v/"), 
            filename = paste0("hovm-dijkstra-stj-", i.ssn))
+  
 }
 
 ## ENDE ENDE ENDE ####
