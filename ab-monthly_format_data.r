@@ -21,7 +21,7 @@ ls()
 
 ## LADEN DES SEA ICE DATENSATZTES ####
 ##
-library(lubridate)
+library(lubridate); library(dplyr)
 
 df.sea.ice <- read.csv("04-data-nc-csv/d-sea-ice-index-arctic-noaa.csv")
 
@@ -32,6 +32,11 @@ df.sea.ice$month <- as.character(month(df.sea.ice$dts, label = TRUE))
 names(df.sea.ice)
 df.sea.ice <- df.sea.ice[c(-1, -3, -4, -5, -8)]
 names(df.sea.ice)
+
+df.sea.ice$area[which(df.sea.ice$area == -9999)] <- NA
+df.sea.ice$extent[which(df.sea.ice$extent == -9999)] <- NA
+
+tb.sea.ice <- as_tibble(df.sea.ice)
 
 ## FORMATIEREN DER DATENSATZE ####
 ## 
@@ -263,7 +268,7 @@ tb.jets.month$class <- factor(tb.jets.month$class, levels = c("MJ", "PFJ", "SJ",
 ## LÖSCHEN UNNÖTIGER VARIABLEN ####
 ## 
 
-rm(list = setdiff(ls(), list("tb.jets.month", "tb.uv", 
+rm(list = setdiff(ls(), list("tb.jets.month", "tb.uv", "tb.sea.ice", 
                              "dts", "dts.cld.wrm", "dts.month", "dts.season", "dts.year", 
                              "get.orography.df", "get.orography.ll", 
                              "i.stp", "lat", "lev", "lon", "n.lat", "n.lon", "n.seas", "n.years", "p.lvl")))
