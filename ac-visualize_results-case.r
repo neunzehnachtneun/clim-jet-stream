@@ -10,11 +10,16 @@ setwd("~/01-Master-Thesis/02-code-git/")
 # getwd()
 
 
+
 ## LADEN DES DATENSATZES ####
 rm(list = ls())
 # Laden
 load("stp-b.RData")
 ls()
+
+## Pfad zum Speichern von Abbildungen festlegen:
+save.dir <- "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf-tikz/"
+# "05-visu-pdf-tikz/"
 
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
@@ -57,11 +62,11 @@ ggp.nh.merc <-
   coord_map(xlim = c(-180,180), ylim = c(0,90)) +
   theme_bw()
 
-plt.save(plt = ggp.nh, width = 140, height = 70, pointsize = 11, 
-         filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/01-area/", 
+plt.save(plt = ggp.nh, width = 135, height = 55, pointsize = 11, 
+         filepath = paste0(save.dir, "01-area"), 
          filename = "north-hem")
-plt.save(plt = ggp.nh.merc, width = 140, height = 70, pointsize = 11, 
-         filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/01-area/", 
+plt.save(plt = ggp.nh.merc, width = 135, height = 55, pointsize = 11, 
+         filepath = paste0(save.dir, "01-area"), 
          filename = "north-hem-merc")
 
 
@@ -80,8 +85,9 @@ repeat {
     break
   }
 }
-print(dts[i.stp])
-
+print(sort(i.stp))
+print(dts[sort(i.stp)])
+i.stp <- c(33, 52, 143, 394, 437, 577, 663, 692)
 ## Schleife über Stichprobe
 for (t.stp in i.stp) {
   print(t.stp)
@@ -196,16 +202,16 @@ for (t.stp in i.stp) {
   
   ## Speichern der Plots als pdfs und tex-files
   plt.save(plt = ggp.nh.m1.m2b, 
-           width = 140, height = 70, pointsize = 11,
-           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/02-case/", 
+           width = 135, height = 55, pointsize = 11,
+           filepath = paste0(save.dir, "02-case/"), 
            filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b"))
   plt.save(plt = ggp.nh.m2c, 
-           width = 140, height = 70, pointsize = 11,
-           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/02-case/", 
+           width = 135, height = 55, pointsize = 11,
+           filepath = paste0(save.dir, "02-case/"), 
            filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2c"))
   plt.save(plt = ggp.nh.m3, 
-           width = 140, height = 70, pointsize = 11,
-           filepath = "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf/02-case/", 
+           width = 135, height = 55, pointsize = 11,
+           filepath = paste0(save.dir, "02-case/"), 
            filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m3"))
 }
 
