@@ -71,7 +71,7 @@ find.jets.chebpoly.2d <- function(matrix.u, matrix.v, matrix.z, axis.x, axis.y, 
   }
   
   ## Herausfiltern der Positionen innerhalb des Sektors [20, 85]
-  sect.ind <- which(array.lat > 20 & array.lat < 85, arr.ind = TRUE)
+  sect.ind <- which(array.lat > 20 & array.lat < 80, arr.ind = TRUE)
   array.lat.sect <- matrix(NA, nrow = n.max.max, ncol = list.max.len)
   array.lat.sect[sect.ind] <- array.lat[sect.ind]
   array.u.sect <- matrix(NA, nrow = n.max.max, ncol = list.max.len)
