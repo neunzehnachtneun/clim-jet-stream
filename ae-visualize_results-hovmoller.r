@@ -17,8 +17,8 @@ load("stp-b.RData")
 ls()
 
 ## Pfad zum Speichern von Abbildungen festlegen:
-save.dir <- "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf-tikz/"
-# "05-visu-pdf-tikz/"
+#save.dir <- "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf-tikz/"
+save.dir <- "05-visu-pdf-tikz/"
 
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);

@@ -16,6 +16,8 @@ rm(list = ls())
 load("stp-b.RData")
 ls()
 
+save.dir <- "05-visu-pdf-tikz/"
+
 # Nachladen der Packages
 # library(ncdf4); library(chron); library(parallel); library(foreach); library(doParallel);
 
