@@ -7,7 +7,7 @@
 ## 
 setwd("~/01-Master-Thesis/02-code-git/")
 # getwd()
-n.cluster <- 8
+n.cluster <- 12
 
 ## EINLESEN DER DATEN ####
 ##

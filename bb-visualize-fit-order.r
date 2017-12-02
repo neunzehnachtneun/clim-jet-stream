@@ -8,8 +8,7 @@ df.order <- read.table("b-set_fit_order.csv")
 tb.order <- as_tibble(df.order)
 
 ## Pfad zum Speichern von Abbildungen festlegen:
-save.dir <- "/home/skiefer/01-Master-Thesis/02-code-git/05-visu-pdf-tikz/"
-# "05-visu-pdf-tikz/"
+save.dir <- "05-visu-pdf-tikz/"
 
 
 
