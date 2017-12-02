@@ -6,7 +6,7 @@
 \uselengthunit{cm}
 
 \begin{document}
-\selectlanguage{ngerman}
+%\selectlanguage{ngerman}
 \pagenumbering{alph}    % a, b, c, ...
 % \printlength{\textwidth}
 % \printlength{\textheight}
@@ -14,7 +14,7 @@
 \include{c-titel}
 \frontmatter
 \pagenumbering{roman}   % i, ii, iii, iv, ...
-% \include{d-eigenstaendigkeit}
+\include{d-eigenstaendigkeit}
 
 \newpage
 \thispagestyle{empty}
@@ -29,31 +29,26 @@
 \mainmatter %% ## 
 \pagenumbering{arabic}  % 1, 2, 3, 4, ...
 % \include{e-abstract}
-
-%\part{Einleitung}
+%
+% %\part{Einleitung}
 \include{f-motivation}
-
-%\part{Hintergründe und Methodik}
+%
+% %\part{Hintergründe und Methodik}
 \include{g-hintergrund}
 \include{h-methodik}
-
+% % %
 % %\part{Auswertung}
-% \include{i-plausibilitaet}
-% \include{j-klimatologie}
-% \include{k-seeeis}
-%
+\include{i-plausibilitaet}
+\include{j-klimatologie}
+\include{k-seeeis}
+% %
 % %\part{Diskussion}
-% \include{l-diskussion}
-% \include{m-danksagung}
-
-
-
-
+\include{l-diskussion}
+\include{m-danksagung}
+%
 % %\part{Anhang}
-% \appendix
-% \chapter{Einzelfallbeispiele}
-% \chapter{Hovmöller-Diagramme der Dijkstra-Methode}
-% \chapter{Saisonale Veränderungen}
+\include{n-appendix}
+%
 
 \bibliography{n-literatur}
 \end{document}

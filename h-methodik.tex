@@ -2,17 +2,58 @@
 Während der Arbeit an dieser Thesis wurden zwei Verfahren zur Detektion von Jetstreams im Allgemeinen und zur Unterscheidung zwischen polarem und subtropischem Jetstream im Speziellen umgesetzt. Die erste Methode wurde eigens entwickelt und basiert auf einer Maximalstellensuche über einen Least-Squares-Fit mit Chebyshev-Polynomen. Im Folgenden wird diese Methode als \enquote{Chebyshev-Methode} bezeichnet. Die zweite Methode ist \citet{molnos-2017} entnommen und baut auf dem Dijkstra-Algorithmus auf, der kürzeste Pfade zwischen einem Start- und Zielknoten in Graphen ermittelt. Diese Methode wird im Folgenden \enquote{Dijkstra-Methode} genannt. 
 
 \section{Untersuchte Datensätze}
-In dieser Arbeit werden die ERA-Interim- \citep{dee-2011} mit den ERA-40-Daten \citep{uppala-2005} kombiniert, um einen konsistenten Datensatz von 1957 bis 2017 zu erhalten. Der ERA-Interim-Datensatz, der in 1979 beginnt, wird so mit dem ERA-40-Datensatz verlängert. Dieser Datensatz wird zunächst monatlich gemittelt und von der südlichen Hemisphäre bereinigt. Um im Anschluss an die Analyse der Reanalysedaten die Option zu haben, die Ergebnisse mit Klimaprojektionen zu vergleichen, werden die Daten vom vorliegenden $1,00^{\circ} \ast 1,00^{\circ}$-Gitter auf ein T63-Gitter interpoliert. In Abbildung \ref{fig:area} ist das Untersuchungsgebiet dargestellt.
-
-Betrachtet werden die Parameter Zonalwind $u$, Meridionalwind $v$ und geopotenzielle Höhe $z$ auf den Druckniveau $250\,$hPa, da \citet{rikus-2015} mit seiner Methode etwa in dieser Höhe den subtropischen und Polarfrontjetstream detektiert hat. Diese Methode liefert für jedes dreidimensionale Windfeld, die mittlere Position des Jetstreams in Breitengraden und Druck. Auch erlaubt diese Methode eine Unterscheidung verschiedener Klassen wie dem Polarfront- oder dem subtropischen Jetstream. \citet{molnos-2017} hat ihre Methode an \citet{rikus-2015} optimiert, weshalb auch hier darauf zurückgegriffen wird.
-\\
-Darüber hinaus wird der Sea-Ice-Index-Datensatz der NOAA \citep{sii-2016} genutzt, um Korrelationen zwischen der Position des Jets sowie dessen Variabilität und der arktischen Eisfläche zu untersuchen.
+In dieser Arbeit werden die ERA-Interim- \citep{dee-2011} mit den ERA-40-Daten \citep{uppala-2005} kombiniert, um einen konsistenten Datensatz von 1957 bis 2017 zu erhalten. Der ERA-Interim-Datensatz, der in 1979 beginnt, wird so mit dem ERA-40-Datensatz verlängert. Dieser Datensatz wird zunächst monatlich gemittelt und von der südlichen Hemisphäre bereinigt. Um im Anschluss an die Analyse der Reanalysedaten die Option zu haben, die Ergebnisse mit Klimaprojektionen zu vergleichen, werden die Daten auf ein T63-Gitter interpoliert. In Abbildung \ref{fig:area} ist das Untersuchungsgebiet dargestellt.
 
 \begin{figure}[hbt]
   \centering
-  \includegraphicstikz{05-visu-pdf-tikz/01-area/north-hem-merc}
+  \includegraphicstikz{../05-visu-pdf-tikz/01-area/north-hem-merc}
   \caption{Geographische Ausdehnung des Untersuchungsgebiets} \label{fig:area}
 \end{figure}
+
+Betrachtet werden die Parameter Zonalwind $u$, Meridionalwind $v$ und geopotenzielle Höhe $z$ auf den Druckniveau $250\,$hPa, da \citet{rikus-2015} mit seiner Methode etwa in dieser Höhe den subtropischen und Polarfrontjetstream detektiert hat. Diese Methode liefert für jedes dreidimensionale Windfeld die mittlere Position des Jetstreams in Breitengraden und Druck. Auch erlaubt diese Methode eine Unterscheidung verschiedener Klassen wie dem Polarfront- und dem subtropischen Jetstream. \citet{molnos-2017} hat ihre Methode an \citet{rikus-2015} optimiert, weshalb auch hier darauf zurückgegriffen wird.
+
+Um zu überprüfen, ob sich die Verlängerung des Datensatzes homogen auf die zeitliche Entwicklung der Zonal- und Meridionalwindkomponente auswirkt, werden die Komponenten für die Tropen, die mittleren Breiten sowie für die Polarregion untersucht. Dargestellt in Abbildung \ref{fig:anom-era-u} sind die Zeitreihen für den räumlich gemittelten Zonalwind für die Polarregion (\SI{90}{\degree}\,N bis \SI{66.5}{\degree}\,N), die mittleren Breiten (\SI{66.5}{\degree}\,N bis \SI{23.5}{\degree}\,N) und die Tropen (\SI{23.5}{\degree}\,N bis \SI{0}{\degree}\,N) abzüglich des zeitlichen Mittels dargestellt. Der Vertikalstrich markiert den Wechsel von ERA-40 zu ERA-Interim. Der Jahresgang ist in den Tropen und den mittleren Breiten am besten zu erkennen. Deutliche Unterschiede zwischen den Zeiträumen sind nicht zu erkenne. Ähnlich verhält es sich mit den Meridionalwind, dargestellt in Abbildung \ref{fig:anom-era-v}. Der Jahresgang ist auch bei diesem am deutlichsten in den Tropen und den mittleren Breiten zu sehen. Deutliche Inhomogenitäten sind nicht zu sehen, Schwache am ehesten in den mittleren Breiten evident. Diese sind jedoch so schwach, dass sie für diese Analyse als irrelevant erachtet werden.
+
+Darüber hinaus wird der Sea-Ice-Index-Datensatz der NOAA \citep{sii-2016} genutzt, um Korrelationen zwischen der Position des Jets sowie dessen Variabilität und der arktischen Eisfläche zu untersuchen.
+
+\begin{figure}[H]
+  \begin{minipage}{\textwidth}
+    \centering
+    \includegraphicstikz{../05-visu-pdf-tikz/09-timeseries-era/polar-u}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+    \centering
+    \includegraphicstikz{../05-visu-pdf-tikz/09-timeseries-era/midlat-u}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+    \centering
+    \includegraphicstikz{../05-visu-pdf-tikz/09-timeseries-era/tropics-u}
+  \end{minipage}
+  \caption[Homogenitätsanalyse des Zonalwinds für ERA-40 und ERA-Interim]{Zonalwindgeschwindigkeiten der Monatsmittel abzüglich des zeitlichen Mittels der ERA-40- und ERA-Interim-Daten für die Polarregion (oben), die mittlere Breiten (mittig) und die Tropen (unten)} \label{fig:anom-era-u}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{minipage}{\textwidth}
+    \centering
+    \includegraphicstikz{../05-visu-pdf-tikz/09-timeseries-era/polar-v}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+    \centering
+    \includegraphicstikz{../05-visu-pdf-tikz/09-timeseries-era/midlat-v}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+    \centering
+    \includegraphicstikz{../05-visu-pdf-tikz/09-timeseries-era/tropics-v}
+  \end{minipage}
+  \caption[Homogenitätsanalyse des Meridionalwinds für ERA-40 und ERA-Interim]{Meridionalwindgeschwindigkeiten der Monatsmittel abzüglich des zeitlichen Mittels der ERA-40- und ERA-Interim-Daten für die Polarregion (oben), die mittlere Breiten (mittig) und die Tropen (unten)} \label{fig:anom-era-v}
+\end{figure}
+
+\subsection{ERA-40}
+\citep{uppala-2005} beschreiben die globale ERA-40-Reanalyse, die einen Zeitraum von September \num{1957} bis August \num{2002} abdeckt. Für die Reanalyse wurden verschiedene Beobachtungsdaten genutzt. Unter anderem wurden Flugzeug-, Meeresbojen-, Bodendaten und ab ab den \num{1970}er Jahren Satellitenmessungen assimiliert.
+\subsection{ERA-Interim}
+\citep{dee-2011} beschreiben das ERA-Interim-Projekt, dessen Ziel es war, eine neue atmosphärische Reanalyse vorzubereiten, die ERA-40 ersetzen und bis ins frühe 20.\,Jahrhundert reichen soll. Die Anzahl der assimilierten Beobachtungsdaten stieg von etwa \num{e6} pro Tag in \num{1979} auf nahezu \num{e7} pro Tag in \num{2010}. Der Großteil dieser Daten entstammt Satellitenmessungen.
+\subsection{Sea-Ice-Daten}
+\citep{sii-2016} stellen Meereisdaten zu Bedeckung und Trends im arktischen und antarktischen Ozean als tägliche und monatliche Produkte zur Verfügung. Die Daten entstammen passiven Mikrowellenmessungen, die von Oktober 1978 an mit dem Nimbus-7-Satelliten und ab Juli 1987 im Defense Meteorological Satellite Program (DMSP) durchgeführt wurden. Die Daten umfassen die Meereisausdehnung, die Schmelz- und Wachstumsrate sowie die Meereiskonzentration.
 
 \begin{table}[hbt]
 \caption[Eckdaten der genutzten Datensätze]{Genutzte Datensätze und deren Eckdaten wie zeitliche und räumliche Auflösungen und genutzte Parameter}
@@ -26,16 +67,16 @@ Darüber hinaus wird der Sea-Ice-Index-Datensatz der NOAA \citep{sii-2016} genut
     & (verfügbar) & (verfügbar) & (verfügbar) \\
   \hline 
   \multirow{2}{\linewidth}{Horizontaler Umfang}
-    & \textbf{Nordhemisphäre} & \textbf{Nordhemisphäre} & \textbf{Summe NH} \\
-    & (Global) & (Global) & (Globale Summe)  \\
+    & \textbf{Nordhemisphäre} & \textbf{Nordhemisphäre} & \textbf{Nordhemisphäre} \\
+    & (Global) & (Global) & (Extratropen)  \\
     & & & \\
   \multirow{2}{\linewidth}{Horizontale Auflösung}
     & \textbf{T63-Gitter} & \textbf{T63-Gitter} & \textbf{Globale Summe} \\
-    & ($1^{\circ}$-Gitter) & ($0,75^{\circ}$-Gitter) & (Globale Summe)  \\
+    & (\SI{2.5}{\degree}-Gitter) & (\SI{1.5}{\degree}-Gitter) & (\SI{25}{\kilo\metre})  \\
     & & & \\
   \multirow{2}{\linewidth}{Vertikale Auflösung}
     & \textbf{250\,hPa-Level} & \textbf{250\,hPa-Level} & \textbf{Oberfläche} \\
-    & (10 Drucklevel) & (20 Höhenlevel) & (Oberfläche)  \\
+    & (23 Drucklevel) & (37 Drucklevel) & (Oberfläche)  \\
     & & & \\
   \multirow{2}{\linewidth}{Zeitlicher Umfang}
     & \textbf{Sep 1957 - Dez 1978} & \textbf{Jan 1979 - Jun 2017} & \textbf{Nov 1978 - Jun 2017} \\
@@ -43,35 +84,32 @@ Darüber hinaus wird der Sea-Ice-Index-Datensatz der NOAA \citep{sii-2016} genut
     & & & \\
   \multirow{2}{*}{\parbox{0.16\textwidth}{Zeitliche Auflösung}}
     & \textbf{Monatliche Mittel der täglichen Mittelwerte} & \textbf{Monatliche Mittel der täglichen Mittelwerte} & \textbf{Monatliche Mittelwerte} \\
-    & (00, 06, 12, 18 UTC) & (00, 06, 12, 18 UTC) & (Monatliche Mittel)  \\
+    & (sechsstündlich) & (sechsstündlich) & (täglich)  \\
     & & & \\
   \multirow{2}{*}{\parbox{0.16\textwidth}{Parameter}}
-    & \textbf{Zonal- und Merdidionalwindgeschwindigkeit, geopotenzielle Höhe} & \textbf{Zonal- und Merdidionalwind, geopotenzielle Höhe} & \textbf{Seeeisausdehnung und -Fläche} \\
-    & (00, 06, 12, 18 UTC) & (00, 06, 12, 18 UTC) & (Monatliche Mittel)  \\
+    & \textbf{Zonal- und Meridionalwindgeschwindigkeit, geopotenzielle Höhe} & \textbf{Zonal- und Meridionalwind, geopotenzielle Höhe} & \textbf{Seeeisausdehnung} \\
   \hline
 \end{tabularx}
 \end{table}
-
-\subsection{ERA-40}
-\citep{uppala-2005}
-\subsection{ERA-Interim}
-\citep{dee-2011}
-\subsection{Sea-Ice-Daten}
-\citep{sii-2016}
 
 \section{Chebyshev-Methode}
 Der Chebyshev-Methode liegen folgende Annahme zugrunde:
 \begin{enumerate}
   \item Die Positionen des Jetstreams bestimmen sich durch die Positionen lokaler meridionaler Maxima des Zonalwinds $u$.
-  \item Falls mehrere lokale Maxima auffindbar sind, ist das nördlichere der beiden Maxima der Polarfront-Jetstream und das Südliche der Subtropen-Jetstream.
-  \item Falls sich aufgefundene lokale Maxima nicht eineindeutig einem der beiden Jets zuordnen lassen oder die Distanz kleiner als $10^\circ$ geographischer Breite ist, werden diese als Single-Jets klassifiziert.
+  \item Falls mehrere lokale Maxima auffindbar sind, ist das Nördlichere der beiden Maxima der Polarfront-Jetstream und das Südliche der Subtropen-Jetstream.
+  \item Falls sich aufgefundene lokale Maxima nicht eineindeutig einem der beiden Jets zuordnen lassen oder die Distanz kleiner als \SI{10}{\degree} geographischer Breite ist, werden diese als Single-Jets klassifiziert.
 \end{enumerate}
-Die Maxima werden lokalisiert, indem ein Polynom mittels Least-Squares-Verfahren für jeden Meridian an den Zonalwind gefittet wird. Hierzu werden Chebyshev-Polynome erster Art genutzt. Diese haben den Vorteil, dass sich über die Koeffizienten nicht bloß die geschätzten Wert sondern auch die Werte der ersten und zweiten Ableitung zurückgegeben lassen. Über eine Nullstellensuche der ersten Ableitung und eine Überprüfung der zweiten Ableitung lassen sich so die Positionen und Werte der Maxima bestimmen.
+Die Maxima werden lokalisiert, indem ein Polynom mittels Least-Squares-Verfahren für jeden Meridian an den Zonalwind gefittet wird. Hierzu werden Chebyshev-Polynome erster Art genutzt. Diese haben den Vorteil, dass sich über die Koeffizienten nicht bloß die geschätzten Werte sondern auch die Werte der ersten und zweiten Ableitung zurückgeben lassen. Über eine Nullstellensuche der ersten Ableitung und eine Überprüfung der zweiten Ableitung lassen sich so die Positionen und Werte der Maxima bestimmen.
 
 \subsection{Least-Squares-Fit}
-Zunächst wird also ein Polynom an den Zonalwinds für jeden Meridian gefittet. Das Least-Squares-Verfahren oder die Methode kleinster Fehlerquadrate ist ein gängiges Verfahren der Regressionsanalyse, mit dem sich \enquote{die Form von Abhängigkeiten zwischen zwei  oder mehreren Merkmalen einer Grundgesamtheit untersuchen}~\citep{bronstein-2006} lässt. Im allgemeinen Fall wird so ein Zusammenhang zwischen einer unabhängigen Variable~$\underline{\boldsymbol{x}}$ und einer abhängigen Variable~$\underline{\boldsymbol{f}}$ gesucht. In diesem Fall sind dies der Breitengrad $\phi$ und die Intensität des Zonalwinds $u$. Über die vektoriellen Datenpunkte $\underline{\boldsymbol{f}}$ und die Schätzmatrix $\boldsymbol{G}$ lassen sich die Koeffizienten eines Polynoms $s$-ter Ordnung bestimmen.  
+Zunächst wird also ein Polynom an den Zonalwind für jeden Meridian gefittet. Das Least-Squares-Verfahren oder die Methode kleinster Fehlerquadrate ist ein gängiges Verfahren der Regressionsanalyse, mit dem sich \enquote{die Form von Abhängigkeiten zwischen zwei  oder mehreren Merkmalen einer Grundgesamtheit untersuchen}~\citep{bronstein-2006} lässt. Im allgemeinen Fall wird so ein Zusammenhang zwischen einer unabhängigen Variable~$\underline{\boldsymbol{x}}$ und einer abhängigen Variable~$\underline{\boldsymbol{f}}$ gesucht. In diesem Fall sind dies der Breitengrad $\phi$ und die Intensität des Zonalwinds $u$. Über die vektoriellen Datenpunkte $\underline{\boldsymbol{f}}$ und die Schätzmatrix $\boldsymbol{G}$ lassen sich die Koeffizienten eines Polynoms $s$-ter Ordnung bestimmen.
+
 \begin{align}
-\begin{split}
+& \underline{\boldsymbol{f}} = \boldsymbol{G} \cdot \underline{\boldsymbol{\tilde{a}}}
+\end{align}
+
+\begin{align}
+\begin{split} \label{eq:guess}
 \underline{\boldsymbol{\tilde{a}}} = 
 \begin{pmatrix}
   \tilde{a}_0 \\
@@ -96,13 +134,13 @@ Zunächst wird also ein Polynom an den Zonalwinds für jeden Meridian gefittet. 
 \end{split}
 \end{align}
 \begin{align}
-& \underline{\boldsymbol{\tilde{a}}} = \boldsymbol{G^TG^{-1}G^T}\underline{\boldsymbol{f}} 
+& \underline{\boldsymbol{\tilde{a}}} = \boldsymbol{\left( G^TG \right)^{-1}G^T}\underline{\boldsymbol{f}} 
 \end{align}
 
 \subsection{Aufbau der Chebyshev-Polynome}
-Über die allgemeine Rekursionsformel für orthogonale Polynome \citep{Abramowitz-1972} lassen sie sich die Chebyshev-Polynome erster Art $T(x)$ und zweiter Art $U(x)$, die im Bereich $-1 < x < 1$ definiert sind, folgendermaßen berechnen:
+Über die allgemeine Rekursionsformel für orthogonale Polynome \citep{Abramowitz-1972} lassen sich die Chebyshev-Polynome erster Art $T(x)$ und zweiter Art $U(x)$, die für die Berechnung der Ableitungen benötigt werden, folgendermaßen berechnen. Der Definitionsbereich beider Polynome liegt im Bereich \num{-1}$<x<$\num{1}.
 \begin{align}
-\begin{split}
+\begin{split} \label{eq:cheb}
 & T_0(x) = 1, \: T_1(x) = x \\
 & T_{n+1}(x) = 2 \cdot x \cdot T_n(x) - T_{n-1}(x)
 \end{split}
@@ -113,7 +151,7 @@ Zunächst wird also ein Polynom an den Zonalwinds für jeden Meridian gefittet. 
 & U_{n+1}(x) = 2 \cdot x \cdot U_n(x) - U_{n-1}(x)
 \end{split}
 \end{align}
-$T_n(x)$ in Formel \ref{eq:cheb} entspricht dem $g(x)$ in Formel \ref{eq:guess} und zeigt so den Aufbau der Schätzmatrix. Die Ableitungen lassen sich aus der trigenometrischen Definition der Polynome bestimmen und lauten nach \citet{spanier-1987} wie folgt:
+$T_n(x)$ in Formel \ref{eq:cheb} entspricht dem $g_s(x)$ in Formel \ref{eq:guess} und zeigt so den Aufbau der Schätzmatrix. Die Ableitungen lassen sich aus der trigenometrischen Definition der Polynome bestimmen und lauten nach \citet{spanier-1987} wie folgt:
 \begin{align}
 %\begin{split}
 & \dfrac{d}{dx} T_n = \dfrac{n}{1-x^2} \left[ x \cdot T_n \left( x \right) - T_{n+1} \left( x \right) \right] = nU_{n-1} \left( x \right)
@@ -134,16 +172,16 @@ $T_n(x)$ in Formel \ref{eq:cheb} entspricht dem $g(x)$ in Formel \ref{eq:guess} 
 \begin{align}
 & \underline{\boldsymbol{\tilde{f}}} = \boldsymbol{G}\underline{\boldsymbol{\tilde{a}}}, \hspace{1em} \dfrac{d}{dx}\underline{\boldsymbol{\tilde{f}}} = \boldsymbol{G}'\underline{\boldsymbol{\tilde{a}}}, \hspace{1em} \dfrac{d^2}{dx^2}\underline{\boldsymbol{\tilde{f}}} = \boldsymbol{G}''\underline{\boldsymbol{\tilde{a}}}
 \end{align}
-Um die Maxima des Datensatzes zu finden, wird nun mithilfe des Newton-Raphson-Verfahrens nach Nullstellen der ersten Ableitung gesucht und überprüft, ob der Wert der zweiten Ableitung $<0$ ist.
+Um die Maxima des Datensatzes zu finden, wird nun mithilfe des Newton-Raphson-Verfahrens nach Nullstellen der ersten Ableitung gesucht und überprüft, ob der Wert der zweiten Ableitung $<$\num{0} ist.
 
 
 \subsection{Anwendung auf den Datensatz}
-Auf den in dieser Arbeit genutzten Datensatz bezogen werden die Tropen ebenso wie der Pol vom Suchalgorithmus ausgeschlossen, um Fehler durch Randoszillationen und Ostwindmaxima in den Tropen auszuschließen. Konzentriert wird sich auf die Nordhemisphäre im Bereich $20^{\circ} < \phi < 85^{\circ}$. Zunächst wird überprüft, welcher Ordnung der Polynomfit sein muss, um die Maxima am besten abzubilden. Hierfür wird die Wurzel der mittleren quadratischen Differenz zwischen der Breitendgrad-Position des Maximalwerts des Zonalwinds und der mittels Least-Squares-Verfahren gefundenen Jetposition errechnet. Abbildung \ref{fig:order_rmse} zeigt ein zu erwartendes Ergebnis. Bei einer meridionalen Auflösung von $48$ Gitterpunkten schneidet das Least Squares Verfahren mit Polynomen der 24. Ordnung am besten ab, da allgemein $n$ Polynome $2 \cdot n$ Gitterpunkte am besten abbilden. Für die folgenden Analysen wird daher ein Fit 24. Ordnung angewandt. 
+Auf den in dieser Arbeit genutzten Datensatz bezogen werden die Tropen ebenso wie der Pol vom Suchalgorithmus ausgeschlossen, um Fehler durch Randoszillationen und Ostwindmaxima in den Tropen auszuschließen. Konzentriert wird sich auf die Nordhemisphäre im Bereich \SI{20}{\degree}$<\phi<$ \SI{85}{\degree}. Zunächst wird überprüft, welcher Ordnung der Polynomfit sein muss, um die Maxima am besten abzubilden. Hierfür wird die Wurzel der mittleren quadratischen Differenz zwischen der Breitendgrad-Position des Maximalwerts des Zonalwinds und der mittels Least-Squares-Ver\-fah\-ren gefundenen Jetposition errechnet. Abbildung \ref{fig:order_rmse} zeigt ein zu erwartendes Ergebnis. Bei einer meridionalen Auflösung von \num{48} Gitterpunkten schneidet das Least Squares Verfahren mit Polynomen der 24. Ordnung am besten ab, da ein Chebyshev-Polynom $n$ter Ordnung \num{2}\,$n$ Datenpunkte exakt beschreiben kann. Für die folgenden Analysen wird daher ein Fit 24. Ordnung angewandt. 
 
 \begin{figure}
   \centering
-  \includegraphicstikz{05-visu-pdf-tikz/00-fit-order/order_rmse}
-  \caption{Zusammenhang zwischen der Ordnung des Polynoms und der Wurzel der mittleren quadratischen Differenz zwischen den Positionen des Maximalwerts des Zonalwinds und des modellierten Maximaljets.} \label{fig:order_rmse}
+  \includegraphicstikz{../05-visu-pdf-tikz/00-fit-order/order_rmse}
+  \caption[Optimierung der Ordnung des Chebyshev-Polynomfits]{Zusammenhang zwischen der Ordnung des Chebyshev-Polynoms und der Wurzel der mittleren quadratischen Differenz zwischen den Positionen des Maximalwerts des Zonalwinds und des modellierten Maximaljets.} \label{fig:order_rmse}
 \end{figure}
 
 % \begin{figure}
@@ -163,7 +201,7 @@ Die Dijkstra-Methode basiert auf der Methodik von \citet{molnos-2017}, der folge
   \item Falls der subtropische und der polare Jetstream näher als $10^\circ$ zusammenliegen, ist eine eindeutige Unterscheidung nicht möglich und der Mittelwert der beiden Positionen wird als Single-Jet klassifiziert.
 \end{enumerate}
 \subsection{Grundlegende Funktionsweise}
-Das Problem des kürzesten Pfades in einem Graphen ist bereits vor einem halben Jahrhundert von \citet{kruskal-1956} und \citet{dijkstra-1959} untersucht worden. Der Fokus in dieser Arbeit liegt auf dem Dijkstra-Algorithmus, der das Problem für gegebene Startknoten und positiv definite Kantenlängen löst und so kürzeste Pfade zwischen einem Startknoten und allen übrigen Knoten findet. Ergänzend sei erwähnt, dass der Algorithmus auch für kürzeste Pfade zwischen allen Knoten und einem festgelegten Zielknoten verwendet werden kann, indem der Ziel- als Startknoten definiert und die Richtungen der Kanten umgekehrt werden. Im Folgenden wird zunächst die Funktionsweise des Dijkstra-Algorithmus im Allgemeinen und darauf aufbauend der Nutzen des Algorithmus für die Jetstream-Detektion erklärt.
+Das Problem des kürzesten Pfades in einem Graphen ist bereits vor einem halben Jahrhundert von \citet{kruskal-1956} und \citet{dijkstra-1959} untersucht worden. Der Fokus in dieser Arbeit liegt auf dem Dijkstra-Al\-go\-rith\-mus, der das Problem für gegebene Startknoten und positiv definite Kantenlängen löst und so kürzeste Pfade zwischen einem Startknoten und allen übrigen Knoten findet. Ergänzend sei erwähnt, dass der Algorithmus auch für kürzeste Pfade zwischen allen Knoten und einem festgelegten Zielknoten verwendet werden kann, indem der Ziel- als Startknoten definiert und die Richtungen der Kanten umgekehrt werden. Im Folgenden wird zunächst die Funktionsweise des Dijkstra-Algorithmus im Allgemeinen und darauf aufbauend der Nutzen des Algorithmus für die Jetstream-Detektion erklärt.
 \\
 Gesucht ist der Pfad minimaler Länge zwischen einem beliebigen Startknoten $P$ und einem beliebigen Zielknoten $Q$. Angenommen der gesuchte Pfad führe über den Knoten $R$ und sei bekannt, dann ist auch der Pfad minimaler Länge von Startknoten $P$ zum Knoten $R$ bekannt. Dieses Wissen wird genutzt, um den Pfad minimaler Länge zu finden. Zunächst werden hierzu die Knoten und die Kanten in jeweils drei disjunkte Untermengen unterteilt:
 \begin{itemize}
@@ -182,8 +220,7 @@ Zunächst sind alle Knoten in Menge C und alle Äste in Menge III. Daraufhin wir
 \end{enumerate}
 Der so gefundene Pfad ist der gesuchte Pfad minimaler Länge vom Startknoten~$P$ zum Zielknoten $Q$. \citep{dijkstra-1959}
 \subsection{Praktische Anwendung}
-Die größte Herausforderung in der Anwendung des Dijkstra-Algorithmus auf ein Problem wie die Detektion des Jetstreams ist die Definition der Knotenpunkte und der Kanten sowie deren Gewichte. Die Festlegung der Knotenpunkte ist relativ anspruchslos. Da der Datensatz auf einem Breiten-Längengrad-Gitter vorliegt, spiegelt jeder der Gitterpunkte einen Knotenpunkt wider. Um sicherzustellen, dass der 
-Um einen vollständigen Umlauf des Jets zu berechnen, wird für jeden Zeitschritt die Datenreihe des ersten Längengrad-Schritts hinter die letzte Datenreihe gesetzt, sodass die erste Datenreihe gleich der letzten Datenreihe ist.
+Die größte Herausforderung in der Anwendung des Dijkstra-Algorithmus auf ein Problem wie die Detektion des Jetstreams ist die Definition der Knotenpunkte und der Kanten sowie deren Gewichte. Die Festlegung der Knotenpunkte ist relativ anspruchslos. Da der Datensatz auf einem Breiten-Längengrad-Gitter vorliegt, spiegelt jeder der Gitterpunkte einen Knotenpunkt wider. Um einen vollständigen Umlauf des Jets um die nördliche Hemisphäre zu berechnen, wird für jeden Zeitschritt die Datenreihe des ersten Längengrad-Schritts hinter die letzte Datenreihe gesetzt, sodass der Datensatz periodisch verlängert wird.
 \\
 Die Kanten führen von jedem Knoten lediglich zu seinen drei bis acht direkten Nachbarknoten, während sich die Gewichte $C_j$ aus den drei Komponenten Betrag der Windstärke $X_j$, Windrichtung $Y_j$ sowie der Abweichung vom klimatologischen Mittel $Z_j$ zusammensetzen (siehe Gleichung \ref{eq:dijkstra1}). Die Gewichtungen $w_1$, $w_2$ und $w_3$ der drei Beiträge sind positiv-semidifinit, summieren sich auf 1 und sind für jeden Beitrag spezifisch (siehe Gleichung \ref{eq:dijkstra2}).
 \begin{align}
@@ -199,7 +236,7 @@ Die Windrichtung fließt über den zweiten Term $Y_j$ ein und ist in Gleichung \
 \\
 Der dritte Beitrag $Z_j$ ist zur Differenzierung zwischen polarem und subtropischem Jetstream notwendig. Hierfür wird das Kantengewicht (Gleichung \ref{eq:dijkstra-z} abhängig von der Breitengradentfernung größer, sodass Positionen eher bevorzugt werden, die näher am klimatologischen Mittel sind. Durch den Einfluss der  vierten Potenz kann sich der Jet in einem Bereich von rund $\pm 20\,\%$ um das klimatologische Mittel relativ frei bewegen. Außerhalb dieses Bereichs steigt der Beitrag schnell gegen $1$.
 \\
-In der Praxis wird die minimale Pfadlänge für jeden einzelnen Breitengrad-Gitterpunkt bestimmt, das heißt bei dem genutzten Datensatz mit einer Längengrad-Breitengrad-Auflösung von $192 \ast 48$ werden $48$ unterschiedliche Pfade berechnet. Der gesuchte Pfad ist jener mit der kürzesten Weglänge.
+In der Praxis wird die minimale Pfadlänge für jeden einzelnen Gitterpunkt auf der Brei\-ten\-grad-Achse bestimmt, das heißt bei dem genutzten Datensatz mit einer Längengrad-Breitengrad-Auflösung von \num{192}$\cdot$\num{48} werden \num{48} unterschiedliche Pfade berechnet. Der gesuchte Pfad ist jener mit der kürzesten Weglänge.
 \begin{align}
   & X_j = 1 - \dfrac{\sqrt{u_A^2 + v_A^2} + \sqrt{u_B^2 + v_B^2}}{2 \cdot \max_{k=1}^n  \sqrt{u_k^2 + v_k^2}}  
   \label{eq:dijkstra-x}\\
@@ -219,29 +256,29 @@ Die Tabelle \ref{tab:dijkstra} zeigt die genutzten Parameter $w_1$, $w_2$, $w_3$
   Jahreszeit & Parameter & Subtropenjet & Polarjet \\
   \hline
   \multirow{4}{*}{November - April} 
-    & $w_1$ & $0,05$ & $0,05$ \\
+    & $w_1$ & \num{0.05} & \num{0,05} \\
     & $w_2$ & $-$ & $-$ \\
-    & $w_3$ & $0,95$ & $0,95$ \\
-    & $\phi_{clim}$ & $25,1^{\circ}$\,N & $67,5^{\circ}$\,N \\
+    & $w_3$ & \num{0,95} & \num{0,95} \\
+    & $\phi_{clim}$ & \SI{25.1}{\degree}\,N & \SI{67.5}{\degree}\,N \\
   \hline
   \multirow{4}{*}{Mai - Oktober} 
-    & $w_1$ & $0,07$ & $0,04$ \\
+    & $w_1$ & \num{0,07} & \num{0,04} \\
     & $w_2$ & $-$ & $-$ \\
-    & $w_3$ & $0,93$ & $0,96$ \\
-    & $\phi_{clim}$ & $29,8^{\circ}$\,N & $69,1^{\circ}$\,N \\
+    & $w_3$ & \num{0,93} & \num{0,96} \\
+    & $\phi_{clim}$ & \SI{29.8}{\degree}\,N & \SI{69.1}{\degree}\,N \\
   \hline
 \end{tabular}
 \label{tab:dijkstra}
 \end{table}
 
-Obwohl sich der in dieser Arbeit genutzte Datensatz (2D, $250\,\text{hPa}$, Monatsmittel) von dem in \citet{molnos-2017} verwendeten Datensatz (2D, vertikal gemittelt über $500-150\,\text{hPa}$, 15-tägiges gleitendes Mittel) unterscheidet, wird keine erneute Optimierung der Parameter vorgenommen, insbesondere um die Dijkstra-Methode mit der Chebyshev-Methode anhand desselben Input-Datensatzes zu vergleichen. 
+Obwohl sich der in dieser Arbeit genutzte Datensatz (2D, \SI{250}{\hecto\pascal}, Monatsmittel) von dem in \citet{molnos-2017} verwendeten Datensatz (2D, vertikal gemittelt über \num{500}-\SI{150}{\hecto\pascal}, 15-tägiges gleitendes Mittel) unterscheidet, wird keine erneute Optimierung der Parameter vorgenommen, insbesondere um die Dijkstra-Methode mit der Chebyshev-Methode anhand desselben Input-Datensatzes zu vergleichen. 
 
 \section{Technische Umsetzung}
-Für die programmiertechnische Umsetzung werden \texttt{R} und \texttt{python} und die Kommando\-zeilen\-werkzeuge \texttt{cdo} und \texttt{git} verwendet. Sie ist folgendermaßen erfolgt: 
+Für die programmiertechnische Umsetzung werden \texttt{R} und \texttt{python} und die Kommando\-zeilen\-werkzeuge \texttt{cdo} und \texttt{git} verwendet. Sie erfolgt folgendermaßen: 
 \\
 Zunächst werden die täglichen Werte verschiedener Parameter der Era-40- und Era-Interim-Datensätze als tägliche Werte mittels der Python-Bibliothek \texttt{ecmwfapi} \citep{ecmwfapi} heruntergeladen. Daraufhin werden diese Datensätze so bearbeitet, dass sich am Ende ein zusammenhängender Datensatz der monatlichen Mittelwerte des Zonalwinds, des Meridionalwinds und der geopotenziellen Höhe auf der Nordhemisphäre auf einem T63-Gitter im Zeitraum von 1957 bis 2017 ergibt. Dies wird mit dem Kommandozeilen-Werkzeug \texttt{cdo} \citep{cdo-2015} bewerkstelligt.
 \\
 Für die weitere Datenverarbeitung wird ausschließlich auf \texttt{R} \citep{R-2017} zurückgegriffen. Neben den für diese Arbeit geschriebenen Routinen und Paketen werden einige weitere Pakete genutzt. Dies sind im Wesentlichen \texttt{ncdf4} \citep{ncdf4-2017} für das Einlesen von Dateien im netCDF-Format, \texttt{chron} \citep{chron-2017} und \texttt{lubridate} \citep{lubridate-2011} für die Verarbeitung von Zeitstempeln, \texttt{rootSolve} \citep{rootSolve-2009} für das Lokalisieren von Nullstellen mit dem Newton-Raphson-Verfahren und \texttt{igraph} \citep{igraph-2006} zum Auffinden des kürzesten Weges zwischen Knoten in einem Graphen mit dem Dijkstra-Algorithmus.
 Darüber hinaus werden \texttt{parallel} \citep{R-2017}, \texttt{foreach} \citep{foreach-2015} und \texttt{doParallel} \citep{doParallel-2015} für paralleles Rechnen sowie \texttt{reshape2} \citep{reshape2-2007} und \texttt{dplyr} \citep{dplyr} für die Verarbeitung der Daten und zu guter Letzt \texttt{ggplot2} \citep{ggplot2-2009} zur Visualisierung der Ergebnisse genutzt.
 
-%Bei Interesse ist der Code öffentlich unter \url{https://sebaki.github.io/clim-jet-stream/} einsehbar. Rückfragen sind per Mail an {\url{s.kiefer@posteo.de}} zu richten.
+Bei Interesse sind der vollständige Code in \texttt{bash}, \texttt{Python} und \texttt{R}, die \LaTeX-Dateien sowie eine knappe Dokumentation als \texttt{git}-Repository öffentlich unter \url{https://sebaki.github.io/clim-jet-stream/} einsehbar. Rückfragen sind per Mail an {\url{s.kiefer@posteo.de}} zu richten.

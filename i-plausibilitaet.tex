@@ -1,70 +1,185 @@
 \chapter{Plausibilitätsanalyse} \label{ch:plausibilitaet}
-In diesem Kapitel werden die berechneten Positionen des Suptropen- und des polaren Jetstreams auf ihre Plausibilät untersucht. Darüberhinaus werden Stärken und Schwächen der beiden Methoden herausgearbeitet.
+In diesem Kapitel werden die berechneten Positionen des Suptropen- und des polaren Jetstreams auf ihre Plausibilät untersucht. Hierzu werden zunächst zufällig ausgewählte Einzelfälle aller Jahreszeiten betrachtet, bevor die Methoden in Gänze mittels Streudiagrammen miteinander verglichen werden, um systematische Unterschiede zu erkennen. Auch werden Stärken und Schwächen der beiden Methoden herausgearbeitet.
 
-\section{Einzelfälle}
+\section{Einzelfalluntersuchung}
+Die Einzelfälle werden zufällig ausgewählt. Als Nebenbedingung wird vorrausgesetzt, dass die acht Einzelfälle alle Jahreszeiten abdecken. In diesem Kapitel werden zwei Einzelfälle vorgestellt, die die Vor- und Nachteile der Methoden veranschaulichen sollen. Sechs weitere Beispiele sind in Anhang \ref{ch:app-case-stud} abgebildet.
+
+Das erste Beispiel in den Abbildung \ref{fig:case-1960-may-a} und \ref{fig:case-1960-may-b} zeigt den Betrag der Windstärke und die gefundenen Jetstream-Positionen für den Monat Mai im Jahr 1960. Der Maximal-Jet verläuft zwischen \SI{20}{\degree} und \SI{50}{\degree} nördlicher Breite. Der Verlauf ist wellenförmig und in weiten Teilen durchgehend. Zwei Ausnahmen sind hier zu nennen. Bei \SI{-125}{\degree} geographischer Länge verlagert sich das Maximum um \SI{20}{\degree} nach Süden, was dem nordamerikanischen Kontinent zuzuschreiben ist. Dieser schwächt den nördlicher verlaufenden Jetstream ab, sodass ein südlich von diesem liegender Jet das Maximum darstellt. Ein ähnlicher Vorgang spielt sich auf dem Nordatlantik bei \SI{-40}{\degree} geographischer Länge ab. Auch hier findet ein Versatz des Maximums um \SI{20}{\degree} statt.
+
+Der Vergleich zwischen dem meridionalen Maximum des Zonalwinds und dem maximalen Chebyshev-Jetstream zeigt eine große Übereinstimmung. Lediglich sechs Stellen stimmen nicht überein. Der Versatz an der westlichen Küste Nordamerikas findet nach der Chebyshev-Methode einen Gitterpunkt früher statt, ebenso zeigt der Versatz über dem Zentralatlantik einen Ausreißer. Darüber hinaus finden sich zwei Maxima nach Chebyshev, von denen eins um \SI{45}{\degree} nach Norden und eins um \SI{35}{\degree} nach Süden abweicht. Beide sind über dem Westpazifik zu finden.
+
+Im Vergleich zwischen gefundenen Polarfront- und Subtropen-Jetstreams nach Chebyshev offenbart sich die größte Schwäche der Methode. Denn auch bei mehreren gefundenen Maximalstellen ist eine eindeutige Zuweisung entweder zum subtropischen Jetstream oder zum Polarfrontjet nicht einfach und sehr vom zugrundeliegenden Zonalwindfeld abhängig.
+
+Der Polarfrontjet liegt in diesem Beispiel zwischen \SI{35}{\degree} und \SI{80}{\degree} nördlicher Breite, wobei er keine durchweg zusammenhängende Struktur aufweist. Zusammenhängend verläuft er lediglich von Asien bis Alaska über dem Arktischen Meer. Von Zentralasien bis an die Westküste Nordamerikas zeigt auch der subtropische Jet eine relativ homogene zusammenhängende Struktur und verläuft zwischen \SI{25}{\degree} und \SI{45}{\degree} nördlicher Breite nördlich des Himalaya über der Mongolei und China. Von dort führt er über das Ostchinesische Meer, das Japanische Meer und annähernd zonal über den Pazifik bis an die Westküste Nordamerikas. Zwischen Nordamerika und Zentralasien ist eine eindeutige Beschreibung schwieriger. Der Polarfrontjet geht aus dem Subtropenjet über dem Pazifik hervor und verläuft von der Westküste Nordamerikas nördlich der Rocky-Mountains in Richtung der Hudson Bay, bevor er über Neufundland wieder nach Süden driftet, um auf der Breite von Gibraltar zu enden. Ein zusammenhängender Polarfrontjet ist in Europa lediglich zonal von den britischen Inseln bis Dänemark zu erkennen. Darüberhinaus sind kürzere Sequenzen über dem Europäischen Nordmeer, über der Barentssee sowie südlich des Golfs von Ligurien und über dem Lybischen Meer über dem Mittelmeer. Weiterhin finden sich einige Positionen, an denen keine eindeutige Zuweisung möglich ist und so ein Single-Jet klassifiziert wird. Diese finden sich verstreut über Nordamerika, dem Atlantik und Asien.
+
+Die größte Schwäche der Methode zeigt sich an diesem Beispiel sehr anschaulich. Es sind Situationen, in denen eigentlich drei verschiedene Jetklassen auftreten. Da wären zunächst die klassischen Polarfront- und subtropischen Jets, die hier detektiert werden sollen. Abgesehen von diesen beiden Klassen zeigt sich in den Daten zusätzlich noch ein arktischer Jet, der dadurch ausgeschlossen werden sollte, dass lediglich in einem Sektor von \SI{20}{\degree} bis \SI{80}{\degree} nach Maxima gesucht wird. Allerdings scheint dies nicht in allen Fällen auszureichen, da auch innerhalb dieses Bereichs drei Jetstreams auftreten können. Weiterhin gibt es Positionen, in denen nur ein Jet gefunden wird. Das schnelle Aufeinanderfolgen dieser verschiedenen Jetklassen sorgt für ein heterogenes Bild in Abbildung \ref{fig:case-1960-may-b}. Eine weitere Schwäche zeigt sich besonders an der Westküste Nordamerikas, wo der subtropische Pazifikjet zu einem Polarfrontjet über dem Kontinent wird. Dies erscheint kontraintuitiv. Das Windfeld über dem Pazifik spräche auch eher für einen subtropischen Jet um \SI{20}{\degree} nördlicher Breite, der auf Mexiko zuläuft. Der erkannte Subtropenjet sollte also eher als Polarfrontjet klassifiziert werden.
+
+Die Dijkstra-Methode zeigt einen Single-Jet von Japan bis Amerika, der von dort als Polarfront-Jetstream auf eine nördliche Route in Richtung der Großen Seen, über den Zentralatlantik, die britischen Inseln, Nordeuropa und Westrussland verläuft. Der subtropische Jet führt entlang der Rocky-Mountains und der Sierra Nevada nach Südosten, bevor er sich am Golf von Mexiko wieder nördlich verlagert und von dort zonal bis zum Zentralatlantik verläuft. Seine weitere Route führt südlich nach Westafrika, zonal über die südliche Sahara und zum mittleren Osten, bevor er sich über dem Himalaya wieder mit dem Polarfont-Jet vereinigt. Östlich des Himalaya trennen sich die Jets wieder, bevor sich an der Ostküste Chinas wieder aufeinandertreffen.
+
+Die größte Stärke dieser Methode ist gleichzeitig ihre größte Schwäche. Dadurch, dass die Methode Jetstreams systematisch zusammenhängend erkennt, zeigt sich ein sehr klares Bild der Jets. Sie lassen sich gut ausdifferenzieren. Jedoch werden Windfelder, die zwar prinzipiell als Jetstream klassifiziert werden könnten, nicht als solche erkannt, weil das Windmaximum zu weit vom Pfad abweicht. So wird beispielsweise das südliche Windmaximum über dem Ostpazifik nicht als Jetstream erkannt. Darüber hinaus lassen sich aufgrund des zusammenhängenden Pfades Dynamiken, die außerhalb des Pfades (oder zu weit entfernt von diesem) nicht abbilden.
+
+
+\begin{figure}
+  \centering
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/02-case/1960-May-m1-m2b}
+  \end{minipage} 
+  \caption[Vergleich des maximalen Chebyshev-Fits und des meridionalen Maximums für Mai 1960]{Positionen des Maximaljets und des maximalem Chebyshev-Jetstreams und der Betrag des horizontalen Windfelds für Mai 1960} \label{fig:case-1960-may-a}
+\end{figure}
+
+
+\begin{figure}
+  \centering
+    \begin{minipage}{\textwidth}
+      \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/02-case/1960-May-m2c}
+  \end{minipage} \\ 
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/02-case/1960-May-m3}
+  \end{minipage}
+  \caption[Vergleich der Chebyshev- und der Dijkstra-Methode für den Mai 1960]{Positionen des Subtropen- und Polarfrontjetstream nach der Chebyshev- (oben) und der Dijkstra-Methode (unten) und der Betrag des horizontalen Windfelds für Mai 1960} \label{fig:case-1960-may-b}
+\end{figure}
 
 
 
-%
+Der zweite Einzelfall ist der November 2012, dargestellt in Abbildung \ref{fig:case-2012-nov-a} und \ref{fig:case-2012-nov-b}. Der Maximaljet zeigt erneut abgesehen von zwei Datenpunkten eine große Übereinstimmung. Er verläuft vom Nordpazifik schwach zyklonal gekrümmt über Kanada bis zum Bundesstaat Alberta, wo diese Sequenz endet. Die nächste Sequenz startet an der Westküste Mexikos und verläuft zonal bis zum Bundesstaat Florida der Vereinigten Staaten. Von dort führt er zyklonal zum Nordatlantik östlich von Neufundland , von wo er antizyklonal gekrümmt bis etwa \SI{1000}{\kilo\metre} westlich der Iberischen Halbinsel verläuft. Die nächste Sequenz startet westlich von Mauretanien und Marokko und führt annähernd zonal mit einer schwachen nordwärts gerichteten Komponente über Nordafrika, die Arabische Halbinsel, Nordindien und China bis in den Zentralpazifik. Lediglich zwei Positionen scheinen nicht erkannt zu werden, eine im Zentralpazifik und eine im Zentralatlantik.
+
+Die Chebyshev-Methode detektiert den Polarfront-Jetstream zwischen \SI{40}{\degree} und \SI{85}{\degree}, während der Subtropenjet zwischen \SI{20}{\degree} und \SI{50}{\degree} aufgefunden wird. Der Polarfrontjet verläuft sequenzweise von der Ostsibirischen See kommend nördlich von Alaska. Eine weitere Sequenz führt etwas weiter südlich von Alaska nach Kanada, bevor er zusammenhängend und aus dem subtropischen Jet hervorgehend vom Ostpazifik über die Küste der Vereinigten Staaten nach Kanada und in Richtung der Hudson Bay verläuft. Eine kurze Sequenz führt über den Mittleren Westen der Vereinigten Staaten, bevor der Jet sich zwischen Hudson Bay und Großen Seen in Richtung Atlantik erstreckt und südlich von Neufundland herführt. Die Sequenz führt als Single-Jet südlich von Grönland und als Subtropenjet von dort nach Osten in Richtung Frankreich und Spanien. Auf der geographischen Länge von Island wird der Jetstream wieder als Polarfrontjet klassifiziert. Ab Nordspanien erstreckt er sich von Nordfrankreich, West- und Norddeutschland über die Ostsee und Estland nach Russland. Von dort führt er südlich nach Kasachstan bis in die Mongolei. Die Sequenz endet dort. Eine neue Sequenz startet in der Laptewsee und führt über die Ostsibirische See nach Alaska. Der Subtropenjetstream erstreckt sich leicht zyklonal über den Nordpazifik, geht dann über in den Polarfrontjet. Eine weitere Sequenz des Subtropenjets startet über dem Zentralpazifik etwa bei Hawaii und führt leicht nördlich nach Nordmexiko und zonal über den Golf von Mexiko. Von dort führt er unter zyklonaler Krümmung in den Zentralatlantik, wo er zunächst endet. Nach einer kurzen Sequenz im Nordatlantik führt er über Marokko, Nordafrika, die Arabische Halbinsel, Nordindien und China in den Zentralpazifik. In diesem Einzelfall wird deutlich, dass vor allem die sprunghaften Übergange, wenn der Polarfront-Jetstream plötzlich zum Subtropischen wird und umgekehrt, problematisch sind.
+
+Die Jetstreams nach der Dijkstra-Methode verlaufen in diesem Fallbeispiel über die gesamte nördliche Hemisphäre getrennt voneinander. Der Polarfrontjet befindet sich zwischen \SI{45}{\degree} und \SI{80}{\degree}, während der Subtropenjet zwischen \SI{25}{\degree} und \SI{35}{\degree} liegt. Der Polarfrontjet erstreckt sich von der Ostsibirischen See über die Beau\-fort\-see südlich über Kanada und die Hudson Bay über den Nordatlantik nördlich der britischen Inseln in Richtung Dänemark und entlang der Ostsee nach Russland. Von dort führt der Jet in Richtung Mongolei und von dort in nördlicher Richtung der Ostsibirischen See. Der Subtropenjet verläuft vom Pazifik kommend über Mexiko und den Golf von Mexiko leicht nördlich in den Zentralatlantik, von wo der Jet zyklonal nach Süden bis etwa \SI{1000}{\kilo\metre} vor den Kapverdischen Inseln führt. Von dort verläuft er nordöstlich bis auf die Höhe der Westsahara und von dort annähernd zonal über Nordafrika, das Rote Meer, die Arabische Halbinsel, Nordindien und China über den Pazifik. Die größte Schwäche ist auch in diesem Fall die Nicht-Detektion von Maxima, die hier über dem östlichen Pazifik vor der Westküste der Vereinigten Staaten sowie schwächer über Skandinavien liegen. Stattdessen wird der arktische Jetstream über der Ostsibirischen See und der Beaufortsee erkannt.
+
+\begin{figure}[hbt] 
+  \centering
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/02-case/2012-Nov-m1-m2b}
+  \end{minipage}
+  \caption[Vergleich des maximalen Chebyshev-Fits und des meridionalen Maximums für November 2012]{Positionen des Maximaljet und des maximalem Chebyshev-Jetstreams und der Betrag des horizontalen Windfelds für November 2012} \label{fig:case-2012-nov-a}
+\end{figure}
+
+
+\begin{figure}[hbt] 
+  \centering
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/02-case/2012-Nov-m2c}
+  \end{minipage} \\ 
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/02-case/2012-Nov-m3}
+  \end{minipage}
+  \caption[Vergleich der Chebyshev- und der Dijkstra-Methode für den November 2012]{Positionen des Subtropen- und Polarfrontjetstream nach der Chebyshev- (oben) und der Dijkstra-Methode (unten) und der Betrag des horizontalen Windfelds für November 2012} \label{fig:case-2012-nov-b}
+\end{figure}
+
+
+
 \section{Gegenüberstellung der beiden Methoden}
 
+Nach den Einzelfällen wird nun betrachtet, wie sich die beiden Methoden abhängig von den Jahreszeiten und der Jetstream-Klassifikation grundsätzlich zueinander verhalten.
 
-% \begin{figure}
-%   \centering
-%   \begin{minipage}{\textwidth}
-%       \includegraphicstikz{05-visu-pdf-tikz/03-comp/MJ_scat}
-%   \end{minipage} \\ 
-%   \begin{minipage}{\textwidth}
-%       \includegraphicstikz{05-visu-pdf-tikz/03-comp/MJ_cont}
-%   \end{minipage}
-%   \caption{Maximaljet Contour} \label{fig:test}
-% \end{figure}
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/PFJ_ptcont_MAM}
-% %   \caption{Polarfrontjet Frühjahr} \label{fig:test}
-% % \end{figure}
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/PFJ_ptcont_JJA}
-% %   \caption{Polarfrontjet Sommer} \label{fig:test}
-% % \end{figure}
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/PFJ_ptcont_SON}
-% %   \caption{Polarfrontjet Herbst} \label{fig:test}
-% % \end{figure}
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/PFJ_ptcont_DJF}
-% %   \caption{Polarfrontjet Winter} \label{fig:test}
-% % \end{figure}
-% %
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/STJ_ptcont_MAM}
-% %   \caption{Subtropenjet Frühjahr} \label{fig:test}
-% % \end{figure}
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/STJ_ptcont_JJA}
-% %   \caption{Subtropenjet Sommer} \label{fig:test}
-% % \end{figure}
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/STJ_ptcont_SON}
-% %   \caption{subtropenjet Herbst} \label{fig:test}
-% % \end{figure}
-% %
-% % \begin{figure}
-% %   \centering
-% %   \includegraphicstikz{05-visu-pdf-tikz/03-comp/STJ_ptcont_DJF}
-% %   \caption{Subtropenjet Winter} \label{fig:test}
-% % \end{figure}
+In Abbildung \ref{fig:comp-pfj-warm} oben sind die Chebyshev- und die Dijkstra-Methode für den Polarfrontjetstream in den Monaten März, April und Mai gegeneinander dargestellt. Die Positionen der Chebyshev-Methode liegen zwischen \SI{30}{\degree} und \SI{85}{\degree}, während die Positionswerte nach Dijkstra zwischen \SI{40}{\degree} und \SI{85}{\degree} schwanken. Auf den ersten Blick wird also klar, dass die Chebyshev-Methode eine größere Streuung zulässt. Entlang der Diagonalen zeigt sich zunächst eine große Übereinstimmung der beiden Methoden. Auch entlang der Diagonalen lässt sich erkennen, dass die Chebyshev-Methode im Vergleich mit der Dijkstra-Methode ab \SI{60}{\degree} nördlichere Werte ermittelt, während südlich von \SI{60}{\degree} eher Südlichere detektiert werden. Außerhalb der Diagonalen fallen zwei Bereiche auf. Der erste ist ein Bereich, in dem die Positionen nach Chebyshev um \SI{40}{\degree} und nach Dijkstra zwischen \SI{45}{\degree} und \SI{65}{\degree} liegen. Der zweite auffällige Bereich ist ein Bereich, in dem Positionen nach Chebyshev zwischen \SI{65}{\degree} und \SI{85}{\degree} und nach Dijkstra um \SI{50}{\degree} ermittelt werden. Letzterer kann zwei Ursachen haben. Einerseits kann die Chebyshev-Methode auch kürzere Jets ermitteln, die der Dijkstra-Algorithmus nicht erkennt, weil er auf den umlaufenden Pfad fixiert ist. Andererseits spricht der Breitengradbereich auch für die Detektion von arktischen Jets.
+
+\begin{figure}[hbt] 
+  \centering
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/PFJ_ptcont_MAM}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/PFJ_ptcont_JJA}
+  \end{minipage}
+  \caption[Vergleich des Polarfrontjets nach beiden Methoden für Frühling und Sommer]{Vergleich von Chebyshev- und Dijkstra-Methode für den Polarfrontjet im Frühling (oben) und im Sommer (unten)} \label{fig:comp-pfj-warm}
+\end{figure}
+
+In den Monaten Juni, Juli und August (Abbildung \ref{fig:comp-pfj-warm} unten)  zeigt sich ein ähnliches Bild. Während die Chebyshev-Methode Jetstream-Positionen zwischen \SI{35}{\degree} und \SI{85}{\degree} detektiert, lokalisiert die Dijkstra-Methode sie zwischen \SI{45}{\degree} und \SI{85}{\degree}. Entlang der Diagonalen liegt der Großteil der Werte. Es liegen wenig Werte oberhalb der Diagonalen, was bedeutet, dass die Dijkstra-Methode im Vergleich weniger Werte überschätzt. Die Chebyshev-Methode findet erneut nördlichere Werte als die Dijkstra-Methode. Besonders deutlich wird dies im Bereich zwischen \SI{65}{\degree} und \SI{85}{\degree} nach Chebyshev und um den Breitengrad \SI{55}{\degree} nach Dijkstra.
+
+In Abbildung \ref{fig:comp-pfj-cold} oben sind die Positionen des Polarfront-Jetstreams für die Monate September, Oktober und November nach beiden Methoden gegeneinander aufgetragen. Die Positionen nach Chebyshev liegen zwischen \SI{30}{\degree} und \SI{85}{\degree}, die Positionen nach Dijkstra zwischen \SI{38}{\degree} und \SI{85}{\degree}. Entlang der Diagonalen zeigt sich wieder die große Übereinstimmung mit einer leichten Überschätzung der Positionen nach Dijkstra und einer deutlicheren Überschätzung der Chebyshev-Positionen. Die Überschätzung der Chebyshev-Methode tritt erneut in einem nördlichen Bereich zwischen \SI{75}{\degree} und \SI{85}{\degree} nach Chebyshev und zwischen \SI{50}{\degree} und \SI{55}{\degree} nach Dijkstra auf. Auch hier liegt die Vermutung nahe, die Ursache hierfür in der freieren Detektion lokaler Jets und in der falschen Detektion von arktischen Jets zu suchen.
+
+\begin{figure}[hbt] 
+  \centering
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/PFJ_ptcont_SON}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/PFJ_ptcont_DJF}
+  \end{minipage}
+  \caption[Vergleich des Polarfrontjets nach beiden Methoden für Herbst und Winter]{Vergleich von Chebyshev- und Dijkstra-Methode für den Polarfrontjet im Herbst (oben) und im Winter (unten)} \label{fig:comp-pfj-cold}
+\end{figure}
+
+In Abbildung \ref{fig:comp-pfj-cold} unten (Dezember, Januar und Februar) zeigt sich primär eine größere Streuung der Jetstream-Positionen um die Diagonale. Diese liegen nach Chebyshev zwischen \SI{35}{\degree} und \SI{85}{\degree} und nach Dijkstra zwischen \SI{41}{\degree} und \SI{83}{\degree}. Zwei Bereiche heben sich von der Diagonale ab. Ein Bereich liegt erneut nördlich zwischen \SI{65}{\degree} und \SI{85}{\degree} nach Chebyshev und zwischen \SI{45}{\degree} und \SI{55}{\degree} nach Dijkstra. Dieser Sektor wurde bereits beschrieben. Der zweite Bereich liegt zwischen \SI{40}{\degree} und \SI{50}{\degree} nach Chebyshev und zwischen \SI{50}{\degree} und \SI{55}{\degree} nach Dijkstra und zeigt eine Unterschätzung der Chebyshev- bzw. eine Überschätzung der Dijkstra-Methode. %Dieser Bereich markiert gleichzeitig die größte Differenz zwischen den beiden Methoden und zeigt sich über alle Jahreszeiten hinweg. 
+
+Der Subtropen-Jetstream liegt in den Monaten März, April und Mai (Abbildung \ref{fig:comp-stj-warm} oben) nach der Chebyshev-Methode zwischen \SI{20}{\degree} und \SI{72}{\degree} und nach der Dijkstra-Methode zwischen \SI{12}{\degree} und \SI{46}{\degree} nördlicher Breite. Der Großteil der Werte liegt entlang der Diagonalen, was zeigt, dass die Übereinstimmung der Methoden für den subtropischen Jetstream groß ist. In Abbildung \ref{fig:comp-stj-warm} unten ist der Subtropenjet nach der Chebyshev- und nach der Dijkstra-Methode für die Monate Juni, Juli und August dargestellt. Dieser liegt nach Chebyshev zwischen \SI{20}{\degree} und \SI{73}{\degree} und nach Dijkstra zwischen \SI{17}{\degree} und \SI{52}{\degree}. Für die Monate September, Oktober und November (Abbildung \ref{fig:comp-stj-cold} oben) verläuft der Subtropen-Jetstream zwischen \SI{20}{\degree} und \SI{68}{\degree} nach Chebyshev und zwischen \SI{15}{\degree} und \SI{51}{\degree} nach Dijkstra. In den Monaten Dezember, Januar und Februar in Abbildung \ref{fig:comp-stj-cold} unten liegt der subtropische Jetstream nach der Chebyshev-Methode zwischen \SI{20}{\degree} und \SI{72}{\degree} und nach der Dijkstra-Methode zwischen \SI{12}{\degree} und \SI{43}{\degree}.
+
+
+\begin{figure}[hbt] 
+  \centering
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/STJ_ptcont_MAM}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/STJ_ptcont_JJA}
+  \end{minipage}
+  \caption[Vergleich des Subtropenjets nach beiden Methoden für Frühling und Sommer]{Vergleich von Chebyshev- und Dijkstra-Methode für den subtropischen Jetstream im Frühling (oben) und im Sommer (unten)} \label{fig:comp-stj-warm}
+\end{figure}
+
+
+\begin{figure}[hbt] 
+  \centering
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/STJ_ptcont_SON}
+  \end{minipage}
+  \begin{minipage}{\textwidth}
+  \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/03-comp/STJ_ptcont_DJF}
+  \end{minipage}
+  \caption[Vergleich des Subtropenjets nach beiden Methoden für Herbst und Winter]{Vergleich von Chebyshev- und Dijkstra-Methode für den subtropischen Jetstream im Herbst (oben) und im Winter (unten)} \label{fig:comp-stj-cold}
+\end{figure}
+
+
+Es zeigt sich über alle Jahreszeiten hinweg eine große Übereinstimmung der beiden Methoden. Zwar zeigt sich auch eine gewisse Streuung, deren Ursache in den Detektionsschemata liegt. Während die Chebyshev-Methode für jeden Längengrad-Schritt unabhängig vom Vorherigen die Positionen der Jetstreams findet, sucht die Dijkstra-Methode nach einem global kürzesten Pfad. Abgesehen von der Streuung liegen die Korrelationen abhängig von den betrachteten Monaten und der untersuchten Jetstreamklasse zwischen \num{0.2} und \num{0.6}. Die p-Werte sind durchweg $\ll$\,\num{0.01}, was für eine hohe Signifikanz der Korrelationen spricht. Am schwächsten sind die Korrelationen mit \num{0.217} zwischen den beiden Methoden im Winter für den Polarfrontjet. Am stärksten sind diese mit \num{0.571} im Herbst für den Subtropenjet. Allgemein zeigt sich auch, dass die Korrelationen der beiden Methoden für den subtropischen Jetstream stärker sind als für den Polarfronjet. Unabhängig von der Stärke der Korrelationen sind diese aufgrund der niedrigen p-Werte allesamt robust. Weitere zentrale Ergebnisse der Methodenvergleiche sind in den Tabellen \ref{tab:korrelationen-dijk-cheb-pfj} und \ref{tab:korrelationen-dijk-cheb-stj} dargestellt.
+
+\begin{table}[hbt] 
+\caption[Korrelationen zwischen Chebyshev- und Dijkstra-Methode für den Polarfrontjet]{Korrelationen zwischen den Positionen des Polarfront-Jetstreams nach Chebyshev und Dijkstra im 95\,\%-Konfidenzintervall} \label{tab:korrelationen-dijk-cheb-pfj}
+\begin{tabularx}{\textwidth}{|X|X|X|X|X|}
+  \hline
+  Monate & Korrelation & Intervall & p-Wert \\
+  \hline \hline
+   & \num{0.323} & \numrange[range-phrase = ;\,]{0.317}{0.329} & $\ll$ \num{0.01} \\
+  \hline
+  März, April \& Mai & \num{0.300} & \numrange[range-phrase = ;\,]{0.287}{0.309} & $\ll$ \num{0.01} \\
+  \hline
+  Juni, Juli \& August & \num{0.497} & \numrange[range-phrase = ;\,]{0.486}{0.508} & $\ll$ \num{0.01} \\
+  \hline
+  September, Oktober \& November & \num{0.333} & \numrange[range-phrase = ;\,]{0.321}{0.346} & $\ll$ \num{0.01} \\
+  \hline
+  Dezember, Januar \& Februar & \num{0.217} & \numrange[range-phrase = ;\,]{0.205}{0.228} & $\ll$ \num{0.01} \\
+  \hline
+\end{tabularx}
+\end{table}
+
+\begin{table}[hbt] 
+\caption[Korrelationen zwischen Chebyshev- und Dijkstra-Methode für den Subtropenjet]{Korrelationen zwischen den Positionen des subtropischen Jetstreams nach Chebyshev und Dijkstra im 95\,\%-Konfidenzintervall} \label{tab:korrelationen-dijk-cheb-stj}
+\begin{tabularx}{\textwidth}{|X|X|X|X|X|}
+  \hline
+  Monate & Korrelation & Intervall & p-Wert \\
+  \hline \hline
+   & \num{0.556} & \numrange[range-phrase = ;\,]{0.551}{0.561} & $\ll$ \num{0.01} \\
+  \hline
+  März, April \& Mai & \num{0.325} & \numrange[range-phrase = ;\,]{0.314}{0.336} & $\ll$ \num{0.01} \\
+  \hline
+  Juni, Juli \& August & \num{0.557} & \numrange[range-phrase = ;\,]{0.547}{0.567} & $\ll$ \num{0.01} \\
+  \hline
+  September, Oktober \& November & \num{0.571} & \numrange[range-phrase = ;\,]{0.561}{0.580} & $\ll$ \num{0.01} \\
+  \hline
+  Dezember, Januar \& Februar & \num{0.287} & \numrange[range-phrase = ;\,]{0.275}{0.298} & $\ll$ \num{0.01} \\
+  \hline
+\end{tabularx}
+\end{table}
