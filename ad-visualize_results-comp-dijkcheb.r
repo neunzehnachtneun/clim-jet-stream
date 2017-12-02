@@ -106,6 +106,57 @@ tb.subset[,13] <-
   arrange(dts, lon) %>%
   select(Maximum.MJ)
 
+## KORRELATIONEN ZWISCHEN CHEBYSHEV- UND DIJKSTRA-METHODE ####
+## 
+library(magrittr)
+library(broom)
+
+ks.test(tb.subset$Dijkstra.STJ, tb.subset$Chebyshev.STJ) %>% tidy
+
+
+
+ks.test(tb.subset$Dijkstra.STJ, "pnorm") %>% tidy
+# Gesamt
+cor.test(x = tb.subset$Chebyshev.PFJ,
+         y = tb.subset$Dijkstra.PFJ) %>%
+  tidy
+# MAM
+tb.subset %>% # Polarfront-Jetstream
+  filter(season == "MAM") %$%
+  cor.test(Chebyshev.PFJ, Dijkstra.PFJ) %>%
+  tidy
+tb.subset %>% # Subtropen-Jetstream
+  filter(season == "MAM") %$%
+  cor.test(Chebyshev.STJ, Dijkstra.STJ) %>%
+  tidy
+# JJA
+tb.subset %>% # Polarfront-Jetstream
+  filter(season == "JJA") %$%
+  cor.test(Chebyshev.PFJ, Dijkstra.PFJ) %>%
+  tidy
+tb.subset %>% # Subtropen-Jetstream
+  filter(season == "JJA") %$%
+  cor.test(Chebyshev.STJ, Dijkstra.STJ) %>%
+  tidy
+# SON
+tb.subset %>% # Polarfront-Jetstream
+  filter(season == "SON") %$%
+  cor.test(Chebyshev.PFJ, Dijkstra.PFJ) %>%
+  tidy
+tb.subset %>% # Subtropen-Jetstream
+  filter(season == "SON") %$%
+  cor.test(Chebyshev.STJ, Dijkstra.STJ) %>%
+  tidy
+# DJF
+tb.subset %>% # Polarfront-Jetstream
+  filter(season == "DJF") %$%
+  cor.test(Chebyshev.PFJ, Dijkstra.PFJ) %>%
+  tidy
+tb.subset %>% # Subtropen-Jetstream
+  filter(season == "DJF") %$%
+  cor.test(Chebyshev.STJ, Dijkstra.STJ) %>%
+  tidy
+
 
 ## VERGLEICH VERSCHIEDENER JETS NACH METHODEN ####
 ##
@@ -240,29 +291,29 @@ ggp.comp.sj.cont <-
 ## 
 
 plt.save(plt = ggp.comp.mj.pt, 
-         width = 90, height = 90, pointsize = 11,
+         width = 100, height = 100, pointsize = 11,
          filepath = paste0(save.dir, "03-comp/"), 
          filename = "MJ_scat")
 plt.save(plt = ggp.comp.mj.cont, 
-         width = 90, height = 90, pointsize = 11,
+         width = 100, height = 100, pointsize = 11,
          filepath = paste0(save.dir, "03-comp/"), 
          filename = "MJ_cont")
 
 plt.save(plt = ggp.comp.pfj.pt, 
-         width = 90, height = 90, pointsize = 11,
+         width = 100, height = 100, pointsize = 11,
          filepath = paste0(save.dir, "03-comp/"), 
          filename = "PFJ_scat")
 plt.save(plt = ggp.comp.pfj.cont, 
-         width = 90, height = 90, pointsize = 11,
+         width = 100, height = 100, pointsize = 11,
          filepath = paste0(save.dir, "03-comp/"), 
          filename = "PFJ_cont")
 
 plt.save(plt = ggp.comp.stj.pt, 
-         width = 90, height = 90, pointsize = 11,
+         width = 100, height = 100, pointsize = 11,
          filepath = paste0(save.dir, "03-comp/"), 
          filename = "STJ_scat")
 plt.save(plt = ggp.comp.stj.cont, 
-         width = 90, height = 90, pointsize = 11,
+         width = 100, height = 100, pointsize = 11,
          filepath = paste0(save.dir, "03-comp/"), 
          filename = "STJ_cont")
 
@@ -271,7 +322,7 @@ plt.save(plt = ggp.comp.sj.pt,
          filepath = paste0(save.dir, "03-comp/"), 
          filename = "SJ_scat")
 plt.save(plt = ggp.comp.sj.cont, 
-         width = 90, height = 90, pointsize = 11,
+         width = 100, height = 100, pointsize = 11,
          filepath = paste0(save.dir, "/03-comp"), 
          filename = "SJ_cont")
 
@@ -321,11 +372,11 @@ for (i.ssn in seq_along(ssn)) {
   
   ## Speichern der Plots
   plt.save(plt = ggp.comp.pfj.pt.cont, 
-           width = 90, height = 90, pointsize = 11,
+           width = 100, height = 100, pointsize = 11,
            filepath = paste0(save.dir, "03-comp/"), 
            filename = paste0("PFJ_ptcont_", ssn[i.ssn]))
   plt.save(plt = ggp.comp.stj.pt.cont, 
-           width = 90, height = 90, pointsize = 11,
+           width = 100, height = 100, pointsize = 11,
            filepath = paste0(save.dir, "03-comp/"), 
            filename = paste0("STJ_ptcont_", ssn[i.ssn]))
 }

@@ -45,9 +45,9 @@ map_nh <- map_data("world")
 # Plot der Nordhemisphäre // Untersuchungsgebiet
 ggp.nh <-
   ggplot() + geom_polygon(data = map_nh, mapping = aes(x = long, y = lat, group = group), fill = "gray50") +
-  scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+  scale_x_continuous(name = "Längengrad in $^{\\circ}$ geographischer Länge",
                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-  scale_y_continuous(name = "Breitengrad in $^{\\circ}$",
+  scale_y_continuous(name = "Breitengrad in\n$^{\\circ}$ nördlicher Breite",
                      breaks = c(0, 30, 60, 90)) +
   coord_fixed(xlim = c(-180,180), ylim = c(0,90)) +
   theme_bw()
@@ -55,17 +55,18 @@ ggp.nh <-
 # Plot der Nordhemisphäre auf Mercator-Projektion
 ggp.nh.merc <-
   ggplot() + geom_polygon(data = map_nh, mapping = aes(x = long, y = lat, group = group), fill = "gray50") +
-  scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+  scale_x_continuous(name = "Längengrad in $^{\\circ}$ geographischer Länge",
                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-  scale_y_continuous(name = "Breitengrad in $^{\\circ}$",
+  scale_y_continuous(name = "Breitengrad in\n$^{\\circ}$ nördlicher Breite",
                      breaks = c(0, 30, 60, 90)) +
   coord_map(xlim = c(-180,180), ylim = c(0,90)) +
   theme_bw()
 
-plt.save(plt = ggp.nh, width = 135, height = 55, pointsize = 11, 
+# options(tikzDefaultEngine = "pdftex", tikzLatexPackages = "siunitx")
+plt.save(plt = ggp.nh, width = 135, height = 55, pointsize = 9, 
          filepath = paste0(save.dir, "01-area"), 
          filename = "north-hem")
-plt.save(plt = ggp.nh.merc, width = 135, height = 55, pointsize = 11, 
+plt.save(plt = ggp.nh.merc, width = 135, height = 55, pointsize = 9, 
          filepath = paste0(save.dir, "01-area"), 
          filename = "north-hem-merc")
 
@@ -109,8 +110,8 @@ for (t.stp in i.stp) {
     geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
     geom_point(mapping = aes(x = lon, y = lat, shape = method, fill = NULL),
                data = tb.subset,
-               fill = "black", size = 1.4, show.legend = TRUE) +
-    labs(shape = "Methode", fill = "$\\sqrt{u^2+v^2}$") +
+               fill = "black", size = 1.2, show.legend = TRUE) +
+    labs(shape = "Methode", fill = "Betrag der hor. Wind-\ngeschwindigkeit in $m\\,s^{-1}$") +
     guides(fill = guide_colourbar(title.position = "top",
                                   direction = "horizontal",
                                   label.position = "bottom"), 
@@ -118,14 +119,15 @@ for (t.stp in i.stp) {
                                 direction = "horizontal",
                                 label.position = "bottom",
                                 nrow = 1)) +
-    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$ geographischer Länge",
                        breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-    scale_y_continuous(name = "Breitengrad in $^{\\circ}$",
+    scale_y_continuous(name = "Breitengrad in\n$^{\\circ}$ nördlicher Breite",
                        breaks = c(0, 30, 60, 90)) +
     geom_polygon(mapping = aes(x = long, y = lat, group = group),
                  data = map_nh, fill = "gray50", alpha = 0.35) +
     coord_fixed(xlim = c(-180,180), ylim = c(0,90)) + 
     theme_bw() + theme(legend.position = "bottom")
+  print(ggp.nh.m1.m2b)
   
   
   # Plot des zonalen Windfeldes und der zwei stärksten Chebyshev-Maxima im Bereich [20,85]
@@ -145,8 +147,8 @@ for (t.stp in i.stp) {
     geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
     geom_point(mapping = aes(x = lon , y = lat, shape = factor(class), fill = NULL),
                data = tb.subset,
-               fill = "black", size = 1.4, show.legend = TRUE) +
-    labs(shape = "Methode", fill = "$\\sqrt{u^2+v^2}$") +
+               fill = "black", size = 1.2, show.legend = TRUE) +
+    labs(shape = "Klasse", fill = "Betrag der hor. Wind- \ngeschwindigkeit in $m\\,s^{-1}$") +
     guides(fill = guide_colourbar(title.position = "top",
                                   direction = "horizontal",
                                   label.position = "bottom"), 
@@ -154,9 +156,9 @@ for (t.stp in i.stp) {
                                 direction = "horizontal",
                                 label.position = "bottom",
                                 nrow = 1)) +
-    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$ geographischer Länge",
                        breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-    scale_y_continuous(name = "Breitengrad in $^{\\circ}$",
+    scale_y_continuous(name = "Breitengrad in\n$^{\\circ}$ nördlicher Breite",
                        breaks = c(0, 30, 60, 90)) +
     geom_polygon(mapping = aes(x = long, y = lat, group = group),
                  data = map_nh, fill = "gray50", alpha = 0.35) +
@@ -181,8 +183,8 @@ for (t.stp in i.stp) {
     geom_tile() + scale_fill_distiller(palette = "RdYlBu") +
     geom_point(mapping = aes(x = lon , y = lat, shape = factor(class), fill = NULL),
                data = tb.subset,
-               fill = "black", size = 1.4, show.legend = TRUE) +
-    labs(shape = "Methode", fill = "$\\sqrt{u^2+v^2}$") +
+               fill = "black", size = 1.2, show.legend = TRUE) +
+    labs(shape = "Klasse", fill = "Betrag der hor. Wind- \ngeschwindigkeit in $m\\,s^{-1}$") +
     guides(fill = guide_colourbar(title.position = "top",
                                   direction = "horizontal",
                                   label.position = "bottom"), 
@@ -190,9 +192,9 @@ for (t.stp in i.stp) {
                                 direction = "horizontal",
                                 label.position = "bottom",
                                 nrow = 1)) +
-    scale_x_continuous(name = "Längengrad in $^{\\circ}$",
+    scale_x_continuous(name = "Längengrad in $^{\\circ}$ geographischer Länge",
                        breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
-    scale_y_continuous(name = "Breitengrad in $^{\\circ}$",
+    scale_y_continuous(name = "Breitengrad in\n$^{\\circ}$ nördlicher Breite",
                        breaks = c(0, 30, 60, 90)) +
     geom_polygon(mapping = aes(x = long, y = lat, group = group),
                  data = map_nh, fill = "gray50", alpha = 0.35) +
@@ -202,15 +204,15 @@ for (t.stp in i.stp) {
   
   ## Speichern der Plots als pdfs und tex-files
   plt.save(plt = ggp.nh.m1.m2b, 
-           width = 135, height = 55, pointsize = 11,
+           width = 135, height = 75, pointsize = 9,
            filepath = paste0(save.dir, "02-case/"), 
            filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m1-m2b"))
   plt.save(plt = ggp.nh.m2c, 
-           width = 135, height = 55, pointsize = 11,
+           width = 135, height = 75, pointsize = 9,
            filepath = paste0(save.dir, "02-case/"), 
            filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m2c"))
   plt.save(plt = ggp.nh.m3, 
-           width = 135, height = 55, pointsize = 11,
+           width = 135, height = 75, pointsize = 9,
            filepath = paste0(save.dir, "02-case/"), 
            filename = paste0(dts.year[t.stp], "-", dts.month[t.stp], "-m3"))
 }
