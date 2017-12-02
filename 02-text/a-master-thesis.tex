@@ -1,0 +1,54 @@
+%% MASTER THESIS
+
+% Präambel
+\include{b-praeambel}
+\usepackage{printlen}
+\uselengthunit{cm}
+
+\begin{document}
+%\selectlanguage{ngerman}
+\pagenumbering{alph}    % a, b, c, ...
+% \printlength{\textwidth}
+% \printlength{\textheight}
+
+\include{c-titel}
+\frontmatter
+\pagenumbering{roman}   % i, ii, iii, iv, ...
+\include{d-eigenstaendigkeit}
+
+\newpage
+\thispagestyle{empty}
+\quad
+\newpage
+\thispagestyle{empty}
+\tableofcontents  % Inhaltsverzeichnis
+\listoffigures    % Abbildungsverzeichnis
+\listoftables     % Tabellenverzeichnis
+% \newpage
+%
+\mainmatter %% ## 
+\pagenumbering{arabic}  % 1, 2, 3, 4, ...
+% \include{e-abstract}
+%
+% %\part{Einleitung}
+\include{f-motivation}
+%
+% %\part{Hintergründe und Methodik}
+\include{g-hintergrund}
+\include{h-methodik}
+% % %
+% %\part{Auswertung}
+\include{i-plausibilitaet}
+\include{j-klimatologie}
+\include{k-seeeis}
+% %
+% %\part{Diskussion}
+\include{l-diskussion}
+\include{m-danksagung}
+%
+% %\part{Anhang}
+\include{n-appendix}
+%
+
+\bibliography{n-literatur}
+\end{document}

@@ -1,0 +1,122 @@
+% Präambel für Master Thesis
+% Dokumentenklasse
+\documentclass[a4paper, 
+                11pt, 
+                twoside, 
+                onecolumn, 
+                openright,
+                final]{memoir}
+
+%% Pakete
+% Unterscheidung zwischen compiler LuaLaTeX vs pdfLaTeX
+\usepackage{ifluatex}
+\ifluatex 
+    % lualatex
+    \usepackage{polyglossia}
+    \setmainlanguage{german}
+    \usepackage{fontspec}
+    %\defaultfontfeatures{Ligatures=TeX}
+    %\usepackage[]{unicode-math} 
+    %\unimathsetup{math-style=TeX}
+    \setmainfont[Ligatures=TeX]{DejaVuSerif} 
+    \setsansfont{DejaVuSans}
+    \setmonofont{DejaVuSansMono}
+\else 
+    % pdflatex
+    \usepackage[T1]{fontenc}
+    \usepackage[utf8]{inputenc}
+    % Schriftarten
+    \usepackage{palatino}       % Serifen %times
+    \usepackage[scaled]{helvet} % Serifenlos
+    \usepackage{courier}        % Schreibmaschinenschrift
+    %\usepackage{mathptmx}      % Matheschrift
+\fi
+
+%% Sprache
+%\usepackage[ngerman, british]{babel}
+
+
+%% Allgemeines Layout
+\setbinding{1cm} % bindekorrektur
+% \semiisopage[] 
+\semiisopage[9]
+% \setlrmargins{*}{1cm}{*}
+\OnehalfSpacing % zeilenabstand
+\usepackage[document]{ragged2e} % linksbündig 
+\usepackage[babel,german=quotes]{csquotes} % Anführungszeichen
+\usepackage{color}                    % farbe 
+
+%% Layout Kopf- und Fußzeile
+% plain
+\makeevenhead{plain}{}{}{}
+\makeevenfoot{plain}{}{\thepage}{}
+\makeoddhead{plain}{}{}{}
+\makeoddfoot{plain}{}{\thepage}{}
+% headings
+\makeevenhead{headings}{\leftmark}{}{}
+\makeevenfoot{headings}{}{\thepage}{}
+\makeoddhead{headings}{}{}{\rightmark}
+\makeoddfoot{headings}{}{\thepage}{}
+% sep line
+%\makeheadrule{plain}{\textwidth}{.5pt}
+\makefootrule{plain}{\textwidth}{.5pt}{0ex}
+\makeheadrule{headings}{\textwidth}{.5pt}
+\makefootrule{headings}{\textwidth}{.5pt}{0ex}
+
+%% Querverweise
+\usepackage[linktoc=all, hypertexnames=false, plainpages=false, pdfpagelabels]{hyperref}
+\usepackage{memhfixc}
+
+%% Inhaltsverzeichnis
+%\usepackage[nottoc,numbib]{tocbibind}
+\setcounter{tocdepth}{1}
+
+%% Matheumgebungen
+\usepackage[fleqn]{mathtools}
+
+%% SI-Einheiten
+\usepackage{siunitx}
+\sisetup{locale = DE,
+          list-final-separator = \text{~und~},
+          list-pair-separator = \text{~und~},
+          range-phrase = \text{~bis~}}
+\DeclareSIUnit\year{yr}
+%\usepackage[german]{translator}
+
+%% Abbildungen
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{float} % für Fließumgebungen; Platzierung H verschiebt nicht
+\restylefloat{figure}
+\ifluatex
+    \newcommand{\includegraphicstikz}{\input}
+\else
+    \newcommand{\includegraphicstikz}{\includegraphics}
+\fi
+
+%% Captions von Tabellen und Abbildungen
+\makeatletter
+\renewcommand{\fnum@table}[1]{\small \textbf{\tablename~\thetable:} }
+\renewcommand{\fnum@figure}[1]{\small \textbf{\figurename~\thefigure:} }
+\makeatother
+
+%% Tabellen
+% \usepackage{tabular}
+\usepackage{tabularx}
+\newcommand{\minitab}[2][l]{\begin{tabular}{#1}#2\end{tabular}}
+\usepackage{multirow}
+\usepackage{bigstrut}
+
+
+%% Zitation und Literaturverzeichnis
+\usepackage[square, semicolon]{natbib}
+\bibliographystyle{abbrvnat} % plainnat abbrvnat unsrtnat
+\usepackage{url}
+
+
+%% Blindtexte
+\usepackage{blindtext, lipsum}
+
+
+%
+%% ## Ende der Präambel

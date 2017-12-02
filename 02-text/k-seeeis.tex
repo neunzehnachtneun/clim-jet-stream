@@ -1,0 +1,61 @@
+\chapter{Arktisches Meereis und Polarfrontjet} \label{ch:seeeis}
+
+\begin{figure} %% Entwicklung Meereis
+  \centering
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/08-sea-ice/seaice-timeseries}
+  \end{minipage} \\ 
+  \caption{Zeitliche Entwicklung des arktischen Meereises} \label{fig:seaice}
+\end{figure}
+
+In diesem Kapitel wird die Entwicklung der Positionen der Jetstreams mit den Veränderungen der Ausdehnung des arktischen Meereises verknüpft. Die Fläche des arktischen Meereises zeigt wie Abbildung \ref{fig:seaice} dargestellt seit Beginn der Messungen aufgrund der steigenden Globaltemperatur einen abnehmenden Trend. Gut sichtbar ist ebenfalls der saisonale Zyklus. Das Minimum der arktischen Meereisfläche zeigt sich stets im Herbst. Um herauszufinden, ob diese Größen zusammenhängen, werden die Korrelationen nach Pearson untersucht und auf ihre Signifikanz getestet. Geprüft wird sowohl der Zusammenhang zwischen der Ausdehnung des Meereises und der meridional gemittelten monatlichen Position des Polarfrontjetstreams als auch jener zwischen der Meereisausdehnung und der monatlichen Standardabweichung der Jetstream-Positionen. Es werden die Chebyshev- und die Dijkstra-Methode analysiert, um zu sehen, ob diese unabhängig voneinander ähnliche Ergebnisse liefern.
+
+In Abbildung \ref{fig:korrelationen-seaice-mean} ist die Streuung der Werte der Meereisausdehnung und der monatsweise gemittelten Positionen des Polarfrontjets dargestellt. Trotz der modellbedingten Unterschiede, die sich durch eine durchgehend nördlichere Positionierung des Polarfrontjets nach Chebyshev auszeichnen, zeigen beide Methoden übereinstimmend einen klaren Trend. Mit abnehmender arktischer Meereisfläche wird dem Jet eine nördlichere Position zugewiesen. Die Korrelationen sind hier für die Chebyshev-Methode \num{-0.198} sowie \num{-0.186} nach Dijkstra. Der p-Wert ist durchweg sehr klein, was für eine hohe Signifikanz für die berechneten schwach negativen Korrelationen spricht. Nicht auszuschließen ist ein saisonaler Einfluss. So liegt das Minimum des Meereises in den Herbstmonaten und das der Jetpositionen im Winter, was allein schon die gefundenen Korrelationen begründen könnte. Hier ist eine Auswertung der Anomalien erforderlich, um den Jahresgang herauszufiltern.
+
+Die Streeung der Werte der Meereisausdehnung und der Standardabweichung der Positionen des Polarfrontjets nach Chebyshev und Dijkstra ist in Abbildung \ref{fig:korrelationen-seaice-sdev} dargestellt. Hier verzeichnet die Dijkstra-Methode wesentlich schwächere Standardabweichungen als die Chebyshev-Methode. Dennoch wird in beiden Methoden übereinstimmend ein schwacher Trend gefunden, der bei abnehmender arktischer Meereisbedeckung geringere Variabilität der Jetstreampositionen. Die Korrelationen liegen bei \num{0.097} nach Chebyshev und bei \num{0.113} nach Dijkstra. Die p-Werte sind erneut niedrig, was wiederum für die Signifikanz der Korrelationen spricht. Jedoch sind diese so niedrig, dass ein Zusammenhang zwischen beiden Größen diskutabel ist.
+
+Die durch die Regression erklärten Varianzen, die sich durch das Quadrat der Korrelationen ausdrücken, liegen bei etwa \SI{4}{\percent} für die Mittelwerte und bei circa \SI{1}{\percent} für die Standardabweichungen. Dies zeigt, dass sich trotz der hohen Signifikanz der Korrelationen diese keinen Zusammenhang zeigen. Da sowohl die Positionen des Polarfrontjets als auch die Ausdehnung des Meereises jahreszeitlichen Schwankungen unterliegen, diese jedoch nicht periodisch schwingen, sollte in künftigen Arbeiten der Jahresgang zur Überprüfung eines Zusammenhangs erst herausgefiltert werden, bevor die Korrelationen errechnet werden. 
+
+\begin{figure} %% Korrelationen Meereisausdehnung und Polarfrontposition Chebyshev
+  \centering
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/08-sea-ice/seaice-cheb-mean}
+  \end{minipage} \\ 
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/08-sea-ice/seaice-dijk-mean}
+  \end{minipage} \\ 
+  \caption[Korrelationen zwischen Ausdehnung des Meereises und Mittelwert der Positionen des Polarfrontjets]{Zusammenhang zwischen der Ausdehnung des arktischen Meereises und dem meridional gemittelten monatlichen Mittelwert der Positionen des Polarfrontjetstreams nach der Chebyshev-Methode (oben) und der Dijkstra-Methode (unten)} \label{fig:korrelationen-seaice-mean}
+\end{figure}
+
+\begin{figure} %% Korrelationen Meereisausdehnung und Polarfrontposition Dijkstra
+  \centering
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/08-sea-ice/seaice-cheb-sdev}
+  \end{minipage} \\ 
+  \begin{minipage}{\textwidth}
+    \centering
+      \includegraphicstikz{../05-visu-pdf-tikz/08-sea-ice/seaice-dijk-sdev}
+  \end{minipage} \\ 
+  \caption[Korrelationen zwischen Ausdehnung des Meereises und Standardabweichung der Positionen des Polarfrontjets]{Zusammenhang zwischen der Ausdehnung des arktischen Meereises und der meridional gemittelten monatlichen Standardabweichung der Positionen des Polarfrontjetstreams nach der Chebyshev-Methode (oben) und der Dijkstra-Methode (unten)} \label{fig:korrelationen-seaice-sdev}
+\end{figure}
+
+\begin{table}[hbt] 
+\caption[Korrelationen zwischen arktischem Meereis und mittlerem Polarfrontjet]{Korrelationen zwischen der Ausdehnung des arktischen Meereises und der meridional gemittelten Position des Polarfrontjetstreams sowie zwischen der Meereisausdehnung und der Standardabweichung der Positionen des Polarfrontjets über alle Meridiane im 95\,\%-Konfidenzintervall.} \label{tab:korrelationen-seeeis}
+\begin{tabularx}{\textwidth}{|X|X|X|X|}
+  \hline
+  Untersuchte Größen & Korrelation & Intervall & p-Wert \\
+  \hline \hline
+  Meereis \& Mittelwert der Positionen nach Chebyshev & \num{-0.198} & \numrange[range-phrase = ;\,]{-0.248}{ -0.147} & $\ll$ \num{0.01} \\
+  \hline
+  Meereis \& Mittelwert der Positionen nach Dijkstra & \num{-0.186} & \numrange[range-phrase = ;\,]{-0.237}{ -0.134} & $\ll$ \num{0.01} \\
+  \hline
+  Meereis \& Standardabweichung der Positionen nach Chebyshev & \num{0.097} & \numrange[range-phrase = ;\,]{0.044}{ 0.149} & $\ll$ \num{0.01} \\
+  \hline
+  Meereis \& Standardabweichung der Positionen nach Dijkstra & \num{0.113} & \numrange[range-phrase = ;\,]{0.060}{ 0.166} & $\ll$ \num{0.01} \\
+  \hline
+\end{tabularx}
+\end{table}

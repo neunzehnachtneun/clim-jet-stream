@@ -74,3 +74,4 @@ Der Seeeis-Datensatz liegt monatsweise (Ein File für Jan, eines für Feb etc.),
 - [ ] Finalisierung der Plots
 - [ ] Konsistenzcheck und Kommentierung des Codes
 - [ ] ~~Bezier-Curves ausprobieren~~
+

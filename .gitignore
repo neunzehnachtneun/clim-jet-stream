@@ -22,3 +22,23 @@ nohup.out
 *.xml
 *.json
 *.Rout
+
+
+# exclude temporary datatypes
+*~
+
+# exclude build files
+*.aux
+*.log
+*.dvi
+*.lof
+*.lot
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+
+# exlude built pdf
+*.pdf
+
