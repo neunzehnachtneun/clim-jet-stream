@@ -16,9 +16,6 @@ Bash-Skripte zum Verarbeiten der Datensätze mittels [cdo](https://code.zmaw.de/
 ### 03-pckg.cheb
 In diesem Ordner befindet sich das für R geschriebene Paket pckg.cheb. Zweck des Packages ist es, über beliebige Datensätze einen Least-Squares-Fit mittels Chebyshev-Polynomen laufen zu lassen und über die ersten beiden Ableitungen dieses Fits die Maxima des Datensatzes zu errechnen.
 
-
-
-
 ## Datei-/Skriptstruktur
 ### a-analyse_monthly_data.r
 Skript zur Untersuchung von saisonalen Änderungen auf der Basis von Monatsmitteln
