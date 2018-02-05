@@ -11,67 +11,25 @@ Die Verzeichnisse und Ordner dieser Arbeit sind hierarchisch gegliedert. Das hei
 ### 00-archiv
 Dateien und Unterordner in diesem Verzeichnis werden lediglich noch temporär als Vorlagen benötigt.
 
-### 01-ecmwf-py
-Die Python-Skripte in diesem Ordner dienen dem automatisierten Download der ERA-40- und ERA-Interim-Datensätze. Hierfür wird ein Account beim ECMWF sowie dessen Python-Paket benötigt.
+### 01-code
+Dieser Ordner enthält den gesamte Quellcode, geschrieben in bash, python und R.
 
-### 02-cdo-bash
-Dieser Ordner beinhaltet bash-Skripte zum Verarbeiten der monats- und/oder jahresweise heruntergeladenen Datensätze der ECMWF-Reanalysen.
-Bash-Skripte zum Verarbeiten der Datensätze mittels [cdo](https://code.zmaw.de/)
-
-### 03-pckg.cheb
-In diesem Ordner befindet sich das für R geschriebene Paket pckg.cheb. Zweck des Packages ist es, über beliebige Datensätze einen Least-Squares-Fit mittels Chebyshev-Polynomen laufen zu lassen und über die ersten beiden Ableitungen dieses Fits die Maxima des Datensatzes zu errechnen.
-
-### 04-data-nc
-Dieser Ordner enthält die mit cdo vorverarbeiteten Datensätzte bestehend aus jeweils dem Mittelwert und der Standardabweichung über unterschiedliche Zeitskalen berechnet aus den täglichen Mittelwerten des kombinierten ERA-40- und ERA-Interim-Datensatz. Diese umfassen:
-1. monatliche Mittelwerte
+### 02-text
+Die tex-Files der Arbeit liegen in diesem Verzeichnis. Als Compiler werden bibtex und lualatex genutzt; pdflatex funktioniert aufgrund der Größe der Abbildungen nicht.
 
 
 ## Datei-/Skriptstruktur
-### a-analyse_monthly_data.r
-Skript zur Untersuchung von saisonalen Änderungen auf der Basis von Monatsmitteln
+### .Rbuildignore
+Hier werden Dateitypen gelistet, die von R ignoriert werden sollen. Wurde von RStudio angelegt und enthält Informationen zum Projektordner.
 
-### aa-monthly_jet_detection.r
-Einlesen des kombinierten ERA-40-Interim-Datensatzes und Anwendung der Jetstream-Detektions-Methoden auf diesen.
+### .gitignore
+Von git ignorierte Dateitypen sind in erster Linie temporäre, Input- und Output-Dateien, wie die Rhistory, große nc-files und kompilierte pdf-Dateien.
 
-### ab-monthly_format_data.r
-Formatierung der Datensätze als dataframe/tibble mit allen zentralen Größen.
+### LICENSE
+Die Arbeit, also Quellcode, Text und Abbildungen sind unter der MIT-Lizenz veröffentlicht. Das bedeutet, dass diese von jeder Person weiterverwendet dürfen.
 
-### ac-visualize_results-case.r
-Visualisierung von stichprobenartigen Einzelfällen für die Plausibilitätsanalyse.
+### README.md
+Diese Datei enthält Beschreibungen und Hinweise zum Umgang mit diesem Repository.
 
-### ad-visualize_results-comp-dijkcheb.r
-Vergleich der beiden Methoden in Streudiagramen und Ellipsen differenziert nach Jettypen.
-
-### ae-visualize_results-hovmoller.r
-Visualisierung von Hovmöllerdiagramen für Positionen und Geschwindigkeiten der mittels Chebyshev- und Dijkstra-Methoden gefundenen polaren und subtropischen Jetstreams.
-
-### d-jetstream_detection_schemes.r
-Verschiedene Routinen zum Auffinden des Jets:
-1. Zonales Maximum des Zonalwindes
-2. Filtern der beiden stärksten zonalen Maxima des Least-Squares-Fits des Zonalwindes
-3. Kürzeste Wegstrecke über Dijkstra-Algorithmus (nach Molnos et al. 2017)
-
-### e-get-orography.r
-Berechnung der Orographie und Einfluss auf zonales Maximum des zonalen Vorticity-Anteils
-> noch nicht fertig
-
-### f-help-functions.r
-Kleine Hilfsfunktionen
-
-### g-citations-bibtex.r
-Ausgabe der bibtex-Zitationen zur Referenzierung dieser im Text der MA.
-
-### h-prepare-seaicedata.r
-Der Seeeis-Datensatz liegt monatsweise (Ein File für Jan, eines für Feb etc.), dieser Datensatz wird hier eingelesen und als csv in einem konsitenten Datensatz übergeben.
-
-## To-Do-Liste
-- [x] Skripte vervollständigen und überprüfen
-- [x] Code PIK implementieren
-- [x] Finalisierung der Methodik
-- [x] Visualisierung erster Ergebnisse
-- [x] Berechnung und Visualisierung von Hovmöller-Diagrammen 
-- [ ] Zusammenhang Jetposition und arktisches Seeeis
-- [ ] Finalisierung der Plots
-- [ ] Konsistenzcheck und Kommentierung des Codes
-- [ ] ~~Bezier-Curves ausprobieren~~
-
+### config.yml
+In dieser Datei sind Design-Richtlinien für https://sebaki.github.io/clim-jet-stream enthalten.
