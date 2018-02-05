@@ -1,0 +1,542 @@
+---
+title: "Klimatologische Analyse der Jetstreams der oberen Troposphäre auf der nördlichen Hemisphäre"
+author: Sebastian Kiefer
+# date: 05. Februar 2018
+output: 
+  ioslides_presentation
+---
+
+## Gliederung
+
+- Motivation
+- Datensatz & Methodik
+- Ergebnisse
+- Technische Umsetzung
+- Fazit und Ausblick
+
+# Motivation
+<!-- ## Motivation -->
+
+
+# Methodik
+
+## Datensätze
+
+Quellen:
+
+- ERA-40-Reanalyse (1957-2002)
+- ERA-Interim-Reanalyse (1979-2017)
+- NOAA-Meereis-Datensatz (1978-2017)
+
+Verarbeitung:
+
+- Monatliche Mittel 
+- T63-Gitter
+
+Einbezogene Größen:
+
+- Zonal- und Meridionalwind
+- Fläche des arktischen Meereises
+
+## Chebyshev-Methode
+
+Konkrete Anwendung:
+
+- Fitten eines Chebyshev-Polynoms 24. Grades an Zonalwind für jeden Längengrad mittels Least-Square-Verfahren
+- Berechnen der ersten und zweiten Ableitung aus den Koeffizienten
+- Finden der Nullstellen der ersten Ableitung mittels Newton-Raphson-Verfahren
+- Überprüfen der zwei stärksten Maxima
+- Nördliches ist als Polarfrontjet, südliches als Subtropenjet klassifiziert
+
+## Chebyshev-Methode
+```{r message=FALSE, echo=FALSE}
+library(lubridate)
+library(magrittr)
+library(dplyr)
+library(reshape2)
+library(zoo)
+library(broom)
+library(ggplot2)
+load("stp-b.RData")
+#load("stp-c.RData")
+
+tb_jets_month <- 
+  tb_jets_month %>%
+  filter(year > 1957) %>%
+  mutate(vv = sqrt(v**2))
+
+# tb_jets_month <- tb_jets_month
+# rm(tb_jets_month)
+
+ggplot(data = filter(tb_uv, year(dts) == 1989, month(dts) == 7, lon == 0),
+       mapping = aes(x = lat, y = u)) + geom_line() +
+  geom_point(data = filter(tb_jets_month, 
+                           year(dts) == 1989, 
+                           month(dts) == 7, 
+                           lon == 0, 
+                           method == "Chebyshev",
+                           class %in% c("PFJ", "STJ")),
+             mapping = aes(x = lat, y = u)) +
+  scale_x_continuous(name = "Breitengrad") +
+  scale_y_continuous(name = "Zonalwindgeschwindigkeit") +
+  theme_bw()
+```
+
+## Chebyshev-Methode
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+map_nh <- map_data("world")
+ggplot(data = tb_uv[which(tb_uv$dts == dts[394]),],
+       mapping = aes(x = lon, y = lat, fill = uv)) +
+  geom_tile() + scale_fill_distiller(palette = "RdYlBu") + 
+  geom_point(data = filter(tb_jets_month, 
+                           year == dts_year[394],
+                           month == dts_month[394],
+                           method == "Chebyshev", 
+                           class != "MJ"),
+    mapping = aes(x = lon, y = lat, shape = factor(class), fill = NULL),
+    fill = "black", size = 1.2, show.legend = TRUE) +
+  labs(shape = "Klasse", fill = "Betrag der hor. Wind- \ngeschwindigkeit") +
+  guides(fill = guide_colourbar(title.position = "top",
+                                direction = "horizontal",
+                                label.position = "bottom"),
+         shape = guide_legend(title.position = "top",
+                              direction = "horizontal",
+                              label.position = "bottom",
+                              nrow = 1)) +
+  scale_x_continuous(name = "Längengrad",
+                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+  scale_y_continuous(name = "Breitengrad",
+                     breaks = c(0, 30, 60, 90)) +
+  geom_polygon(mapping = aes(x = long, y = lat, group = group),
+               data = map_nh, fill = "gray50", alpha = 0.35) +
+  coord_cartesian(xlim = c(-180,180), ylim = c(0,90)) + 
+  theme_bw() + theme(legend.position = "bottom")
+```
+
+## Dijkstra-Methode
+
+
+```{r echo=FALSE,warning=FALSE}
+tb_dijkstra <- tibble(x_point = c(1,3,1,3,2, rep(NA,4)), 
+                      y_point = c(1,1,3,3,5, rep(NA,4)),
+                      x_line = c(3,1,1,2,3,1,3,3,1),
+                      y_line = c(1,1,3,5,3,3,1,3,1))
+ggplot(data = tb_dijkstra,
+       mapping = aes(x = x_point, y = y_point)) + geom_point() +
+  geom_path(mapping = aes(x = x_line, y = y_line)) +
+  theme_bw()
+```
+
+## Dijkstra-Methode
+
+Grundsätzliches Ziel des Dijkstra-Algorithmus:
+
+- findet kürzeste Pfade in Graphen mit über Kanten verbundene Knoten
+
+Konkrete Anwendung in der Jetstream-Detektion
+
+- Gitternetz repräsentiert die Knoten
+- Von jedem Knoten sind nur die umliegenden Knoten über Kanten erreichbar
+- Die Kantengewichte bestimmen sich aus Windstärke, Windrichtung und klimatologischem Mittel
+- Die drei Parameter fließen unterschiedlich stark in die Gewichtung ein
+- Unterscheidung zwischen Polarfront- und subtropischem Jet über Gewichtung
+
+
+Methode entstammt Molnos et al. (2017)
+
+## Dijkstra-Methode
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+map_nh <- map_data("world")
+ggplot(data = tb_uv[which(tb_uv$dts == dts[394]),],
+       mapping = aes(x = lon, y = lat, fill = uv)) +
+  geom_tile() + scale_fill_distiller(palette = "RdYlBu") + 
+  geom_point(data = filter(tb_jets_month, 
+                           year == dts_year[394],
+                           month == dts_month[394],
+                           method == "Dijkstra", 
+                           class != "MJ"),
+    mapping = aes(x = lon, y = lat, shape = factor(class), fill = NULL),
+    fill = "black", size = 1.2, show.legend = TRUE) +
+  labs(shape = "Klasse", fill = "Betrag der hor. Wind- \ngeschwindigkeit") +
+  guides(fill = guide_colourbar(title.position = "top",
+                                direction = "horizontal",
+                                label.position = "bottom"),
+         shape = guide_legend(title.position = "top",
+                              direction = "horizontal",
+                              label.position = "bottom",
+                              nrow = 1)) +
+  scale_x_continuous(name = "Längengrad",
+                      breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+  scale_y_continuous(name = "Breitengrad",
+                     breaks = c(0, 30, 60, 90)) +
+  # geom_polygon(mapping = aes(x = long, y = lat, group = group),
+  #              data = map_nh, fill = "gray50", alpha = 0.35) +
+  geom_polygon(mapping = aes(x = long, y = lat, group = group),
+               data = map_nh, fill = "gray50", alpha = 0.35) +
+  coord_cartesian(xlim = c(-180,180), ylim = c(0,90)) + 
+  theme_bw() + theme(legend.position = "bottom")
+```
+
+## Vergleich der Methoden
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+tb_subset <- 
+  tb_jets_month %>%
+  filter(method == "Dijkstra" & class == "STJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Dijkstra.STJ = lat) %>%
+  arrange(dts, lon)
+
+tb_subset[,7] <- 
+  tb_jets_month %>%
+  filter(method == "Dijkstra" & class == "PFJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Dijkstra.PFJ = lat) %>%
+  arrange(dts, lon) %>%
+  select(Dijkstra.PFJ)
+
+tb_subset[,8] <- 
+  tb_jets_month %>%
+  filter(method == "Dijkstra" & class == "SJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Dijkstra.SJ = lat) %>%
+  arrange(dts, lon) %>%
+  select(Dijkstra.SJ)
+
+tb_subset[,9] <- 
+  tb_jets_month %>%
+  filter(method == "Chebyshev" & class == "STJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Chebyshev.STJ = lat) %>%
+  arrange(dts, lon) %>%
+  select(Chebyshev.STJ)
+
+tb_subset[,10] <- 
+  tb_jets_month %>%
+  filter(method == "Chebyshev" & class == "PFJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Chebyshev.PFJ = lat) %>%
+  arrange(dts, lon) %>%
+  select(Chebyshev.PFJ)
+
+tb_subset[,11] <- 
+  tb_jets_month %>%
+  filter(method == "Chebyshev" & class == "SJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Chebyshev.SJ = lat) %>%
+  arrange(dts, lon) %>%
+  select(Chebyshev.SJ)
+
+tb_subset[,12] <- 
+  tb_jets_month %>%
+  filter(method == "Chebyshev" & class == "MJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Chebyshev.MJ = lat) %>%
+  arrange(dts, lon) %>%
+  select(Chebyshev.MJ)
+
+tb_subset[,13] <- 
+  tb_jets_month %>%
+  filter(method == "Maximum" & class == "MJ") %>%
+  select(dts, year, season, month, lon, lat) %>%
+  rename(Maximum.MJ = lat) %>%
+  arrange(dts, lon) %>%
+  select(Maximum.MJ)
+
+ggplot(data = tb_subset, mapping = aes(x = Chebyshev.PFJ, y = Dijkstra.PFJ)) + 
+  geom_point(size = 0.1, colour = "#d7191c") +
+  geom_density_2d(colour = "black") +  
+  # scale_colour_brewer(palette = "RdYlBu", direction = -1) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dotdash") +
+  scale_x_continuous(name = "Position Chebyshev") +
+  scale_y_continuous(name = "Position Dijkstra") +
+  coord_cartesian(xlim = c(30, 85), ylim = c(35,85)) + 
+  theme_bw()#  + theme(legend.position = NULL)
+  
+```
+
+
+# Ergebnisse
+
+## Mittlerer Zustand
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+  ggplot(data = tb_jets_month %>%
+           # filter(season == "DJF") %>%
+           filter(method == "Chebyshev") %>%
+           filter(class %in% c("PFJ", "SJ")),
+       mapping = aes(x = lon, y = lat)) +
+  geom_density_2d(aes(colour = "#d7191c")) +
+  geom_density_2d(data = tb_jets_month %>%
+           # filter(season == "DJF") %>%
+           filter(method == "Chebyshev") %>%
+           filter(class %in% c("STJ", "SJ")),
+           mapping = aes(colour = "#2c7bb6")) +
+  scale_x_continuous(name = "Längengrad",
+                     breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+  scale_y_continuous(name = "Breitengrad",
+                     breaks = c(0, 30, 60, 90)) +
+  coord_cartesian(xlim = c(-180,180), ylim = c(0,90)) +
+  geom_polygon(mapping = aes(x = long, y = lat, group = group),
+               data = map_nh, fill = "gray50", alpha = 0.35) +
+  # scale_x_continuous(name = "Längengrad") +
+  # scale_y_continuous(name = "Breitengrad") +
+  theme_bw() + theme(legend.position = "none")
+
+```
+
+
+## Mittlerer Zustand
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+  ggplot(data = tb_jets_month %>%
+           # filter(season == "DJF") %>%
+           filter(method == "Dijkstra") %>%
+           filter(class %in% c("PFJ", "SJ")),
+       mapping = aes(x = lon, y = lat)) +
+  geom_density_2d(aes(colour = "#d7191c")) +
+  geom_density_2d(data = tb_jets_month %>%
+           # filter(season == "DJF") %>%
+           filter(method == "Dijkstra") %>%
+           filter(class %in% c("STJ", "SJ")),
+           mapping = aes(colour = "#2c7bb6")) +
+  scale_x_continuous(name = "Längengrad",
+                     breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+  scale_y_continuous(name = "Breitengrad",
+                     breaks = c(0, 30, 60, 90)) +
+  coord_cartesian(xlim = c(-180,180), ylim = c(0,90)) +
+  geom_polygon(mapping = aes(x = long, y = lat, group = group),
+               data = map_nh, fill = "gray50", alpha = 0.35) +
+  # scale_x_continuous(name = "Längengrad") +
+  # scale_y_continuous(name = "Breitengrad") +
+  theme_bw() + theme(legend.position = "none")
+
+```
+
+## Zeitliche Entwicklung
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+tb_subset.yr.mean <-
+  tb_jets_month %>%
+  filter(class != "MJ") %>%
+  select(year, season, method, class, lon, lat, u, v, vv) %>%
+  group_by(method, class, year) %>%
+  summarise_at(.vars = vars(lat, u, v, vv), .funs = funs("mean", mean, mean(., na.rm = TRUE)))
+
+ggplot(data = tb_subset.yr.mean %>%
+         filter(class == "PFJ"),
+       mapping = aes(x = year, y = lat_mean, 
+                     shape = method))  + geom_point() + 
+  stat_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x,
+              se = TRUE, level = 0.95) +
+  labs(shape = "Methode", color = "Lineares Modell") +
+  guides(shape = guide_legend(order = 1,
+                              title.position = "top", 
+                              reverse = TRUE),
+         colour = guide_legend(order = 2,
+                               title.position = "top", 
+                               reverse = TRUE)) +     
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Breitengrad",
+                     breaks = c(50, 55, 60, 65, 70)) +
+  theme_bw() + theme(legend.position = "bottom")
+
+```
+
+
+## Zeitliche Entwicklung
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+ggplot(data = tb_subset.yr.mean %>%
+         filter(class == "PFJ"),
+       mapping = aes(x = year, y = u_mean, 
+                     shape = method))  + geom_point() + 
+  stat_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x,
+              se = TRUE, level = 0.95) +
+  labs(shape = "Methode", color = "Lineares Modell") +
+  guides(shape = guide_legend(order = 1,
+                              title.position = "top", 
+                              reverse = TRUE),
+         colour = guide_legend(order = 2,
+                               title.position = "top", 
+                               reverse = TRUE)) +     
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Zonalwind") +
+  theme_bw() + theme(legend.position = "bottom")
+
+```
+
+
+## Zeitliche Entwicklung
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+ggplot(data = tb_subset.yr.mean %>%
+         filter(class == "PFJ"),
+       mapping = aes(x = year, y = vv_mean, 
+                     shape = method))  + geom_point() + 
+  stat_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x,
+              se = TRUE, level = 0.95) +
+  labs(shape = "Methode", color = "Lineares Modell") +
+  guides(shape = guide_legend(order = 1,
+                              title.position = "top", 
+                              reverse = TRUE),
+         colour = guide_legend(order = 2,
+                               title.position = "top", 
+                               reverse = TRUE)) +     
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Betrag des Meridionalwindes") +
+  theme_bw() + theme(legend.position = "bottom")
+
+```
+
+
+## Hovmöller-Diagramm Winter
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+tb_subset.mean <-
+  tb_jets_month %>%
+  filter(class != "MJ") %>%
+  select(year, season, method, class, lon, lat, u, v) %>%
+  group_by(method, class, year, season, lon) %>%
+  summarise_all(funs("mean", mean, mean(., na.rm = TRUE)))
+rollmean5 <- function(data) rollapply(data, 5, mean, na.rm = TRUE, fill = NA, partial = TRUE)
+tb_subset.rollmean <-
+  tb_subset.mean %>%
+  group_by(method, class, season, lon) %>%
+  mutate_at(.vars = vars(lat_mean, u_mean, v_mean), .funs = funs("rollmean5", rollmean5, rollmean5(.)))
+
+  ggplot(data = tb_subset.rollmean %>%
+           filter(method == "Chebyshev", class == "PFJ", season == "DJF"),
+         mapping = aes(x = lon, y = year, fill = lat_mean_rollmean5)) +
+  geom_tile() + scale_fill_distiller(palette = "RdYlBu", 
+                                     direction = 1,
+                                     limits = c(40,80)) +
+  labs(fill = "Breitengrad") +
+  guides(fill = guide_colourbar(title.position = "left",
+                                direction = "horizontal",
+                                label.position = "bottom")) +
+  scale_x_continuous(name = "Längengrad",
+                     breaks = c(-180, -135, -90, -45, 0, 45, 90, 135, 180)) +
+  scale_y_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  theme_bw() + theme(legend.position = "bottom")
+
+
+```
+
+
+
+
+# Technische Umsetzung
+## Technische Umsetzung
+
+```{r message=FALSE}
+### <b>
+## Laden wichtiger Pakete
+library(ncdf4)
+library(lubridate)
+library(parallel); library(foreach); library(doParallel)
+library(magrittr); library(dplyr); library(reshape2)
+library(zoo)
+library(broom)
+library(ggplot2); library(tikzDevice)
+### </b>
+```
+https://www.github.com/sebaki/clim-jet-stream/
+
+# Fazit und Ausblick
+
+# Danke für Eure/Ihre Aufmerksamkeit!
+
+# Zusatzmaterial
+
+## Variabilitäts-Trends
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+tb_subset.yr.sdev <-
+  tb_jets_month %>%
+  filter(class != "MJ") %>%
+  select(year, method, class, lon, lat, u, v, vv) %>%
+  group_by(method, class, year) %>%
+  summarise_at(.vars = vars(lat, u, v, vv), .funs = funs("sd", sd, sd(., na.rm = TRUE)))
+
+  ggplot(data = tb_subset.yr.sdev %>%
+           filter(class == "PFJ"),
+         mapping = aes(x = year, y = lat_sd, 
+                       shape = method))  + geom_point() + 
+  geom_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x) +
+  labs(shape = "Methode", color = "Lineares Modell") +
+  guides(shape = guide_legend(order = 1,
+                              title.position = "top", 
+                              reverse = TRUE),
+         colour = guide_legend(order = 2,
+                               title.position = "top", 
+                               reverse = TRUE)) +  
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Breitengrad in\n$^{\\circ}$nördlicher Breite") +
+  theme_bw() + theme(legend.position = "bottom")
+
+```
+
+## Variabilitäts-Trends
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+
+
+  
+
+
+  ggplot(data = tb_subset.yr.sdev %>%
+           filter(class == "PFJ"),
+         mapping = aes(x = year, y = u_sd, 
+                       shape = method))  + geom_point() + 
+  geom_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x) +
+  labs(shape = "Methode", color = "Lineares Modell") +
+  guides(shape = guide_legend(order = 1,
+                              title.position = "top", 
+                              reverse = TRUE),
+         colour = guide_legend(order = 2,
+                               title.position = "top", 
+                               reverse = TRUE)) +  
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Zonalwind in $m\\,s^{-1}$") +
+  theme_bw() + theme(legend.position = "bottom")
+  
+
+```
+
+## Variabilitäts-Trends
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+
+
+  ggplot(data = tb_subset.yr.sdev %>%
+           filter(class == "PFJ"),
+         mapping = aes(x = year, y = vv_sd, 
+                       shape = method))  + geom_point() + 
+  geom_smooth(mapping = aes(color = method),
+              method = "lm", formula = y ~ x) +
+  labs(shape = "Methode", color = "Lineares Modell") +
+  guides(shape = guide_legend(order = 1,
+                              title.position = "top", 
+                              reverse = TRUE),
+         colour = guide_legend(order = 2,
+                               title.position = "top", 
+                               reverse = TRUE)) +  
+  scale_x_continuous(name = "Jahr",
+                     breaks = c(1960, 1970, 1980, 1990, 2000, 2010)) +
+  scale_y_continuous(name = "Meridionalwind in $m\\,s^{-1}$") +
+  theme_bw() + theme(legend.position = "bottom")
+
+
+```
+
+
