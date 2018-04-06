@@ -139,30 +139,30 @@ find_jets_via_chebpoly_2d <- function(matrix_u, matrix_v, matrix_z,
   
   ## Überprüfen, ob Jets weiter als 10 Grad auseinanderliegen.
   ## Falls nicht, Annahme für Single-Jetstream
-  SJS_index <- which(sqrt((PFJ_lat - STJ_lat)**2) < threshold_single_jet)
-  
-  SJS_lat <- rep(NA, n_axis_x); 
-  SJS_u <- SJS_lat; SJS_v <- SJS_lat; SJS_z <- SJS_lat
-  
-  if (length(SJS_index) != 0) {
-    ## Nehme Mittelwert der beiden Werte
-    SJS_lat[SJS_index]  <- apply(cbind(PFJ_lat[SJS_index], STJ_lat[SJS_index]), 1, mean)
-    SJS_u[SJS_index]    <- apply(cbind(PFJ_u[SJS_index], STJ_u[SJS_index]), 1, mean)
-    SJS_v[SJS_index]    <- apply(cbind(PFJ_v[SJS_index], STJ_v[SJS_index]), 1, mean)
-    SJS_z[SJS_index]    <- apply(cbind(PFJ_z[SJS_index], STJ_z[SJS_index]), 1, mean)
-    
-    ## Setze korrespondierende PFJ.* und STJ.* gleich NA
-    PFJ_lat[SJS_index] <- NA;  PFJ_u[SJS_index]   <- NA
-    PFJ_v[SJS_index]   <- NA;  PFJ_v[SJS_index]   <- NA
-    STJ_lat[SJS_index] <- NA;  STJ_u[SJS_index]   <- NA
-    STJ_v[SJS_index]   <- NA;  STJ_z[SJS_index]   <- NA
-  }
+  # SJS_index <- which(sqrt((PFJ_lat - STJ_lat)**2) < threshold_single_jet)
+  # 
+  # SJS_lat <- rep(NA, n_axis_x); 
+  # SJS_u <- SJS_lat; SJS_v <- SJS_lat; SJS_z <- SJS_lat
+  # 
+  # if (length(SJS_index) != 0) {
+  #   ## Nehme Mittelwert der beiden Werte
+  #   SJS_lat[SJS_index]  <- apply(cbind(PFJ_lat[SJS_index], STJ_lat[SJS_index]), 1, mean)
+  #   SJS_u[SJS_index]    <- apply(cbind(PFJ_u[SJS_index], STJ_u[SJS_index]), 1, mean)
+  #   SJS_v[SJS_index]    <- apply(cbind(PFJ_v[SJS_index], STJ_v[SJS_index]), 1, mean)
+  #   SJS_z[SJS_index]    <- apply(cbind(PFJ_z[SJS_index], STJ_z[SJS_index]), 1, mean)
+  #   
+  #   ## Setze korrespondierende PFJ.* und STJ.* gleich NA
+  #   PFJ_lat[SJS_index] <- NA;  PFJ_u[SJS_index]   <- NA
+  #   PFJ_v[SJS_index]   <- NA;  PFJ_v[SJS_index]   <- NA
+  #   STJ_lat[SJS_index] <- NA;  STJ_u[SJS_index]   <- NA
+  #   STJ_v[SJS_index]   <- NA;  STJ_z[SJS_index]   <- NA
+  # }
   
   ## Übergabe der Variablen ## "all.max.lat" = array.lat, # "all.max.u" = array.u,
   list_model_jet <- list("MaxJ_lat" = MaxJ_lat, # "MaxJ_u" = MaxJ_u,
                          "PFJ_lat" = PFJ_lat, "PFJ_u" = PFJ_u, "PFJ_v" = PFJ_v, "PFJ_z" = PFJ_z,
-                         "STJ_lat" = STJ_lat, "STJ_u" = STJ_u, "STJ_v" = STJ_v, "STJ_z" = STJ_z,
-                         "SJS_lat" = SJS_lat, "SJS_u" = SJS_u, "SJS_v" = SJS_u, "SJS_z" = SJS_z)
+                         "STJ_lat" = STJ_lat, "STJ_u" = STJ_u, "STJ_v" = STJ_v, "STJ_z" = STJ_z) #,
+                         # "SJS_lat" = SJS_lat, "SJS_u" = SJS_u, "SJS_v" = SJS_u, "SJS_z" = SJS_z)
   return(list_model_jet)
 }
 
@@ -274,26 +274,26 @@ find_jets_via_dijkstra_2d <- function(matrix_u, matrix_v,
   
   ## Überprüfen, ob Jets weiter als 10 Grad auseinanderliegen.
   ## Falls nicht, Annahme für Single-Jetstream
-  SJS_index <- which(sqrt((PFJ_lat - STJ_lat)**2) < threshold_single_jet)
-  
-  SJS_lat <- rep(NA, nrow(matrix_u)); 
-  SJS_u <- SJS_lat; SJS_v <- SJS_lat; SJS_z <- SJS_lat
-  
-  if (length(SJS_index) != 0) {
-    ## Nehme Mittelwert der beiden Werte
-    SJS_lat[SJS_index]  <- apply(cbind(PFJ_lat[SJS_index], STJ_lat[SJS_index]), 1, mean)
-    SJS_u[SJS_index]    <- apply(cbind(PFJ_u[SJS_index], STJ_u[SJS_index]), 1, mean)
-    SJS_v[SJS_index]    <- apply(cbind(PFJ_v[SJS_index], STJ_v[SJS_index]), 1, mean)
-
-    ## Setze korrespondierende PFJ.* und STJ.* gleich NA
-    PFJ_lat[SJS_index] <- NA;  PFJ_u[SJS_index]   <- NA;  PFJ_v[SJS_index]   <- NA;  
-    STJ_lat[SJS_index] <- NA;  STJ_u[SJS_index]   <- NA;  STJ_v[SJS_index]   <- NA;  
-  }
+  # SJS_index <- which(sqrt((PFJ_lat - STJ_lat)**2) < threshold_single_jet)
+  # 
+  # SJS_lat <- rep(NA, nrow(matrix_u)); 
+  # SJS_u <- SJS_lat; SJS_v <- SJS_lat; SJS_z <- SJS_lat
+  # 
+  # if (length(SJS_index) != 0) {
+  #   ## Nehme Mittelwert der beiden Werte
+  #   SJS_lat[SJS_index]  <- apply(cbind(PFJ_lat[SJS_index], STJ_lat[SJS_index]), 1, mean)
+  #   SJS_u[SJS_index]    <- apply(cbind(PFJ_u[SJS_index], STJ_u[SJS_index]), 1, mean)
+  #   SJS_v[SJS_index]    <- apply(cbind(PFJ_v[SJS_index], STJ_v[SJS_index]), 1, mean)
+  # 
+  #   ## Setze korrespondierende PFJ.* und STJ.* gleich NA
+  #   PFJ_lat[SJS_index] <- NA;  PFJ_u[SJS_index]   <- NA;  PFJ_v[SJS_index]   <- NA;  
+  #   STJ_lat[SJS_index] <- NA;  STJ_u[SJS_index]   <- NA;  STJ_v[SJS_index]   <- NA;  
+  # }
   
   # Übergabe der Variablen
   list_model_jet <- list("PFJ_lat" = PFJ_lat, "PFJ_u" = PFJ_u, "PFJ_v" = PFJ_v, "PFJ_z" = PFJ_z,
-                         "STJ_lat" = STJ_lat, "STJ_u" = STJ_u, "STJ_v" = STJ_v, "STJ_z" = STJ_z,
-                         "SJS_lat" = SJS_lat, "SJS_u" = SJS_u, "SJS_v" = SJS_u, "SJS_z" = SJS_z)
+                         "STJ_lat" = STJ_lat, "STJ_u" = STJ_u, "STJ_v" = STJ_v, "STJ_z" = STJ_z) #,
+                         # "SJS_lat" = SJS_lat, "SJS_u" = SJS_u, "SJS_v" = SJS_u, "SJS_z" = SJS_z)
   return(list_model_jet)
 }
 

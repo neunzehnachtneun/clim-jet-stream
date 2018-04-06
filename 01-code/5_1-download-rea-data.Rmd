@@ -1,0 +1,109 @@
+---
+title: "Download ERA-Reanalysis-Datasets"
+output: html_document
+---
+
+## Local Setup
+```{r setup, include = TRUE}
+library(knitr)
+opts_chunk$set(eval = FALSE, echo = TRUE, message = FALSE, warning = FALSE, error = FALSE)
+opts_chunk$set(engine.path = "~/miniconda3/envs/py27/bin/python")
+library(reticulate)
+knitr::knit_engines$set(python = eng_python)
+```
+
+
+## Set Python Environment And Import Libraries
+```{python, eval = TRUE}
+import sys
+print(sys.version)
+
+import datetime as dt
+import numpy as np
+from ecmwfapi import ECMWFDataServer
+```
+
+
+## Download ERA-40-Datasets By Year
+```{python, eval = TRUE}
+server = ECMWFDataServer()
+save_dir = "/automount/agh/Projects/skiefer/02-raw-by-year/"
+year_first = 1958
+year_last = 1978
+years_vec = np.arange(year_first, (year_last + 1))
+print(years_vec)
+```
+
+```{python, eval = TRUE, results = 'hide'}
+for i in range(len(years_vec)):
+    print(years_vec[i])
+    date_loop = str(dt.date(years_vec[i], 1, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 2, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 3, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 4, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 5, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 6, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 7, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 8, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 9, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 10, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 11, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 12, 1).strftime('%Y%m%d'))
+    target_loop = save_dir+str(years_vec[i])+'-e4.nc'
+    server.retrieve({
+        "class": "e4",
+        "dataset": "era40",
+        "format": "netcdf",
+        "date": date_loop,
+        "grid": "1.00/1.00",
+        "levelist": "100/150/200/250/300/400/500",
+        "levtype": "pl",
+        "param": "129.128/130.128/131.128/132.128/135.128/155.128",
+        "step": "0",
+        "stream": "moda",
+        "type": "an",
+        "target": target_loop
+    })
+```
+
+
+## Download ERA-Interim-Datasets By Year
+```{python, eval = TRUE}
+year_first = 1979
+year_last = 2017
+years_vec = np.arange(year_first, (year_last + 1))
+print(years_vec)
+```
+
+```{python, eval = TRUE, results = 'hide'}
+for i in range(len(years_vec)):
+    print(years_vec[i])
+    date_loop = str(dt.date(years_vec[i], 1, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 2, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 3, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 4, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 5, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 6, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 7, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 8, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 9, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 10, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 11, 1).strftime('%Y%m%d')) + '/' + \
+        str(dt.date(years_vec[i], 12, 1).strftime('%Y%m%d'))
+    target_loop = save_dir+str(years_vec[i])+'-ei.nc'
+    server.retrieve({
+        "class": "ei",
+        "dataset": "interim",
+        "format": "netcdf",
+        "date": date_loop,
+        "grid": "1.00/1.00",
+        "levelist": "100/125/150/175/200/225/250/300/350/400/450/500",
+        "levtype": "pl",
+        "param": "129.128/130.128/131.128/132.128/135.128/155.128",
+        "step": "0",
+        "stream": "moda",
+        "type": "an",
+        "target": target_loop
+    })
+```
+

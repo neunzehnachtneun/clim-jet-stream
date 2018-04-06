@@ -1,0 +1,96 @@
+---
+title: "Format ERA-Reanalysis-Datasets"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Show downloaded raw data
+```{bash}
+cd /automount/agh/Projects/skiefer/01-raw-by-year-data/
+# ls
+```
+
+
+## Process ERA-40 raw data into continuously dataset
+```{bash}
+cd /automount/agh/Projects/skiefer/01-raw-by-year-data/
+# ncdump -h 1958-e4.nc
+cdo -b F32 -mergetime *e4.nc ../02-processed-data/a-e4-1deg-1958-1978.nc
+cdo -sinfo ../02-processed-data/a-e4-1deg-1958-1978.nc
+cdo -pardes ../02-processed-data/a-e4-1deg-1958-1978.nc
+```
+
+
+## Process ERA-Interim raw data into continuously dataset
+```{bash}
+cd /automount/agh/Projects/skiefer/01-raw-by-year-data/
+# ncdump -h 1979-ei.nc
+cdo -b F32  -mergetime *ei.nc ../02-processed-data/a-ei-1deg-1979-2017.nc
+cdo -sinfo ../02-processed-data/a-ei-1deg-1979-2017.nc
+cdo -pardes ../02-processed-data/a-ei-1deg-1979-2017.nc
+```
+
+
+## Extract searched parameters and northern hemisphere 
+```{bash}
+cd /automount/agh/Projects/skiefer/02-processed-data/
+# ls
+cdo -invertlat -sellonlatbox,0,360,90,0 -selname,z,t,u,v a-e4-1deg-1958-1978.nc a-e4-1deg-1958-1978-ztuv.nc
+cdo -sinfo a-e4-1deg-1958-1978-ztuv.nc
+cdo -pardes a-e4-1deg-1958-1978-ztuv.nc
+cdo -invertlat -sellonlatbox,0,360,90,0 -selname,z,t,u,v a-ei-1deg-1979-2017.nc a-ei-1deg-1979-2017-ztuv.nc
+cdo -sinfo a-ei-1deg-1979-2017-ztuv.nc
+cdo -pardes a-ei-1deg-1979-2017-ztuv.nc
+```
+
+
+## Homogenize vertical resolution of datasets to get original dataset (ERA-Interim extended with ERA-40 on T63-grid)
+```{bash}
+cd /automount/agh/Projects/skiefer/02-processed-data/
+# ls
+cdo -sellevel,100,150,200,250,300,400,500 a-e4-1deg-1958-1978-ztuv.nc b-e4-1deg-1958-1978-ztuv.nc
+cdo -sellevel,100,150,200,250,300,400,500 a-ei-1deg-1979-2017-ztuv.nc b-ei-1deg-1979-2017-ztuv.nc
+cdo -b F32 mergetime b-e4-1deg-1958-1978-ztuv.nc b-ei-1deg-1979-2017-ztuv.nc b-e4ei-1deg-1958-2017-ztuv.nc
+cdo -remapbil,t63grid b-e4ei-1deg-1958-2017-ztuv.nc b-e4ei-t63-1958-2017-ztuv.nc
+```
+
+
+## Delete obsolete temporary files
+```{bash}
+cd /automount/agh/Projects/skiefer/02-processed-data/
+rm a-e4-1deg-1958-1978.nc a-ei-1deg-1979-2017.nc 
+rm b-e4-1deg-1958-1978-ztuv.nc b-ei-1deg-1979-2017-ztuv.nc
+rm b-e4ei-1deg-1958-2017-ztuv.nc
+```
+
+
+## Show original dataset
+```{bash}
+cd /automount/agh/Projects/skiefer/02-processed-data/
+ls -lht
+cdo -sinfo b-e4ei-t63-1958-2017-ztuv.nc
+# cdo griddes b-e4ei-1deg-1958-2017.nc
+# cdo pardes b-e4ei-1deg-1958-2017.nc
+```
+
+
+## Show ERA-40-dataset with higher spatial and vertical resolution
+```{bash}
+cd /automount/agh/Projects/skiefer/02-processed-data/
+cdo -sinfo a-e4-1deg-1958-1978-ztuv.nc
+cdo -griddes a-e4-1deg-1958-1978-ztuv.nc
+cdo -pardes a-e4-1deg-1958-1978-ztuv.nc
+```
+
+
+## Show ERA-Interim-dataset with higher spatial and vertical resolution
+```{bash}
+cd /automount/agh/Projects/skiefer/02-processed-data/
+cdo -sinfo a-ei-1deg-1979-2017-ztuv.nc
+cdo -griddes a-ei-1deg-1979-2017-ztuv.nc
+cdo -pardes a-ei-1deg-1979-2017-ztuv.nc
+```

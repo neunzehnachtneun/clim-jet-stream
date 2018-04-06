@@ -11,12 +11,13 @@
 
 
 #' Setzen des Working Directories
-setwd("~/01-Master-Thesis/02-code-git/01-code/")
+setwd("~/01-Master-Thesis/01-code-git/01-code/")
 #' Setzen des Verzeichnisses zum Speichern von Abbildungen
 save_dir <- "../03-visu/"
 
 
 #' Laden wichtiger Pakete -----------------------------------------------------------------------------------
+library(abind)
 library(ncdf4)
 library(ChebyshevMax)
 library(rootSolve)
@@ -31,7 +32,7 @@ library(reshape2)
 library(zoo)
 library(broom)
 library(ggplot2)
-library(tikzDevice)
+# library(tikzDevice)
 # library(styler)
 # library(lintr)
 
@@ -47,7 +48,7 @@ bound_lower_chebyshev <- 20
 bound_upper_chebyshev <- 80
 order_polynomial_fit <- 24
 threshold_single_jet <- 10
-n_cluster <- 16
+n_cluster <- 2 #16
 
   
 #' Eigenständige (!) Vor-Routinen ---------------------------------------------------------------------------
@@ -58,7 +59,8 @@ n_cluster <- 16
 
 #' Sourcen von Haupt-Routinen im Workflow -------------------------------------------------------------------
 #'
-source("1_05_read_era_data.R")
+# source("1_05_read_era_data_T63.R")
+source("1_05_read_era_data_1deg.R")
 source("1_06_apply_jet_detection_on_data.R")
 save.image("stp-a.RData"); load("stp-a.RData")
 source("1_07_format_tidy_data.R")
