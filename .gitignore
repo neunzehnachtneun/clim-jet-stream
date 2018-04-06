@@ -22,7 +22,9 @@ nohup.out
 *.xml
 *.json
 *.Rout
-
+*.eps
+*.jpg
+*.png
 
 # exclude temporary datatypes
 *~
@@ -41,4 +43,5 @@ nohup.out
 
 # exlude built pdf
 *.pdf
+*.html
 
