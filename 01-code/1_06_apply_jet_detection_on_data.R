@@ -24,7 +24,7 @@ registerDoParallel(cl_fork_2)
 m2 <- foreach(t_stp = 1:length(dts)) %dopar% {
   find_jets_via_chebpoly_2d(matrix_u = u[,, pressure_level, t_stp], 
                             matrix_v = v[,, pressure_level, t_stp],
-                            matrix_z = z[,, pressure_level, t_stp],
+#                           matrix_z = z[,, pressure_level, t_stp],
                             axis_x = lon, axis_y = lat, 
                             bound_lower = bound_lower_chebyshev, 
                             bound_upper = bound_upper_chebyshev,
@@ -38,16 +38,21 @@ stopCluster(cl_fork_2); rm(cl_fork_2)
 cl_psock_1 <- makeCluster(n_cluster, type = "PSOCK")
 registerDoParallel(cl_psock_1)
 m3 <- foreach(t_stp = 1:length(dts), .packages = "igraph") %dopar% {
-  find_jets_via_dijkstra_2d(matrix_u = u[,, pressure_level, t_stp], 
-                            matrix_v = v[,, pressure_level, t_stp], 
-                            axis_x = lon, axis_y = lat, 
+  find_jets_via_dijkstra_2d(matrix_u = u_cast[,,t_stp], 
+                            matrix_v = v_cast[,,t_stp], 
+                            axis_x = lon, 
+                            axis_y = lat, 
                             season = dts_cold_warm[t_stp],
                             threshold_single_jet = threshold_single_jet) }
 stopCluster(cl_psock_1); rm(cl_psock_1)
 
-
-## ZWISCHENSPEICHERN DER WERTE DES DATENSATZES ####
-# Speichern
-save.image("stp-a.RData")
-
-## ENDE ENDE ENDE ####
+# 
+# 
+# ## ENDE ENDE ENDE ####
+# 
+# test <- find_jets_via_dijkstra_2d(matrix_u = u_cast[,, t_stp], 
+#                                   matrix_v = v_cast[,, t_stp], 
+#                                   axis_x = lon, 
+#                                   axis_y = lat, 
+#                                   season = dts_cold_warm[t_stp],
+#                                   threshold_single_jet = threshold_single_jet)

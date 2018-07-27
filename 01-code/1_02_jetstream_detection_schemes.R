@@ -35,7 +35,7 @@ find_jet_via_maximum_2d <- function(matrix, axis) {
 
 ## Methode 2: Polynomfit des Zonalwinds in Merdionalrichtung im Sektor [20,85]
 ## Übergebene Variablen: Alle gefundenen Maxima, globales Maximum, zwei lokale Maxima in Sektor
-find_jets_via_chebpoly_2d <- function(matrix_u, matrix_v, matrix_z,
+find_jets_via_chebpoly_2d <- function(matrix_u, matrix_v, matrix_z = array(NA, dim = dim(matrix_u)),
                                       axis_x, axis_y,
                                       bound_lower, bound_upper,
                                       order_polyfit, threshold_single_jet = 10) {

@@ -38,11 +38,11 @@ m2c_STJ_lat <- sapply(m2, "[[", "STJ_lat"); colnames(m2c_STJ_lat) <- dts; rownam
 m2c_STJ_u   <- sapply(m2, "[[", "STJ_u");   colnames(m2c_STJ_u)   <- dts; rownames(m2c_STJ_u)   <- lon;
 m2c_STJ_v   <- sapply(m2, "[[", "STJ_v");   colnames(m2c_STJ_v)   <- dts; rownames(m2c_STJ_v)   <- lon;
 m2c_STJ_z   <- sapply(m2, "[[", "STJ_z");   colnames(m2c_STJ_z)   <- dts; rownames(m2c_STJ_z)   <- lon;
-## Single-Jetstream
-m2c_SJS_lat <- sapply(m2, "[[", "SJS_lat"); colnames(m2c_SJS_lat) <- dts; rownames(m2c_SJS_lat) <- lon;
-m2c_SJS_u   <- sapply(m2, "[[", "SJS_u");   colnames(m2c_SJS_u)   <- dts; rownames(m2c_SJS_u)   <- lon;
-m2c_SJS_v   <- sapply(m2, "[[", "SJS_v");   colnames(m2c_SJS_v)   <- dts; rownames(m2c_SJS_v)   <- lon;
-m2c_SJS_z   <- sapply(m2, "[[", "SJS_z");   colnames(m2c_SJS_z)   <- dts; rownames(m2c_SJS_z)   <- lon;
+# ## Single-Jetstream
+# m2c_SJS_lat <- sapply(m2, "[[", "SJS_lat"); colnames(m2c_SJS_lat) <- dts; rownames(m2c_SJS_lat) <- lon;
+# m2c_SJS_u   <- sapply(m2, "[[", "SJS_u");   colnames(m2c_SJS_u)   <- dts; rownames(m2c_SJS_u)   <- lon;
+# m2c_SJS_v   <- sapply(m2, "[[", "SJS_v");   colnames(m2c_SJS_v)   <- dts; rownames(m2c_SJS_v)   <- lon;
+# m2c_SJS_z   <- sapply(m2, "[[", "SJS_z");   colnames(m2c_SJS_z)   <- dts; rownames(m2c_SJS_z)   <- lon;
 
 ## Dijkstra
 ## Polarfrontjet
@@ -53,10 +53,10 @@ m3_PFJ_v    <- sapply(m3, "[[", "PFJ_v");   colnames(m3_PFJ_v)   <- dts; rowname
 m3_STJ_lat  <- sapply(m3, "[[", "STJ_lat"); colnames(m3_STJ_lat) <- dts; rownames(m3_STJ_lat) <- lon;
 m3_STJ_u    <- sapply(m3, "[[", "STJ_u");   colnames(m3_STJ_u)   <- dts; rownames(m3_STJ_u)   <- lon;
 m3_STJ_v    <- sapply(m3, "[[", "STJ_v");   colnames(m3_STJ_v)   <- dts; rownames(m3_STJ_v)   <- lon;
-## Single-Jetstream
-m3_SJS_lat  <- sapply(m3, "[[", "SJS_lat"); colnames(m3_SJS_lat) <- dts; rownames(m3_SJS_lat) <- lon;
-m3_SJS_u    <- sapply(m3, "[[", "SJS_u");   colnames(m3_SJS_u)   <- dts; rownames(m3_SJS_u)   <- lon;
-m3_SJS_v    <- sapply(m3, "[[", "SJS_v");   colnames(m3_SJS_v)   <- dts; rownames(m3_SJS_v)   <- lon;
+# ## Single-Jetstream
+# m3_SJS_lat  <- sapply(m3, "[[", "SJS_lat"); colnames(m3_SJS_lat) <- dts; rownames(m3_SJS_lat) <- lon;
+# m3_SJS_u    <- sapply(m3, "[[", "SJS_u");   colnames(m3_SJS_u)   <- dts; rownames(m3_SJS_u)   <- lon;
+# m3_SJS_v    <- sapply(m3, "[[", "SJS_v");   colnames(m3_SJS_v)   <- dts; rownames(m3_SJS_v)   <- lon;
 
 ## MELTEN DER DATENSÄTZE (RESHAPE2::MELT) FÜR GGPLOT2 ####
 ## Maximaljet max()
@@ -131,13 +131,13 @@ df_jets_month <- merge(df_jets_month, df_sea_ice,
 df_jets_month <- df_jets_month[order(df_jets_month$dts, df_jets_month$lon),]
 
 
-## U-V-Datensatz ####
-# Melten
-df_uv <- melt(u[,,pressure_level,], varnames = c("lon", "lat", "dts"), value.name = "u")
-df_uv$dts <- rep(dts, each = n_lon*n_lat)
-df_uv$v <- melt(data = v[,,pressure_level,])$value
-df_uv$uv <- sqrt( df_uv$u ** 2 + df_uv$v ** 2 )
-df_uv$z <- melt(data = z[,,pressure_level,])$value
+# ## U-V-Datensatz ####
+# # Melten
+# df_uv <- melt(u[,,pressure_level,], varnames = c("lon", "lat", "dts"), value.name = "u")
+# df_uv$dts <- rep(dts, each = n_lon*n_lat)
+# df_uv$v <- melt(data = v[,,pressure_level,])$value
+# # df_uv$uv <- sqrt( df_uv$u ** 2 + df_uv$v ** 2 )
+# # df_uv$z <- melt(data = z[,,pressure_level,])$value
 
 
 ## DATAFRAMES ALS TIBBLES ####
